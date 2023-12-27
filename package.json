@@ -1,0 +1,51 @@
+{
+  "name": "utyme",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "@t3-oss/env-nuxt": "^0.7.1",
+    "@trpc/client": "^10.9.0",
+    "@trpc/server": "^10.9.0",
+    "eslint-plugin-nuxt": "^4.0.0",
+    "eslint-ts-patch": "^8.56.0-0",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.45.0",
+    "superjson": "^2.0.0",
+    "trpc-nuxt": "^0.10.12",
+    "vite-plugin-eslint": "^1.8.1",
+    "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@nuxtjs/supabase": "^1.1.4",
+    "@types/node": "^20.2.5",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.2.1",
+    "autoprefixer": "^10.4.7",
+    "eslint": "^8.56.0",
+    "eslint-config-standard-with-typescript": "^43.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.5.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.19.2",
+    "nuxt": "^3.7.0",
+    "nuxt-primevue": "^0.2.2",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.2.0",
+    "typescript": "^4.9.5"
+  },
+  "ct3nMetaData": {
+    "initVersion": "0.2.1"
+  }
+}

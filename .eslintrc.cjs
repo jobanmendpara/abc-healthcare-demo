@@ -9,7 +9,9 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     sourceType: "module",
   },
-  plugins: ["@typescript-eslint"],
+  plugins: [
+    "@typescript-eslint"
+  ],
   extends: [
     "plugin:nuxt/recommended",
     "plugin:@typescript-eslint/recommended",
@@ -17,10 +19,14 @@ module.exports = {
   ],
   rules: {
     "@typescript-eslint/consistent-type-imports": "warn",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "vue/multi-word-component-names": "off",
-    "vue/max-attributes-per-line": 1,
-    semi: 2,
+    "semi": 2,
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "varsIgnorePattern": "^_"
+      }
+    ],
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
   },
 };
