@@ -27,6 +27,7 @@
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^2.6.1",
     "@nuxtjs/supabase": "^1.1.4",
     "@types/node": "^20.2.5",
     "@typescript-eslint/eslint-plugin": "^6.16.0",

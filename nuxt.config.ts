@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   },
   modules: ['@nuxtjs/supabase', '@pinia/nuxt', 'nuxt-primevue'],
   vite: {
-    plugins: [eslintPlugin()],
+    // plugins: [eslintPlugin()],
   },
   postcss: {
     plugins: {
