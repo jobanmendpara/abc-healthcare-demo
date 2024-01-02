@@ -2,9 +2,9 @@
 import { usePrimeVue } from 'primevue/config';
 
 const { auth } = useSupabaseClient();
-const isDarkMode = ref<boolean>(true);
+const primeVue = usePrimeVue();
 
-const PrimeVue = usePrimeVue();
+const isDarkMode = ref<boolean>(true);
 
 const navItems = ref([
   {
@@ -29,9 +29,8 @@ const navItems = ref([
 
 function toggleTheme() {
   if (isDarkMode.value)
-    PrimeVue.changeTheme('lara-dark-green', 'lara-light-green', 'theme');
-  else
-    PrimeVue.changeTheme('lara-light-green', 'lara-dark-green', 'theme');
+    primeVue.changeTheme('lara-dark-green', 'lara-light-green', 'theme');
+  else primeVue.changeTheme('lara-light-green', 'lara-dark-green', 'theme');
 
   isDarkMode.value = !isDarkMode.value;
 }
@@ -55,7 +54,6 @@ function toggleTheme() {
             <i class="pi pi-sun" />
             <InputSwitch
               v-model="isDarkMode"
-              class=""
               @click="toggleTheme"
             />
           </div>
@@ -78,7 +76,6 @@ function toggleTheme() {
         </template>
       </Card>
     </main>
-    <Toast />
   </body>
 </template>
 

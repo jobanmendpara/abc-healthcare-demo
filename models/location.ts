@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const LocationSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   latitude: z.number(),
   longitude: z.number(),
   formattedAddress: z.string(),

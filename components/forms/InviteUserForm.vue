@@ -1,16 +1,27 @@
 <script setup lang="ts">
+import type { UserRoles } from '~/models';
+
 const props = defineProps({
   isVisible: {
     type: Boolean,
     default: false,
   },
+  role: {
+    type: String as PropType<UserRoles>,
+    default: 'employee',
+  },
 });
-defineEmits(['hide']);
+const emit = defineEmits(['hide']);
 
+const { $client } = useNuxtApp();
 const visible = ref<boolean>(false);
 const email = ref<string>('');
 
-function submit() {}
+function submit() {
+  $client.users.invite.mutate({ email: email.value, role: props.role });
+  email.value = '';
+  emit('hide');
+}
 
 watch(
   () => props.isVisible,
@@ -27,7 +38,10 @@ watch(
     header="Invite User"
     @hide="$emit('hide')"
   >
-    <form class="flex min-h-fit w-fit flex-col gap-2" @submit.prevent="submit">
+    <form
+      class="flex min-h-fit w-fit flex-col gap-2"
+      @submit.prevent="submit"
+    >
       <InputText
         id="email"
         v-model="email"
@@ -38,7 +52,7 @@ watch(
       <Button
         icon="pi pi-send"
         icon-pos="right"
-        class="w-full p-2"
+        class="w-full p-2 hover:bg-primary-700"
         label="Send Invite"
         type="submit"
       />

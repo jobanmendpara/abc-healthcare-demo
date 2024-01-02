@@ -28,7 +28,7 @@ definePageMeta({
     </h1>
     <NuxtLink
       class="rounded-lg bg-surface-500 px-4 py-2 text-white hover:bg-primary-500"
-      to="/login"
+      to="/signin"
     >
       Sign In
     </NuxtLink>

@@ -2,12 +2,14 @@
 definePageMeta({
   layout: 'main',
 });
+
+const store = useAppStore();
 </script>
 
 <template>
   <div class="text-center">
     <h1 class="text-left text-2xl font-semibold">
-      Home
+      Hi, {{ store.user.firstName }}
     </h1>
   </div>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { UserRoles } from '~/models';
+
 definePageMeta({
   layout: 'main',
 });
@@ -61,6 +63,7 @@ const isInviteFormVisible = ref<boolean>(false);
   </div>
   <InviteUserForm
     :is-visible="isInviteFormVisible"
+    :role="activeSubView === 0 ? 'employee' : 'admin'"
     @hide="isInviteFormVisible = false"
   />
 </template>

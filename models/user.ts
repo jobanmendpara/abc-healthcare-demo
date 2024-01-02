@@ -2,9 +2,8 @@ import { z } from 'zod';
 
 import { LocationSchema } from '~/models/location';
 
-const UserRolesValues = ['DEV', 'ADMIN', 'EMPLOYEE', 'CLIENT'] as const;
-
-export const UserRolesEnum = z.enum(UserRolesValues);
+export const UserRolesEnum = z.enum(['admin', 'employee', 'client']);
+export type UserRoles = z.infer<typeof UserRolesEnum>;
 
 export const UserSchema = z.object({
   id: z.string(),
@@ -15,6 +14,7 @@ export const UserSchema = z.object({
   role: UserRolesEnum,
   phoneNumber: z.string(),
   address: LocationSchema,
-  assignments: z.array(z.string()),
+  // WARN: TESTING
+  assignments: z.array(z.string()).optional(),
 });
 export type User = z.infer<typeof UserSchema>;

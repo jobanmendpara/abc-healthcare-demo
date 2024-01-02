@@ -13,14 +13,18 @@
     "preview": "nuxt preview"
   },
   "dependencies": {
+    "@nuxt/types": "^2.17.2",
     "@pinia/nuxt": "^0.5.1",
+    "@supabase/supabase-js": "^2.39.1",
     "@t3-oss/env-nuxt": "^0.7.1",
     "@trpc/client": "^10.9.0",
     "@trpc/server": "^10.9.0",
+    "@vue/runtime-dom": "^3.4.3",
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-ts-patch": "^8.56.0-0",
     "primeicons": "^6.0.1",
     "primevue": "^3.45.0",
+    "supabase": ">=1.8.1",
     "superjson": "^2.0.0",
     "trpc-nuxt": "^0.10.12",
     "vite-plugin-eslint": "^1.8.1",

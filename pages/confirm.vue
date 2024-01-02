@@ -1,7 +1,8 @@
 <script setup lang="ts">
 watchEffect(() => {
-  console.log(useSupabaseUser().value);
-  if (useSupabaseUser().value)
+  const user = useSupabaseUser();
+
+  if (user.value)
     navigateTo('/home');
 });
 </script>

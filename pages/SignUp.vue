@@ -12,7 +12,7 @@ const password = ref<string>('');
     <h1
       class="text-5xl font-extrabold tracking-tight text-[#858585] sm:text-[5rem]"
     >
-      Register
+      Sign Up
     </h1>
     <InputText
       v-model="username"
