@@ -1,4 +1,4 @@
-import type { ErrorLike } from '~/models';
+import type { ErrorLike } from '~/types';
 
 export function hasMessage(error: unknown): error is ErrorLike {
   return typeof error === 'object'

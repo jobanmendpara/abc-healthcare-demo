@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { UserRoles } from '~/models';
+import type { Role } from '~/types';
+import { useAuthStore } from '~/stores';
 
 const props = defineProps({
   isVisible: {
@@ -7,19 +8,22 @@ const props = defineProps({
     default: false,
   },
   role: {
-    type: String as PropType<UserRoles>,
+    type: String as PropType<Role>,
     default: 'employee',
   },
 });
 const emit = defineEmits(['hide']);
 
-const { $client } = useNuxtApp();
+const authStore = useAuthStore();
 const visible = ref<boolean>(false);
-const email = ref<string>('');
+// WARN: Remove before Prod
+const email = ref<string>('me@joban.dev');
 
-function submit() {
-  $client.users.invite.mutate({ email: email.value, role: props.role });
+async function submit(localEmail: string, localRole: Role) {
+  await authStore.inviteUser(localEmail, localRole);
+
   email.value = '';
+
   emit('hide');
 }
 
@@ -39,13 +43,13 @@ watch(
     @hide="$emit('hide')"
   >
     <form
-      class="flex min-h-fit w-fit flex-col gap-2"
-      @submit.prevent="submit"
+      class="space-y-4"
+      @submit.prevent="submit(email, props.role)"
     >
       <InputText
         id="email"
         v-model="email"
-        class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
+        class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
         type="email"
         placeholder="johndoe@acme.org"
       />

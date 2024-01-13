@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { usePrimeVue } from 'primevue/config';
+import { AppRoutes } from '~/types';
 
 const { auth } = useSupabaseClient();
+const user = useSupabaseUser();
 const primeVue = usePrimeVue();
+const store = useAppStore();
 
-const isDarkMode = ref<boolean>(true);
+const isDarkMode = ref<boolean>(store.isDarkMode);
 
 const navItems = ref([
   {
@@ -13,7 +16,7 @@ const navItems = ref([
     icon: 'pi pi-home',
     visible: true,
     command: () => {
-      navigateTo('/home');
+      navigateTo(AppRoutes.HOME);
     },
   },
   {
@@ -22,7 +25,7 @@ const navItems = ref([
     icon: 'pi pi-user',
     visible: true,
     command: () => {
-      navigateTo('/home');
+      navigateTo(AppRoutes.PEOPLE);
     },
   },
 ]);
@@ -34,6 +37,12 @@ function toggleTheme() {
 
   isDarkMode.value = !isDarkMode.value;
 }
+
+onBeforeMount(() => {
+  if (user.value)
+    store.hydrate(user.value.id);
+  toggleTheme();
+});
 </script>
 
 <template>

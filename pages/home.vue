@@ -9,7 +9,7 @@ const store = useAppStore();
 <template>
   <div class="text-center">
     <h1 class="text-left text-2xl font-semibold">
-      Hi, {{ store.user.firstName }}
+      Hi, {{ store.user.first_name }}
     </h1>
   </div>
 </template>

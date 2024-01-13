@@ -1,8 +1,9 @@
 import { AppRoutes } from '~/types';
 
 export default defineNuxtRouteMiddleware((to, _from) => {
-  const phone = to.query.phone;
+  // TODO: Consider some way to make url params type safe
+  const email = to.query.email;
 
-  if (!phone || phone.toString().trim() === '')
+  if (!email || email.toString().trim() === '')
     return navigateTo(AppRoutes['/']);
 });

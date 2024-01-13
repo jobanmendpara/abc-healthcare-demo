@@ -54,6 +54,7 @@ export default antfu(
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'unused-imports/no-unused-vars': 'off',
       'vue/multi-word-component-names': 'off',
+      'vue/valid-v-for': 'off',
     },
     overrides: [
       {

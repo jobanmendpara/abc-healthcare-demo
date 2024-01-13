@@ -1,25 +1,25 @@
-import type { Location, User } from '~/models';
+import type { Geopoint, User } from '~/types';
 
-export function initLocation(): Location {
+export function initGeopoint(): Geopoint {
   return {
-    id: 0,
+    id: '',
     latitude: 0,
     longitude: 0,
-    aptNumber: '',
-    formattedAddress: '',
+    apt_number: '',
+    formatted_address: '',
   };
 };
 
 export function initUser(): User {
   return {
     id: '',
-    firstName: '',
-    middleName: '',
-    lastName: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
     email: '',
-    phoneNumber: '',
-    address: initLocation(),
+    phone_number: '',
+    geopoint: initGeopoint(),
     role: 'employee',
-    assignments: [],
+    is_active: false,
   };
 };

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    * {
+      background-color: rgb(248, 249, 250);
+      font-family: 'Arial';
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .header {
+      color: rgb(43, 204, 146);
+      background-color: rgb(18, 23, 34);
+      padding: 8px;
+      width: 100%;
+    }
+
+    .content {
+      min-height: 64px;
+      margin: 16px 0px;
+    }
+
+    .footer {
+      width: 100%;
+      min-height: 24px;
+      background-color: rgb(18, 23, 34);
+    }
+  </style>
+</head>
+
+<body>
+  <h2 class="header">
+    You've been invited to uTyme
+  </h2>
+  <section class="content">
+    <p>Follow this link to sign up:</p>
+    <p><a href="{{ .ConfirmationURL }}">Sign Up</a></p>
+  </section>
+  <div class="footer"></div>
+</body>
+
+</html>

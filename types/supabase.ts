@@ -45,74 +45,82 @@ export interface Database {
           },
         ]
       }
-      invites: {
-        Row: {
-          email: string | null
-          id: string | null
-          role: Database['public']['Enums']['role_enum']
-        }
-        Insert: {
-          email?: string | null
-          id?: string | null
-          role?: Database['public']['Enums']['role_enum']
-        }
-        Update: {
-          email?: string | null
-          id?: string | null
-          role?: Database['public']['Enums']['role_enum']
-        }
-        Relationships: []
-      }
-      locations: {
+      geopoints: {
         Row: {
           apt_number: string | null
           formatted_address: string | null
-          id: number
+          id: string
           latitude: number | null
           longitude: number | null
         }
         Insert: {
           apt_number?: string | null
           formatted_address?: string | null
-          id?: number
+          id: string
           latitude?: number | null
           longitude?: number | null
         }
         Update: {
           apt_number?: string | null
           formatted_address?: string | null
-          id?: number
+          id?: string
           latitude?: number | null
           longitude?: number | null
         }
         Relationships: []
+      }
+      invites: {
+        Row: {
+          email: string
+          id: string
+          role: Database['public']['Enums']['role_enum']
+        }
+        Insert: {
+          email: string
+          id: string
+          role?: Database['public']['Enums']['role_enum']
+        }
+        Update: {
+          email?: string
+          id?: string
+          role?: Database['public']['Enums']['role_enum']
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'invites_id_fkey'
+            columns: ['id']
+            isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
       }
       timecards: {
         Row: {
           assignment_id: number | null
           created_at: string | null
           ended_at: string | null
+          geopoint_id: string | null
           id: number
           is_active: boolean | null
-          location_id: number | null
           started_at: string | null
         }
         Insert: {
           assignment_id?: number | null
           created_at?: string | null
           ended_at?: string | null
+          geopoint_id?: string | null
           id?: number
           is_active?: boolean | null
-          location_id?: number | null
           started_at?: string | null
         }
         Update: {
           assignment_id?: number | null
           created_at?: string | null
           ended_at?: string | null
+          geopoint_id?: string | null
           id?: number
           is_active?: boolean | null
-          location_id?: number | null
           started_at?: string | null
         }
         Relationships: [
@@ -124,57 +132,54 @@ export interface Database {
             referencedColumns: ['id']
           },
           {
-            foreignKeyName: 'timecards_location_id_fkey'
-            columns: ['location_id']
+            foreignKeyName: 'timecards_geopoint_id_fkey'
+            columns: ['geopoint_id']
             isOneToOne: false
-            referencedRelation: 'locations'
+            referencedRelation: 'geopoints'
             referencedColumns: ['id']
           },
         ]
       }
       users: {
         Row: {
-          created_at: string | null
           email: string
           first_name: string
+          geopoint_id: string
           id: string
           is_active: boolean
           last_name: string
-          location_id: number | null
           middle_name: string | null
-          phone_number: string | null
+          phone_number: string
           role: Database['public']['Enums']['role_enum']
         }
         Insert: {
-          created_at?: string | null
           email: string
           first_name: string
+          geopoint_id: string
           id?: string
           is_active?: boolean
           last_name: string
-          location_id?: number | null
           middle_name?: string | null
-          phone_number?: string | null
+          phone_number: string
           role?: Database['public']['Enums']['role_enum']
         }
         Update: {
-          created_at?: string | null
           email?: string
           first_name?: string
+          geopoint_id?: string
           id?: string
           is_active?: boolean
           last_name?: string
-          location_id?: number | null
           middle_name?: string | null
-          phone_number?: string | null
+          phone_number?: string
           role?: Database['public']['Enums']['role_enum']
         }
         Relationships: [
           {
-            foreignKeyName: 'users_location_id_fkey'
-            columns: ['location_id']
+            foreignKeyName: 'users_geopoint_id_fkey'
+            columns: ['geopoint_id']
             isOneToOne: false
-            referencedRelation: 'locations'
+            referencedRelation: 'geopoints'
             referencedColumns: ['id']
           },
         ]

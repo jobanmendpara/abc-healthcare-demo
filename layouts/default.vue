@@ -1,9 +1,16 @@
 <script setup lang="ts">
-const primeVue = usePrimeVue();
+import { isSystemInDarkMode } from '~/utils/general';
+
+onBeforeMount(() => {
+  if (isSystemInDarkMode())
+    usePrimeVue().changeTheme('lara-light-green', 'lara-dark-green', 'theme');
+  else
+    usePrimeVue().changeTheme('lara-dark-green', 'lara-light-green', 'theme');
+});
 </script>
 
 <template>
-  <div class="container mx-auto">
+  <body class="container mx-auto">
     <slot />
-  </div>
+  </body>
 </template>

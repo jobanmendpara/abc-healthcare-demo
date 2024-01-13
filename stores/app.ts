@@ -1,34 +1,40 @@
 import { defineStore } from 'pinia';
-import { z } from 'zod';
-import type { User } from '~/models';
-import { UserSchema } from '~/models';
-
-const { $client } = useNuxtApp();
+import type { User } from '~/types';
 
 export const useAppStore = defineStore('app', () => {
+  const { $toast } = useNuxtApp();
+
   const user = ref<User>(initUser());
+  const isDarkMode = ref<boolean>(false);
 
   async function hydrate(userId: string) {
     try {
-      const res = await $client.users.get.query({ userIds: [userId] });
+      const response = await useUsersStore().fetch(userId);
+      if (!response)
+        throw new Error('No user returned.');
 
-      user.value = z.array(UserSchema).parse(res)[0];
+      user.value = response;
 
-      toastSuccess({
+      $toast.add({
+        severity: 'success',
         summary: 'Sign In Successful',
         detail: 'Welcome!',
+        life: 2000,
       });
     }
     catch (error) {
-      toastError({
+      $toast.add({
+        severity: 'error',
         summary: 'Error',
         detail: getUnknownErrorMessage(error),
+        life: 2000,
       });
     }
   };
 
   return {
     hydrate,
+    isDarkMode,
     user,
   };
 });

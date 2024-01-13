@@ -1,96 +1,114 @@
 import { z } from 'zod';
-import type { QueryData } from '@supabase/supabase-js';
 import { createTRPCRouter, publicProcedure } from '../trpc';
-import { getUnknownErrorMessage } from '~/utils/errorHandling';
-import type { User } from '~/models';
-import { AppErrorSchema, UserRolesEnum, UserSchema } from '~/models';
+import type { Tables } from '~/types';
+import { roleEnumSchema, userSchema } from '~/types';
 
 export const usersRouter = createTRPCRouter({
-  get: publicProcedure
-    .input(
-      z.object({
-        userIds: z.array(z.string()),
-      }),
-    )
-    .output(
-      z.array(UserSchema).or(AppErrorSchema),
-    )
-    .query(async ({ ctx: { db }, input: { userIds } }) => {
-      try {
-        const users: User[] = [];
-        const query = db.from('users').select(
-          `
-            *,
-            locations (*)
-          `,
-        ).in('id', userIds);
-        const { data, error } = await query;
-        let rows: QueryData<typeof query> = [];
+  create: publicProcedure
+    .input(z.object({
+      users: z.array(userSchema),
+    }))
+    .output(z.void())
+    .mutation(async ({ ctx: { db }, input: { users } }) => {
+      const { data, error } = await db.from('users').insert(users).select();
 
-        if (error)
-          throw new Error(error.message);
-        if (!data || data.length < 1)
-          throw new Error('No Data Found');
-
-        rows = data;
-        for (const row of rows) {
-          users.push({
-            id: row.id,
-            role: row.role,
-            email: row.email,
-            address: {
-              id: row.locations!.id,
-              latitude: row.locations?.latitude ?? 0,
-              longitude: row.locations?.longitude ?? 0,
-              formattedAddress: row.locations?.formatted_address ?? '',
-              aptNumber: row.locations?.apt_number ?? '',
-            },
-            lastName: row.last_name,
-            firstName: row.first_name,
-            middleName: row.middle_name ?? '',
-            phoneNumber: row.phone_number ?? '',
-          });
-        }
-
-        return users;
-      }
-      catch (error) {
-        return {
-          message: getUnknownErrorMessage(error),
-        };
-      }
+      if (error)
+        throw new Error(error.message);
+      if (!data)
+        throw new Error('No data returned.');
     }),
-  invite: publicProcedure
-    .input(
-      z.object({
+  fetch: publicProcedure
+    .input(z.object({
+      userId: z.string().uuid(),
+    }))
+    .output(z.object({
+      users: z.record(z.string().uuid(), userSchema),
+      invites: z.record(z.string().uuid(), z.object({
+        id: z.string().uuid(),
         email: z.string().email(),
-        role: UserRolesEnum,
-      }),
-    )
-    .output(
-      z.void().or(AppErrorSchema),
-    )
-    .mutation(async ({ ctx: { db }, input: { email, role } }) => {
-      try {
-        const query = db.from('invites').upsert({
-          id: crypto.randomUUID(),
-          email,
-          role,
-        }, {
-          onConflict: 'email',
-        }).select();
+        role: roleEnumSchema,
+      })).optional(),
+    }))
+    .query(async ({ ctx: { db }, input: { userId } }) => {
+      let invites: Record<string, Tables<'invites'>> = {};
+      let users: Record<string, Tables<'users'>> = {};
+      const getRequestor = await db.from('users').select().eq('id', userId).single();
 
-        const { data, error } = await query;
+      if (getRequestor.error)
+        throw new Error(getRequestor.error.message);
+      if (!getRequestor.data)
+        throw new Error('No data returned.');
 
-        if (error)
-          throw new Error(error.message);
-        if (!data)
-          throw new Error('Unable to invite user.');
+      const { role } = getRequestor.data;
+
+      if (role === 'admin') {
+        const getAllUsers = await db.from('users').select();
+        if (getAllUsers.error)
+          throw new Error(getAllUsers.error.message);
+        if (!getAllUsers.data)
+          throw new Error('No data returned.');
+
+        const getAllInvites = await db.from('invites').select();
+        if (getAllInvites.error)
+          throw new Error(getAllInvites.error.message);
+        if (!getAllInvites.data)
+          throw new Error('No data returned.');
+
+        invites = getAllInvites.data.reduce((acc: Record<string, Tables<'invites'>>, invite) => {
+          acc[invite.id] = invite;
+
+          return acc;
+        }, {});
+
+        users = getAllUsers.data.reduce((acc: Record<string, Tables<'users'>>, user) => {
+          acc[user.id] = user;
+
+          return acc;
+        }, {});
       }
-      catch (error) {
-        return {
-          message: getUnknownErrorMessage(error),
-        };
+      else {
+        const getAssignedUsersIds = await db.from('assignments').select(`employee_id`).eq('employee_id', userId);
+        if (getAssignedUsersIds.error)
+          throw new Error(getAssignedUsersIds.error.message);
+        if (!getAssignedUsersIds.data)
+          throw new Error('No data returned.');
+
+        const userIdsList = getAssignedUsersIds.data.map(({ employee_id }) => employee_id);
+        const getAssignedUsers = await db.from('users').select().in('id', userIdsList);
+        if (getAssignedUsers.error)
+          throw new Error(getAssignedUsers.error.message);
+        if (!getAssignedUsers.data)
+          throw new Error('No data returned.');
+
+        getAssignedUsers.data.push(getRequestor.data);
+
+        users = getAssignedUsers.data.reduce((acc: Record<string, Tables<'users'>>, user) => {
+          acc[user.id] = user;
+
+          return acc;
+        }, {});
       }
+
+      const response = role === 'admin' ? { users, invites } : { users };
+
+      return response;
+    }),
+  get: publicProcedure
+    .input(z.object({
+      userIds: z.array(z.string().uuid()),
+    }))
+    .output(z.object({
+      users: z.array(userSchema),
+    }))
+    .query(async ({ ctx: { db }, input: { userIds } }) => {
+      const { data, error } = await db.from('users').select().in('id', userIds);
+      if (error)
+        throw new Error(error.message);
+      if (!data)
+        throw new Error('No data returned.');
+
+      return {
+        users: data,
+      };
     }),
 });

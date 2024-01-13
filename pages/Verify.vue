@@ -1,15 +1,13 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: ['verify-sign-in'],
-});
+import { AppRoutes } from '~/types';
 
+const { $toast } = useNuxtApp();
 const { auth } = useSupabaseClient();
 const { query } = useRoute();
-const store = useAppStore();
+const user = useSupabaseUser();
 
 const token = ref<string>('');
 const { phone } = query;
-const user = useSupabaseUser();
 
 async function submit() {
   const { error } = await auth.verifyOtp({
@@ -17,17 +15,22 @@ async function submit() {
     type: 'sms',
     phone: `1${phone!.toString() ?? ''}`,
     options: {
-      redirectTo: '/home',
+      redirectTo: AppRoutes.HOME,
     },
   });
 
-  if (error)
-    toastError({ detail: error.message });
-
-  const user = useSupabaseUser();
-  if (user.value)
-    await store.hydrate(user.value.id);
+  if (error) {
+    $toast.add({
+      severity: 'error',
+      detail: error.message,
+      life: 2000,
+    });
+  }
 }
+
+definePageMeta({
+  middleware: ['verify-sign-in'],
+});
 
 // WARN: Consider a moving redirection to submit()
 watchEffect(() => {
