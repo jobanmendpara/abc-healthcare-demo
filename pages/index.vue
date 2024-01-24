@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { AppRoutes } from '~/types';
 
+definePageMeta({
+  layout: 'default',
+});
+
 useHead({
   title: 'uTyme',
   meta: [
@@ -15,10 +19,6 @@ useHead({
       href: '/favicon.ico',
     },
   ],
-});
-
-definePageMeta({
-  layout: 'default',
 });
 </script>
 

@@ -18,7 +18,8 @@ export function validatePassword(password: string) {
   const hasLower = /[a-z]/.test(password);
   const hasUpper = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const isValidLength = password.length >= 8;
 
-  return hasLower && hasUpper && hasNumber && isValidLength;
+  return hasLower && hasUpper && hasNumber && hasSpecial && isValidLength;
 }

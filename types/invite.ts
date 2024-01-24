@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { roleEnumSchema } from './role';
 
-const inviteSchema = z.object({
+export const inviteFormDataSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   role: roleEnumSchema,
 });
-export type Invite = z.infer<typeof inviteSchema>;
+export type InviteFormData = z.infer<typeof inviteFormDataSchema>;

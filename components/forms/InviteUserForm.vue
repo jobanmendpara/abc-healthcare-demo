@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Role } from '~/types';
-import { useAuthStore } from '~/stores';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import type { InviteFormData, Role } from '~/types';
 
 const props = defineProps({
   isVisible: {
@@ -9,23 +9,42 @@ const props = defineProps({
   },
   role: {
     type: String as PropType<Role>,
-    default: 'employee',
+    default: '',
   },
 });
 const emit = defineEmits(['hide']);
-
-const authStore = useAuthStore();
+const { $toast } = useNuxtApp();
+const queryClient = useQueryClient();
+const { $server } = useNuxtApp();
 const visible = ref<boolean>(false);
-// WARN: Remove before Prod
-const email = ref<string>('me@joban.dev');
+const email = ref<string>('');
 
-async function submit(localEmail: string, localRole: Role) {
-  await authStore.inviteUser(localEmail, localRole);
+const { mutate: submit, isPending } = useMutation({
+  mutationFn: async (inviteFormData: Omit<InviteFormData, 'id'>) => await $server.auth.invite.mutate({
+    id: useSupabaseUser().value!.id,
+    ...inviteFormData,
+  }),
+  onMutate: (inviteFormData) => {
+    if (!validateEmail(inviteFormData.email))
+      throw new Error('Please enter a valid email.');
 
-  email.value = '';
+    return inviteFormData;
+  },
+  onSuccess() {
+    queryClient.invalidateQueries({
+      queryKey: ['people'],
+    });
+    email.value = '';
+    emit('hide');
 
-  emit('hide');
-}
+    $toast.add({
+      severity: 'success',
+      summary: 'Invite Sent',
+      detail: 'The invite has been sent.',
+    });
+  },
+  throwOnError: true,
+});
 
 watch(
   () => props.isVisible,
@@ -40,11 +59,12 @@ watch(
     v-model:visible="visible"
     modal
     header="Invite User"
+    :closable="!isPending"
     @hide="$emit('hide')"
   >
     <form
       class="space-y-4"
-      @submit.prevent="submit(email, props.role)"
+      @submit.prevent="submit({ email, role })"
     >
       <InputText
         id="email"
@@ -59,6 +79,7 @@ watch(
         class="w-full p-2 hover:bg-primary-700"
         label="Send Invite"
         type="submit"
+        :loading="isPending"
       />
     </form>
   </Dialog>

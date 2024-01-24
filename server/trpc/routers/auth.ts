@@ -1,13 +1,10 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
-import { AppRoutes, roleEnumSchema, signInCredentialsSchema } from '~/types';
+import { AppRoutes, inviteFormDataSchema, roleEnumSchema, signInCredentialsSchema } from '~/types';
 
 export const authRouter = createTRPCRouter({
   invite: publicProcedure
-    .input(z.object({
-      email: z.string().email(),
-      role: roleEnumSchema,
-    }))
+    .input(inviteFormDataSchema)
     .output(z.void())
     .mutation(async ({ ctx: { db }, input: { email, role } }) => {
       const checkIfUserExistsQueryResult = await db.from('users').select().eq('email', email);
@@ -34,6 +31,17 @@ export const authRouter = createTRPCRouter({
           onConflict: 'email',
         },
       ).select();
+    }),
+  deleteInvite: publicProcedure
+    .input(z.object({
+      ids: z.array(z.string().uuid()),
+    }))
+    .output(z.void())
+    .mutation(async ({ ctx: { db }, input: { ids } }) => {
+      const deleteInviteResults = await db.from('invites').delete().in('id', ids);
+
+      if (deleteInviteResults.error)
+        throw new Error(deleteInviteResults.error.message);
     }),
   signInWithCredentials: publicProcedure
     .input(z.object({
@@ -84,7 +92,7 @@ export const authRouter = createTRPCRouter({
       if (getInviteResults.error)
         throw new Error(getInviteResults.error.message);
 
-      const signUpResponse = await db.auth.signUp({ email, password });
+      const signUpResponse = await db.auth.signUp({ email, phone, password });
       if (signUpResponse.error)
         throw new Error(signUpResponse.error.message);
 

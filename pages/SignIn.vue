@@ -1,22 +1,60 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default',
-});
+import type { AuthTokenResponse } from '@supabase/supabase-js';
+import { useMutation } from '@tanstack/vue-query';
+import type { SignInCredentials } from '~/types';
+import { AppRoutes } from '~/types';
 
-const authStore = useAuthStore();
+const { $server, $toast } = useNuxtApp();
+const { auth } = useSupabaseClient();
 
 // WARN: Remove before Prod
 const email = ref<string>('app@utyme.io');
 const password = ref<string>('dev');
 const phone = ref<string>('6208039700');
 
-async function signInWithCredentials(localEmail: string, localPassword: string) {
-  await authStore.signInWithCredentials({ email: localEmail, password: localPassword, phone: '' });
-}
+const signInWithCredentialsMutation = useMutation({
+  mutationFn: async (credentials: SignInCredentials) => await $server.auth.signInWithCredentials.mutate({ credentials }) as AuthTokenResponse['data'],
+  onSuccess: async (data) => {
+    if (!data.user && !data.session)
+      throw new Error('No user or session returned from Supabase');
 
-async function signInWithPhone(localPhone: string) {
-  await authStore.signInWithPhone(localPhone);
-}
+    await auth.setSession(data.session);
+
+    navigateTo(AppRoutes.HOME);
+  },
+  onError: (error) => {
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.message,
+      life: 2000,
+    });
+  },
+});
+
+const signInWithPhoneMutation = useMutation({
+  mutationFn: async (phone: string) => await $server.auth.signInWithPhone.mutate({ phone }) as AuthTokenResponse['data'],
+  onSuccess: async (data) => {
+    if (!data.user && !data.session)
+      throw new Error('No user or session returned from Supabase');
+
+    await auth.setSession(data.session);
+
+    navigateTo(AppRoutes.HOME);
+  },
+  onError: (error) => {
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.message,
+      life: 2000,
+    });
+  },
+});
+
+definePageMeta({
+  layout: 'default',
+});
 </script>
 
 <template>
@@ -55,7 +93,8 @@ async function signInWithPhone(localPhone: string) {
       <Button
         class="focus:shadow-outline mb-4 w-full rounded bg-primary-500 px-4 py-2 font-bold hover:bg-primary-700 focus:outline-none"
         label="Sign In"
-        @click="signInWithCredentials(email, password)"
+        :loading="signInWithCredentialsMutation.status.value === 'pending' && signInWithPhoneMutation.status.value === 'pending'"
+        @click="signInWithCredentialsMutation.mutate({ email, password, phone: '' })"
       />
     </form>
     <p class="my-2 text-center">
@@ -80,7 +119,8 @@ async function signInWithPhone(localPhone: string) {
       <Button
         class="focus:shadow-outline mb-4 w-full rounded bg-slate-400 px-4 py-2 font-bold hover:bg-slate-700 focus:outline-none"
         label="Sign In with Phone"
-        @click="signInWithPhone(phone)"
+        :loading="signInWithCredentialsMutation.status.value === 'pending' && signInWithPhoneMutation.status.value === 'pending'"
+        @click="signInWithPhoneMutation.mutate(phone)"
       />
     </form>
   </div>

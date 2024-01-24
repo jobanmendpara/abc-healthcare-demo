@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import type { Geopoint, SignUpFormData } from '~/types';
+import { useMutation } from '@tanstack/vue-query';
+import { AppRoutes } from '~/types';
+import type { Geopoint, Role, SignUpFormData, User } from '~/types';
 
-const authStore = useAuthStore();
+const { $server, $toast } = useNuxtApp();
 const route = useRoute();
 
 // WARN: Remove before Prod
@@ -37,10 +39,79 @@ function initSignUpFormData(): SignUpFormData {
   };
 }
 
-async function submit(data: SignUpFormData) {
-  await authStore.signUp(data);
+function signUpFormDataToUserObject(userId: string, role: Role, formData: SignUpFormData): User {
+  return {
+    id: userId,
+    first_name: formData.first_name,
+    middle_name: formData.middle_name,
+    last_name: formData.last_name,
+    email: formData.credentials.email,
+    is_active: true,
+    role,
+    geopoint_id: formData.geopoint.id,
+    phone_number: formData.credentials.phone,
+  };
+}
 
-  data = initSignUpFormData();
+const signUpMutation = useMutation({
+  mutationFn: async (data: SignUpFormData) => await $server.auth.signUp.mutate(data.credentials),
+  onMutate: async (data) => {
+    if (!validateEmail(data.credentials.email))
+      throw new Error('Please enter a valid email.');
+
+    if (!validatePhone(data.credentials.phone))
+      throw new Error('Please enter a valid phone number.');
+
+    if (!validatePassword(data.credentials.password))
+      throw new Error('Passwords must contain 1 lowercase, 1 uppercase, and 1 numerical character.');
+  },
+  onSuccess: async (data) => {
+    if (!data.role)
+      throw new Error('No role returned from Supabase');
+    if (!data.userId)
+      throw new Error('No userId returned from Supabase');
+
+    $toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Check your email for a confirmation link.',
+      life: 2000,
+    });
+  },
+  throwOnError: true,
+});
+
+const createUserMutation = useMutation({
+  mutationFn: async (user: User) => await $server.users.create.mutate({ users: [user] }),
+  throwOnError: true,
+});
+
+async function submit(localData: SignUpFormData) {
+  signUpMutation.mutate(localData, {
+    onSuccess: async (data) => {
+      if (!data.role)
+        throw new Error('No role returned from Supabase');
+      if (!data.userId)
+        throw new Error('No userId returned from Supabase');
+
+      const newUser = signUpFormDataToUserObject(data.userId, data.role, formData.value);
+
+      createUserMutation.mutate(newUser);
+    },
+    onError: (error) => {
+      $toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: getUnknownErrorMessage(error),
+        life: 2000,
+      });
+    },
+    onSettled: () => {
+      localData = initSignUpFormData();
+
+      navigateTo(AppRoutes['/']);
+    },
+  });
 }
 
 definePageMeta({
@@ -54,7 +125,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div class="container mx-auto my-16 rounded-lg p-8 shadow-md sm:w-full md:w-1/3">
+  <div class="container mx-auto my-16 rounded-lg p-8 shadow-md sm:w-full md:w-2/3">
     <form
       class="mb-4 space-y-8"
       @submit.prevent="submit(formData)"
@@ -112,6 +183,20 @@ onBeforeMount(() => {
           formData.geopoint = geopoint
         }"
       />
+      <span class="p-float-label">
+        <InputText
+          id="aptNumber"
+          v-model="formData.geopoint.apt_number"
+          class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
+          type="text"
+        />
+        <label
+          class="mb-2 block text-sm font-bold"
+          for="aptNumber"
+        >
+          Apt Number
+        </label>
+      </span>
       <span class="p-float-label">
         <InputText
           id="phone"

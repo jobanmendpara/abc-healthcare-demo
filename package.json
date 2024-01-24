@@ -19,6 +19,7 @@
     "@pinia/nuxt": "^0.5.1",
     "@supabase/supabase-js": "^2.39.1",
     "@tanstack/vue-query": "^5.17.13",
+    "@tanstack/vue-query-devtools": "^5.17.15",
     "@trpc/client": "^10.9.0",
     "@trpc/server": "^10.9.0",
     "@types/google.maps": "^3.54.10",

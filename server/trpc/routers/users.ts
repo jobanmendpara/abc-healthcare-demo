@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../trpc';
+import { initUserSettings } from '~/utils/initializers';
 import type { Tables } from '~/types';
 import { roleEnumSchema, userSchema } from '~/types';
+import { getUnknownErrorMessage } from '~/utils/errorHandling';
 
 export const usersRouter = createTRPCRouter({
   create: publicProcedure
@@ -10,12 +12,58 @@ export const usersRouter = createTRPCRouter({
     }))
     .output(z.void())
     .mutation(async ({ ctx: { db }, input: { users } }) => {
-      const { data, error } = await db.from('users').insert(users).select();
-
-      if (error)
-        throw new Error(error.message);
-      if (!data)
+      const insertUserQuery = await db.from('users').insert(users).select();
+      if (insertUserQuery.error)
+        throw new Error(insertUserQuery.error.message);
+      if (!insertUserQuery.data)
         throw new Error('No data returned.');
+
+      const initialUserSettings = users.map(({ id }) => initUserSettings(id));
+      const insertUserSettingsQuery = await db.from('user_settings').insert(initialUserSettings).select();
+      if (insertUserSettingsQuery.error)
+        throw new Error(insertUserSettingsQuery.error.message);
+      if (!insertUserSettingsQuery.data)
+        throw new Error('No data returned.');
+    }),
+  delete: publicProcedure
+    .input(z.object({
+      userIds: z.array(z.string().uuid()),
+    }))
+    .output(z.void())
+    .mutation(async ({ ctx: { db }, input }) => {
+      const errors: string[] = [];
+
+      let assignmentsId: number[] = [];
+      const deleteUsersQuery = await db.from('users').delete().in('id', input.userIds).select();
+      if (deleteUsersQuery.error)
+        errors.push(getUnknownErrorMessage(deleteUsersQuery.error));
+
+      const deleteUserSettingsQuery = await db.from('user_settings').delete().in('id', input.userIds).select();
+      if (deleteUserSettingsQuery.error)
+        errors.push(getUnknownErrorMessage(deleteUserSettingsQuery.error));
+
+      input.userIds.forEach(async (userId) => {
+        const deleteAssignmentsQuery = await db.from('assignments').delete().eq('employee_id', userId).select();
+        if (deleteAssignmentsQuery.error) {
+          errors.push(getUnknownErrorMessage(deleteAssignmentsQuery.error.message));
+          return;
+        }
+
+        assignmentsId = deleteAssignmentsQuery.data.map(({ id }) => id);
+
+        const deleteAuthQuery = await db.auth.admin.deleteUser(userId);
+        if (deleteAuthQuery.error)
+          errors.push(getUnknownErrorMessage(deleteAuthQuery.error.message));
+      });
+
+      assignmentsId.forEach(async (assignmentId) => {
+        const deleteTimecardsQuery = await db.from('timecards').delete().eq('assignment_id', assignmentId).select();
+        if (deleteTimecardsQuery.error)
+          errors.push(getUnknownErrorMessage(deleteTimecardsQuery.error.message));
+      });
+
+      if (errors.length > 0)
+        throw errors;
     }),
   fetch: publicProcedure
     .input(z.object({
@@ -89,9 +137,9 @@ export const usersRouter = createTRPCRouter({
         }, {});
       }
 
-      const response = role === 'admin' ? { users, invites } : { users };
+      delete users[userId];
 
-      return response;
+      return role === 'admin' ? { users, invites } : { users };
     }),
   get: publicProcedure
     .input(z.object({

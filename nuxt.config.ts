@@ -14,7 +14,9 @@ export default defineNuxtConfig({
     },
   },
   plugins: [
-    './plugins/toast.ts'
+    './plugins/toast.ts',
+    './plugins/vue-query.ts',
+    './plugins/confirm.ts',
   ],
   css: ['primeicons/primeicons.css', '~/assets/global.css'],
   typescript: {
