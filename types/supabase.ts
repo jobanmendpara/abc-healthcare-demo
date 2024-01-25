@@ -12,21 +12,18 @@ export interface Database {
       assignments: {
         Row: {
           client_id: string
-          created_at: string
           employee_id: string
-          id: number
+          id: string
         }
         Insert: {
           client_id: string
-          created_at: string
           employee_id: string
-          id?: number
+          id?: string
         }
         Update: {
           client_id?: string
-          created_at?: string
           employee_id?: string
-          id?: number
+          id?: string
         }
         Relationships: [
           {
@@ -97,29 +94,29 @@ export interface Database {
       }
       timecards: {
         Row: {
-          assignment_id: number | null
+          assignment_id: string | null
           created_at: string | null
           ended_at: string | null
           geopoint_id: string | null
-          id: number
+          id: string
           is_active: boolean | null
           started_at: string | null
         }
         Insert: {
-          assignment_id?: number | null
+          assignment_id?: string | null
           created_at?: string | null
           ended_at?: string | null
           geopoint_id?: string | null
-          id?: number
+          id?: string
           is_active?: boolean | null
           started_at?: string | null
         }
         Update: {
-          assignment_id?: number | null
+          assignment_id?: string | null
           created_at?: string | null
           ended_at?: string | null
           geopoint_id?: string | null
-          id?: number
+          id?: string
           is_active?: boolean | null
           started_at?: string | null
         }

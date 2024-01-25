@@ -25,7 +25,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ['trpc-nuxt'],
   },
-  modules: ['@nuxtjs/supabase', '@pinia/nuxt', 'nuxt-primevue'],
+  modules: ['@nuxtjs/supabase', '@pinia/nuxt', 'nuxt-primevue', '@vueuse/nuxt'],
   vite: {},
   postcss: {
     plugins: {
