@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { AppRoutes } from '~/types';
 
-const { $toast } = useNuxtApp();
-const { auth } = useSupabaseClient();
+const { $db, $toast, $user } = useNuxtApp();
 const { query } = useRoute();
-const user = useSupabaseUser();
 
 const token = ref<string>('');
 const { phone } = query;
 
 async function submit() {
-  const { error } = await auth.verifyOtp({
+  const { error } = await $db.auth.verifyOtp({
     token: token.value,
     type: 'sms',
     phone: `1${phone!.toString() ?? ''}`,
@@ -19,13 +17,8 @@ async function submit() {
     },
   });
 
-  if (error) {
-    $toast.add({
-      severity: 'error',
-      detail: error.message,
-      life: 2000,
-    });
-  }
+  if (error)
+    $toast.error(error.message);
 }
 
 definePageMeta({
@@ -34,7 +27,7 @@ definePageMeta({
 
 // WARN: Consider a moving redirection to submit()
 watchEffect(() => {
-  if (user.value)
+  if ($user.value)
     navigateTo('/home');
 });
 </script>
@@ -51,7 +44,7 @@ watchEffect(() => {
       >
         OTP Token
       </label>
-      <InputText
+      <Input
         id="token"
         v-model="token"
         class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
@@ -59,10 +52,12 @@ watchEffect(() => {
         placeholder="123456"
       />
       <Button
-        class="focus:shadow-outline mb-4 w-full rounded bg-primary-500 px-4 py-2 font-bold hover:bg-primary-700 focus:outline-none"
+        class="focus:shadow-outline mb-4 w-full rounded px-4 py-2 font-bold hover:bg-primary-700 focus:outline-none"
         label="Verify"
         type="submit"
-      />
+      >
+        Verify OTP
+      </Button>
     </form>
   </div>
 </template>

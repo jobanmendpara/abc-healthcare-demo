@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
-import { AppRoutes, inviteFormDataSchema, roleEnumSchema, signInCredentialsSchema } from '~/types';
+import { AppRoutes, inviteFormDataSchema, loginCredentialsSchema, roleEnumSchema } from '~/types';
 
 export const authRouter = createTRPCRouter({
   invite: publicProcedure
@@ -39,13 +39,18 @@ export const authRouter = createTRPCRouter({
     .output(z.void())
     .mutation(async ({ ctx: { db }, input: { ids } }) => {
       const deleteInviteResults = await db.from('invites').delete().in('id', ids);
-
       if (deleteInviteResults.error)
         throw new Error(deleteInviteResults.error.message);
+
+      ids.forEach(async (id) => {
+        const deleteAuthResults = await db.auth.admin.deleteUser(id);
+        if (deleteAuthResults.error)
+          throw new Error(deleteAuthResults.error.message);
+      });
     }),
-  signInWithCredentials: publicProcedure
+  loginWithCredentials: publicProcedure
     .input(z.object({
-      credentials: signInCredentialsSchema,
+      credentials: loginCredentialsSchema,
     }))
     .output(z.object({
       user: z.unknown(),
@@ -61,7 +66,7 @@ export const authRouter = createTRPCRouter({
 
       return data;
     }),
-  signInWithPhone: publicProcedure
+  loginWithPhone: publicProcedure
     .input(z.object({ phone: z.string() }))
     .output(z.object({
       user: z.unknown(),
@@ -72,8 +77,6 @@ export const authRouter = createTRPCRouter({
 
       if (error)
         throw new Error(error.message);
-      if (!data || !data.user || !data.session)
-        throw new Error('No data returned.');
 
       return data;
     }),
@@ -91,6 +94,18 @@ export const authRouter = createTRPCRouter({
       const getInviteResults = await db.from('invites').select().eq('email', email).single();
       if (getInviteResults.error)
         throw new Error(getInviteResults.error.message);
+
+      const getDuplicateEmailResults = await db.from('users').select().eq('email', email);
+      if (getDuplicateEmailResults.error)
+        throw new Error(getDuplicateEmailResults.error.message);
+      if (getDuplicateEmailResults.data.length > 0)
+        throw new Error('User already exists.');
+
+      const getDuplicatePhoneResults = await db.from('users').select().eq('phone_number', phone);
+      if (getDuplicatePhoneResults.error)
+        throw new Error(getDuplicatePhoneResults.error.message);
+      if (getDuplicatePhoneResults.data.length > 0)
+        throw new Error('User already exists.');
 
       const signUpResponse = await db.auth.signUp({ email, phone, password });
       if (signUpResponse.error)

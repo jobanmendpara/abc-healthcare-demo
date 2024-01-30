@@ -1,11 +1,10 @@
-import type { useToast } from 'primevue/usetoast';
+import { toast } from 'vue-sonner';
+import { defineNuxtPlugin } from '#imports';
 
-export default defineNuxtPlugin((nuxtApp) => {
-  const getToast: typeof useToast = () => nuxtApp.vueApp.config.globalProperties.$toast;
-
+export default defineNuxtPlugin(() => {
   return {
     provide: {
-      toast: getToast(),
+      toast,
     },
   };
 });

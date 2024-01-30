@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import type { CompleteUser, UserSettings } from '~/types';
+import type { UserQueryData } from '~/types';
 
-type UserQueryData = CompleteUser & {
-  settings: Omit<UserSettings, 'id'>
-};
-
-const userData = ref(useQueryClient().getQueryData(['user']) as UserQueryData);
+const userData = computed(() => useQueryClient().getQueryData(['user']) as UserQueryData);
 
 definePageMeta({
   layout: 'main',

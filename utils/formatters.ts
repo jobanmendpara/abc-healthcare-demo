@@ -1,3 +1,3 @@
 export function formatToPhone(input: string) {
-  return `+1 (${input.slice(0, 3)}) ${input.slice(3, 6)} - ${input.slice(6)}`;
+  return `(${input.slice(1, 4)}) ${input.slice(4, 7)} - ${input.slice(7)}`;
 }

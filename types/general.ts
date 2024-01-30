@@ -6,13 +6,13 @@ export enum AppRoutes {
   CONFIRM = '/confirm',
   HOME = '/home',
   NOT_FOUND = '/404',
-  PEOPLE = '/people',
-  SIGN_IN = '/signin',
+  LOGIN = '/login',
   SIGN_UP = '/signup',
   VERIFY = '/verify',
+  USERS = '/users',
 }
 
-export enum AppSignInMethods {
+export enum AppLoginMethods {
   EMAIL = 'email',
   PHONE = 'phone',
   GOOGLE = 'google',

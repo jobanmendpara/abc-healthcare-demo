@@ -9,7 +9,6 @@ import {
   hydrate,
 } from '@tanstack/vue-query';
 
-// Nuxt 3 app aliases
 import { defineNuxtPlugin, useState } from '#imports';
 
 export default defineNuxtPlugin((nuxt) => {
@@ -25,7 +24,7 @@ export default defineNuxtPlugin((nuxt) => {
       mutations: {
         throwOnError: true,
         onError: (error) => {
-          $toast.add({
+          $toast.error({
             severity: 'error',
             summary: 'Error',
             detail: error.message,

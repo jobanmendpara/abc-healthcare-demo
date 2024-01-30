@@ -1,6 +1,6 @@
 import type { Assignment, CompleteUser, Geopoint, User } from '~/types';
 
-export function buildCompleteUser(user: User, geopoint: Geopoint, assignments: Record<string, Assignment>): CompleteUser {
+export function buildCompleteUser(user: User, geopoint: Geopoint, assignments?: Record<string, Assignment>): CompleteUser {
   return {
     id: user.id,
     first_name: user.first_name,

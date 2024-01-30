@@ -11,7 +11,7 @@ export function validateEmail(email: string) {
 export function validatePhone(phone: string) {
   const regex = /^\d{10}$/;
 
-  return regex.test(phone);
+  return regex.test(phone.slice(-10));
 }
 
 export function validatePassword(password: string) {

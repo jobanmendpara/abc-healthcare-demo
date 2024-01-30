@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'uTyme',
+  title: 'abc Healthcare',
   meta: [
     {
       name: 'description',
@@ -24,12 +24,12 @@ useHead({
 
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center gap-16">
-    <h1 class="text-5xl font-extrabold text-slate-400 sm:text-[5rem]">
-      u <span class="text-glow text-primary-500">·</span>
-      <span class="text-slate-700">Tyme</span>
+    <h1 class="text-5xl font-extrabold sm:text-[5rem]">
+      abc &#x2022; Healthcare
     </h1>
+    <h2 class="text-3xl">As simple as that</h2>
     <NuxtLink
-      class="rounded-lg bg-surface-500 px-4 py-2 text-white hover:bg-primary-500"
+      class="bg-primary text-secondary rounded-lg px-4 py-2"
       :to="AppRoutes.SIGN_IN"
     >
       Sign In

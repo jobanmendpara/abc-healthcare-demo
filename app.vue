@@ -2,8 +2,8 @@
 </script>
 
 <template>
+  <Toaster />
   <NuxtLayout>
     <NuxtPage />
-    <Toast />
   </NuxtLayout>
 </template>

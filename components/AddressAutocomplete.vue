@@ -1,83 +1,157 @@
 <script setup lang="ts">
 import { Loader } from '@googlemaps/js-api-loader';
-import type { AutoCompleteCompleteEvent } from 'primevue/autocomplete';
 import type { Geopoint } from '~/types';
 
+const props = defineProps({
+  value: {
+    type: Object as PropType<Geopoint>,
+    required: true,
+  },
+});
 const emits = defineEmits(['select']);
 
-const loader = new Loader({
-  apiKey: useRuntimeConfig().public.gmapsApiKey,
-  version: 'weekly',
-  libraries: ['places'],
-  region: 'US',
-});
-const places = await loader
-  .importLibrary('places')
-  .then((res) => {
-    return res;
+const {
+  autocomplete,
+  buttonText,
+  currentValue,
+  geopoints,
+  reset,
+  searchTerm,
+  selectGeopoint,
+} = await useAutocomplete();
+const { isOpen } = usePopover();
+
+function usePopover() {
+  const isOpen = ref(false);
+
+  return {
+    isOpen,
+  };
+}
+
+async function useAutocomplete() {
+  const buttonText = ref<string | null>();
+  const currentValue = ref<Geopoint | null>(props.value);
+  const searchTerm = ref('');
+  const loader = new Loader({
+    apiKey: useRuntimeConfig().public.gmapsApiKey,
+    version: 'weekly',
+    libraries: ['places'],
+    region: 'US',
   });
-const autocompleteService = new places.AutocompleteService();
-const geocoderService = new google.maps.Geocoder();
-const localValue = ref<Geopoint | undefined>();
-let predictions: google.maps.places.QueryAutocompletePrediction[] | null = [];
-let geopoints: Geopoint[] = [];
+  const places = await loader
+    .importLibrary('places')
+    .then((res) => {
+      return res;
+    });
+  const autocompleteService = new places.AutocompleteService();
+  const geocoderService = new google.maps.Geocoder();
+  let predictions: google.maps.places.QueryAutocompletePrediction[] | null = [];
+  const geopoints = ref<Set<Geopoint>>(new Set());
 
-async function autocomplete(event: AutoCompleteCompleteEvent) {
-  geopoints = [];
+  async function autocomplete(event: Event) {
+    if (!event.target)
+      return;
 
-  const { query } = event;
-  if (!query) {
-    predictions = [];
-    return;
+    const { value: input } = event.target as HTMLInputElement;
+    geopoints.value = new Set<Geopoint>();
+
+    if (input.length < 3) {
+      predictions = [];
+      return;
+    }
+
+    autocompleteService.getQueryPredictions({ input }, (results) => {
+      predictions = results ?? [];
+    });
+
+    if (!predictions)
+      return;
+
+    const newGeopoints = ref(new Set<Geopoint>());
+    predictions.forEach(async (prediction) => {
+      const geolocation = await geocoderService.geocode({ placeId: prediction.place_id }, (results) => {
+        if (results)
+          return results;
+      });
+
+      newGeopoints.value.add({
+        id: geolocation.results[0].place_id,
+        latitude: geolocation.results[0].geometry.location.lat(),
+        longitude: geolocation.results[0].geometry.location.lng(),
+        formatted_address: geolocation.results[0].formatted_address,
+      });
+    });
+
+    geopoints.value = newGeopoints.value;
   }
 
-  autocompleteService.getQueryPredictions({ input: query }, (results) => {
-    predictions = results ?? [];
-  });
+  function reset() {
+    currentValue.value = null;
+    buttonText.value = null;
+  }
 
-  if (!predictions)
-    return;
+  function selectGeopoint(geopoint: Geopoint) {
+    emits('select', geopoint);
+    currentValue.value = geopoint;
+    buttonText.value = currentValue.value.formatted_address;
+    isOpen.value = false;
+    geopoints.value = new Set<Geopoint>();
+  }
 
-  predictions.forEach(async (prediction) => {
-    const geolocation = await geocoderService.geocode({ placeId: prediction.place_id }, (results) => {
-      if (results)
-        return results;
-    });
-
-    geopoints.push({
-      id: geolocation.results[0].place_id,
-      aptNumber: '',
-      formattedAddress: geolocation.results[0].formatted_address,
-      latitude: geolocation.results[0].geometry.location.lat(),
-      longitude: geolocation.results[0].geometry.location.lng(),
-    });
-  });
-
-  return geopoints;
+  return {
+    autocomplete,
+    buttonText,
+    currentValue,
+    geopoints,
+    reset,
+    searchTerm,
+    selectGeopoint,
+  };
 }
 </script>
 
 <template>
-  <span class="p-float-label">
-    <AutoComplete
-      id="address"
-      v-model="localValue"
-      class="w-full"
-      :class="localValue ? 'p-valid border-green-500' : 'p-invalid border-red-500'"
-      input-id="address"
-      :input-class="`${localValue ? 'p-valid border-green-500' : 'p-invalid border-red-500'} px-3 py-2 leading-tight shadow focus:outline-none w-full`"
-      option-label="formattedAddress"
-      :suggestions="geopoints"
-      @complete="autocomplete"
-      @item-select="(address) => $emit('select', address.value)"
-    />
-    <label
-      class="mb-2 block text-sm font-bold"
-      for="address"
-    >
-      Address
-    </label>
-  </span>
+  <Popover v-model:open="isOpen">
+    <div class="w-full text-center">
+      <PopoverTrigger>
+        <div class="space-x-2 mb-4">
+          <Button
+            :class="(currentValue ?? initGeopoint()).formatted_address ? '' : 'bg-red-500 hover:bg-red-700'"
+            @click.prevent=""
+          >
+            {{ buttonText ?? 'Select Address' }}
+          </Button>
+          <Button
+            variant="outline"
+            @click.prevent="reset"
+          >
+            Reset
+          </Button>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent>
+        <Command v-model:search-term="searchTerm">
+          <CommandInput @input="async (event: Event) => await autocomplete(event)" />
+          <CommandEmpty>No Address Found</CommandEmpty>
+          <CommandList>
+            <CommandGroup>
+              <CommandItem
+                v-for="(geopoint, index) in geopoints"
+                :key="geopoint.id"
+                :value="geopoint.formatted_address"
+                @select="selectGeopoint(geopoint)"
+              >
+                <span v-if="index < 5">
+                  {{ geopoint.formatted_address }}
+                </span>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </div>
+  </Popover>
 </template>
 
 <style scoped></style>

@@ -8,3 +8,5 @@ export * from './auth';
 export * from './user';
 export * from './userSettings';
 export * from './invite';
+export * from './ui';
+export * from './query';

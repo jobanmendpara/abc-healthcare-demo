@@ -2,26 +2,16 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import type { InviteFormData, Role } from '~/types';
 
-const props = defineProps({
-  isVisible: {
-    type: Boolean,
-    default: false,
-  },
-  role: {
-    type: String as PropType<Role>,
-    default: '',
-  },
-});
-const emit = defineEmits(['hide']);
-const { $toast } = useNuxtApp();
+const { $server, $toast, $user } = useNuxtApp();
 const queryClient = useQueryClient();
-const { $server } = useNuxtApp();
-const visible = ref<boolean>(false);
 const email = ref<string>('');
+const role = ref<Role>('employee');
+
+const { isOpen } = useDialog();
 
 const { mutate: submit, isPending } = useMutation({
   mutationFn: async (inviteFormData: Omit<InviteFormData, 'id'>) => await $server.auth.invite.mutate({
-    id: useSupabaseUser().value!.id,
+    id: $user.value!.id,
     ...inviteFormData,
   }),
   onMutate: (inviteFormData) => {
@@ -30,58 +20,82 @@ const { mutate: submit, isPending } = useMutation({
 
     return inviteFormData;
   },
-  onSuccess() {
+  onSuccess: () => {
     queryClient.invalidateQueries({
-      queryKey: ['people'],
+      queryKey: [usersKeys.all],
     });
     email.value = '';
-    emit('hide');
+    role.value = 'employee';
+    isOpen.value = false;
 
-    $toast.add({
-      severity: 'success',
-      summary: 'Invite Sent',
-      detail: 'The invite has been sent.',
-    });
+    $toast.success('Invite sent!');
   },
-  throwOnError: true,
+  onError: (error) => {
+    $toast.error(error.message);
+  },
 });
 
-watch(
-  () => props.isVisible,
-  (newValue) => {
-    visible.value = newValue;
-  },
-);
+function useDialog() {
+  const isOpen = ref(false);
+
+  return {
+    isOpen,
+  };
+}
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    header="Invite User"
-    :closable="!isPending"
-    @hide="$emit('hide')"
-  >
-    <form
-      class="space-y-4"
-      @submit.prevent="submit({ email, role })"
-    >
-      <InputText
-        id="email"
-        v-model="email"
-        class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
-        type="email"
-        placeholder="johndoe@acme.org"
-      />
-      <Button
-        icon="pi pi-send"
-        icon-pos="right"
-        class="w-full p-2 hover:bg-primary-700"
-        label="Send Invite"
-        type="submit"
-        :loading="isPending"
-      />
-    </form>
+  <Dialog v-model:open="isOpen">
+    <DialogTrigger>
+      <Button>
+        Invite
+      </Button>
+    </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        Invite User
+      </DialogHeader>
+      <form
+        class="space-y-4"
+        @submit.prevent="submit({ email, role })"
+      >
+        <Label for="email">
+          Email
+        </Label>
+        <Input
+          id="email"
+          v-model="email"
+          class="w-full px-3 py-2"
+          type="email"
+          placeholder="johndoe@acme.org"
+        />
+        <Select v-model="role">
+          <SelectTrigger>
+            <SelectValue placeholder="Select Role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Roles</SelectLabel>
+              <SelectItem
+                v-for="role in ['employee', 'admin', 'client']"
+                :key="role"
+                :value="role"
+              >
+                {{ role.charAt(0).toUpperCase() + role.slice(1) }}
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Button
+          class="w-full p-2"
+          type="submit"
+          :disabled="isPending"
+        >
+          Send Invite
+        </Button>
+      </form>
+      <DialogFooter />
+    </DialogContent>
   </Dialog>
 </template>
 

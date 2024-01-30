@@ -14,18 +14,22 @@ export default defineNuxtConfig({
     },
   },
   plugins: [
-    './plugins/toast.ts',
     './plugins/vue-query.ts',
-    './plugins/confirm.ts',
   ],
-  css: ['primeicons/primeicons.css', '~/assets/global.css'],
+  css: ['~/assets/global.css'],
   typescript: {
     shim: false,
   },
   build: {
     transpile: ['trpc-nuxt'],
   },
-  modules: ['@nuxtjs/supabase', '@pinia/nuxt', 'nuxt-primevue', '@vueuse/nuxt'],
+  modules: [
+    '@nuxtjs/supabase',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    'shadcn-nuxt',
+    'nuxt-icon',
+  ],
   vite: {},
   postcss: {
     plugins: {
@@ -47,22 +51,14 @@ export default defineNuxtConfig({
     serviceKey: process.env.SUPABASE_SERVICE_KEY,
     redirect: true,
     redirectOptions: {
-      login: '/signin',
+      login: '/login',
       callback: '/confirm',
       // TODO: Find a better way to pass these in to allow for easier refactor
-      exclude: ['/', '404', '/signin', '/signup']
+      exclude: ['/', '404', '/login', '/signup', '/verify']
     },
   },
   pinia: {
     storesDirs: ['./stores/**'],
-  },
-  primevue: {
-    usePrimeVue: true,
-    options: {
-      ripple: true,
-    },
-    cssLayerOrder: 'tailwind-base, primevue, tailwind-utilities',
-    importPT: { as: 'Lara', from: path.resolve(__dirname, './presets/lara/') },
   },
   components: {
     dirs: [
@@ -72,6 +68,10 @@ export default defineNuxtConfig({
       },
       {
         path: '~/components/forms',
+        pathPrefix: false,
+      },
+      {
+        path: '~/components/ui/',
         pathPrefix: false,
       },
     ],

@@ -1,26 +1,24 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
-import { usePrimeVue } from 'primevue/config';
+import { useDark, useToggle } from '@vueuse/core';
 import type { CompleteUser, UserSettings } from '~/types';
-import { AppRoutes } from '~/types';
 import { buildCompleteUser } from '~/utils/objectBuilders';
 
-const { $server } = useNuxtApp();
+const { $server, $user } = useNuxtApp();
 const { auth } = useSupabaseClient();
-const primeVue = usePrimeVue();
 const queryClient = useQueryClient();
 
-const isDarkMode = ref(false);
+const { isOpen, show } = useAccountSettings();
+const isDarkMode = useDark();
 
 const userQuery = useQuery({
   queryKey: ['user'],
   queryFn: async (): Promise<CompleteUser & { settings: Omit<UserSettings, 'id'> }> => {
-    const userResponse = await $server.users.get.query({ userIds: [useSupabaseUser().value!.id] });
+    const userResponse = await $server.users.get.query({ userIds: [$user.value!.id] });
     const geopointReponse = await $server.geopoints.get.query({ ids: [userResponse.users[0].geopoint_id] });
-    const settingsResponse = await $server.userSettings.get.query({ userIds: [useSupabaseUser().value!.id] });
+    const settingsResponse = await $server.userSettings.get.query({ userIds: [$user.value!.id] });
 
-    if (isDarkMode.value !== settingsResponse.userSettings[0].is_dark_mode)
-      applyTheme(settingsResponse.userSettings[0].is_dark_mode);
+    isDarkMode.value = settingsResponse.userSettings[0].is_dark_mode;
 
     return {
       ...buildCompleteUser(
@@ -37,14 +35,16 @@ const userQuery = useQuery({
 });
 
 const toggleThemeMutation = useMutation({
-  mutationFn: async (newSettings: Omit<UserSettings, 'id'>) => await $server.userSettings.update.mutate({
-    userSettings: [{ id: useSupabaseUser().value!.id, ...newSettings }],
+  mutationFn: async () => await $server.userSettings.update.mutate({
+    userSettings: [{ id: $user.value!.id, is_dark_mode: !isDarkMode.value }],
   }),
-  onSuccess(_data, variables, _context) {
+  onSuccess: () => {
     queryClient.invalidateQueries({
       queryKey: ['user'],
     });
-    applyTheme(variables.is_dark_mode);
+  },
+  onSettled: () => {
+    useToggle(!isDarkMode.value);
   },
 });
 
@@ -54,88 +54,43 @@ const signOutMutation = useMutation({
     queryClient.invalidateQueries({
       queryKey: ['user'],
     });
-    navigateTo(AppRoutes.SIGN_IN);
   },
 });
 
-const navItems = ref([
-  {
-    label: 'Home',
-    route: AppRoutes.HOME,
-    icon: 'pi pi-home',
-    visible: true,
-    command: () => {
-      navigateTo(AppRoutes.HOME);
-    },
-  },
-  {
-    label: 'People',
-    route: AppRoutes.PEOPLE,
-    icon: 'pi pi-user',
-    visible: () => {
-      if (!userQuery.data.value)
-        return false;
+function useAccountSettings() {
+  const isOpen = ref(false);
 
-      return userQuery.data.value.role === 'admin';
-    },
-    command: () => {
-      navigateTo(AppRoutes.PEOPLE);
-    },
-  },
-]);
+  function show() {
+    isOpen.value = true;
+  }
 
-function applyTheme(isDark: boolean) {
-  isDarkMode.value = isDark;
-
-  primeVue.changeTheme(
-    `lara-${!isDarkMode.value ? 'dark' : 'light'}-green`,
-    `lara-${!isDarkMode.value ? 'light' : 'dark'}-green`,
-    `theme`,
-  );
+  return {
+    isOpen,
+    show,
+  };
 }
 </script>
 
 <template>
-  <body class="container mx-auto grid h-screen grid-cols-[auto,1fr] gap-2 p-2">
-    <div class="overflow-y-auto">
-      <Menu :model="navItems">
-        <template #item="{ item }">
-          <NuxtLink :to="item.route">
-            <div class="p-2">
-              <i :class="item.icon" />
-              {{ item.label }}
-            </div>
-          </NuxtLink>
-        </template>
-        <template #end>
-          <hr class="mb-2">
-          <div class="inline-flex w-full items-center justify-center gap-2 p-2">
-            <i class="pi pi-sun" />
-            <InputSwitch
-              v-model="isDarkMode"
-              @click="() => toggleThemeMutation.mutate({ is_dark_mode: !isDarkMode })"
-            />
-          </div>
-          <NuxtLink
-            to="/"
-            @click="signOutMutation.mutate"
-          >
-            <div class="inline-flex w-full items-center justify-between gap-2 p-2 hover:bg-red-500">
-              <p>Sign Out</p>
-              <i class="pi pi-sign-out" />
-            </div>
-          </NuxtLink>
-        </template>
-      </Menu>
-    </div>
-    <main>
-      <Card class="min-h-full overflow-y-auto">
-        <template #content>
-          <slot v-if="userQuery.status.value === 'success'" />
-        </template>
-      </Card>
+  <body :class="`${isDarkMode ? 'dark' : ''} h-screen overflow-hidden mx-auto grid grid-cols-[auto,1fr] gap-2`">
+    <NavBar
+      :is-dark-mode="isDarkMode"
+      :role="userQuery.data.value?.role"
+      @sign-out="signOutMutation.mutate"
+      @toggle-dark-mode="toggleThemeMutation.mutate"
+      @show-account-settings="show"
+    />
+    <main class="container pt-3 overflow-auto scrollbar-width-none">
+      <slot v-if="userQuery.status.value === 'success'" />
+      <AccountSettings
+        v-model:open="isOpen"
+      />
     </main>
   </body>
 </template>
 
-<style scoped></style>
+<style scoped>
+.scrollbar-width-none {
+  scrollbar-width: none;
+}
+</style>
