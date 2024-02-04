@@ -6,16 +6,16 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['assignments', 'info']);
+const emits = defineEmits(['clickAssignments', 'clickInfo']);
 
 const actions = [
   {
     label: 'Info',
-    action: () => emits('info', props.id),
+    action: () => emits('clickInfo', props.id),
   },
   {
     label: 'Assignments',
-    action: () => emits('assignments', props.id),
+    action: () => emits('clickAssignments', props.id),
   },
 ];
 </script>

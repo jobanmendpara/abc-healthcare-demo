@@ -1,32 +1,45 @@
+import type { inferQueryKeyStore } from '@lukemorales/query-key-factory';
 import { createQueryKeyStore } from '@lukemorales/query-key-factory';
-import type { Role } from '~/types';
+import { api } from '~/plugins/server';
+import { useSupabaseUser } from '#imports';
+import type { ListParams, UsersListParams } from '~/types';
 
-const { $server } = useNuxtApp();
-
-interface PageDataRequest {
-  page: number
-  size: number
-}
+const supabaseUser = useSupabaseUser();
 
 export const queries = createQueryKeyStore({
+  app: {
+    user: (userId: string) => ({
+      queryKey: [userId],
+      queryFn: async () => {
+        const userResponse = await api.users.getById.query({ userIds: [userId] });
+        const userSettingsResponse = await api.userSettings.get.query({ userIds: [userId] });
+
+        const user = userResponse.data.get(supabaseUser.value!.id);
+        if (!user)
+          throw new Error('User not found');
+        const settings = userSettingsResponse.userSettings.find(setting => setting.id === user.id);
+        if (!settings)
+          throw new Error('User settings not found');
+
+        return {
+          ...user,
+          settings,
+        };
+      },
+    }),
+  },
   invites: {
-    page: ({ page, size }: PageDataRequest) => ({
-      queryKey: [page],
-      queryFn: $server.invites.list.query({ page, size }),
+    list: (input: ComputedRef<ListParams>) => ({
+      queryKey: [input] as const,
+      queryFn: async () => await api.invites.list.query(input.value),
     }),
   },
   users: {
-    page: ({
-      userIds,
-      role,
-      page,
-      size,
-    }: {
-      userIds: string[]
-      role: Role
-    } & PageDataRequest) => ({
-      queryKey: [page],
-      queryFn: $server.users.get.query({ userIds, page, size, role }),
+    all: null,
+    list: (input: ComputedRef<UsersListParams>) => ({
+      queryKey: [input] as const,
+      queryFn: async () => await api.users.list.query(input.value),
     }),
   },
 });
+export type QueryKeys = inferQueryKeyStore<typeof queries>;

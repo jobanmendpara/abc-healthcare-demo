@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AlertDialogDescription } from 'radix-vue';
-import type { CompleteUser } from '~/types';
+import type { User } from '~/types';
 
 const props = defineProps({
   open: {
@@ -8,8 +8,8 @@ const props = defineProps({
     default: false,
   },
   user: {
-    type: Object as PropType<CompleteUser>,
-    default: () => initCompleteUser(),
+    type: Object as PropType<User>,
+    default: () => initUser(),
   },
 });
 

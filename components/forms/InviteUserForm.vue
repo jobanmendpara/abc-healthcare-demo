@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import type { InviteFormData, Role } from '~/types';
 
-const { $server, $toast, $user } = useNuxtApp();
+const { $api, $toast, $user } = useNuxtApp();
 const queryClient = useQueryClient();
 const email = ref<string>('');
 const role = ref<Role>('employee');
@@ -10,7 +9,7 @@ const role = ref<Role>('employee');
 const { isOpen } = useDialog();
 
 const { mutate: submit, isPending } = useMutation({
-  mutationFn: async (inviteFormData: Omit<InviteFormData, 'id'>) => await $server.auth.invite.mutate({
+  mutationFn: async (inviteFormData: Omit<InviteFormData, 'id'>) => await $api.auth.invite.mutate({
     id: $user.value!.id,
     ...inviteFormData,
   }),

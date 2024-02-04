@@ -1,8 +1,9 @@
-import type { AppRoutes } from './general';
+import type { RoutesNamesList } from '@typed-router';
 
 export interface NavItem {
   label: string
-  route: AppRoutes
+  name: RoutesNamesList
+  params?: unknown
   visible: boolean
   icon?: string
 }

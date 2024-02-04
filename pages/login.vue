@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import type { AuthTokenResponse } from '@supabase/supabase-js';
-import { useMutation } from '@tanstack/vue-query';
 import type { LoginCredentials } from '~/types';
-import { AppRoutes } from '~/types';
 
-const { $server, $toast } = useNuxtApp();
+const { $api, $toast } = useNuxtApp();
 const { auth } = useSupabaseClient();
 
 // WARN: Remove before Prod
@@ -13,7 +11,7 @@ const password = ref<string>('dev');
 const phone = ref<string>('6208039700');
 
 const loginWithCredentialsMutation = useMutation({
-  mutationFn: async (credentials: LoginCredentials) => await $server.auth.loginWithCredentials.mutate({ credentials }) as AuthTokenResponse['data'],
+  mutationFn: async (credentials: LoginCredentials) => await $api.auth.loginWithCredentials.mutate({ credentials }) as AuthTokenResponse['data'],
   onSuccess: async (data) => {
     if (!data.user && !data.session)
       throw new Error('No user or session returned from Supabase');
@@ -21,7 +19,7 @@ const loginWithCredentialsMutation = useMutation({
     await auth.setSession(data.session);
 
     $toast.success('Welcome!');
-    navigateTo(AppRoutes.HOME);
+    navigateTo({ name: 'Home' });
   },
   onError: (error) => {
     $toast.error(error.message);
@@ -29,9 +27,12 @@ const loginWithCredentialsMutation = useMutation({
 });
 
 const loginWithPhoneMutation = useMutation({
-  mutationFn: async (phone: string) => await $server.auth.loginWithPhone.mutate({ phone }),
+  mutationFn: async (phone: string) => await $api.auth.loginWithPhone.mutate({ phone }),
   onSuccess: async () => {
-    navigateTo(`${AppRoutes.VERIFY}?phone=${phone}`);
+    navigateTo({
+      name: 'Verify',
+      query: { phone: phone.value },
+    });
     $toast.success('Please enter the OTP sent to your phone.');
   },
   onError: error => $toast.error(error.message),
@@ -39,6 +40,7 @@ const loginWithPhoneMutation = useMutation({
 
 definePageMeta({
   layout: 'default',
+  name: 'Login',
 });
 </script>
 
@@ -55,6 +57,7 @@ definePageMeta({
           class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
           type="email"
           placeholder="johndoe@acme.org"
+          autocomplete="username"
         />
       </div>
       <div class="mb-6">
@@ -71,6 +74,7 @@ definePageMeta({
           class="focus:shadow-outline mb-3 w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
           type="password"
           placeholder="********"
+          autocomplete="current-password"
         />
       </div>
       <Button

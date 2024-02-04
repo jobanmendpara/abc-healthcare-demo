@@ -3,19 +3,9 @@ import path from 'node:path';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
-    head: {
-      link: [
-        {
-          id: 'theme',
-          rel: 'stylesheet',
-          href: 'themes/lara-dark-green/theme.css',
-        },
-      ],
-    },
+    head: {},
   },
-  plugins: [
-    './plugins/vue-query.ts',
-  ],
+  plugins: [],
   css: ['~/assets/global.css'],
   typescript: {
     shim: false,
@@ -23,14 +13,34 @@ export default defineNuxtConfig({
   build: {
     transpile: ['trpc-nuxt'],
   },
+  imports: {
+    autoImport: true,
+  },
   modules: [
+    '@hebilicious/vue-query-nuxt',
     '@nuxtjs/supabase',
+    '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@vueuse/nuxt',
     'shadcn-nuxt',
     'nuxt-icon',
+    'nuxt-typed-router',
   ],
+  nuxtTypedRouter: {
+    plugin: true,
+  },
   vite: {},
+  vueQuery: {
+    autoImports: [
+      'useQuery',
+      'useQueries',
+      'useInfiniteQuery',
+      'useMutation',
+      'useIsFetching',
+      'useIsMutating',
+      'useQueryClient'
+    ],
+  },
   postcss: {
     plugins: {
       tailwindcss: {},

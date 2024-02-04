@@ -1,124 +1,44 @@
 <script setup lang="ts">
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
-import type { Assignment, CompleteUser, Role } from '~/types';
-import { buildCompleteUser } from '~/utils/objectBuilders';
+import { keepPreviousData } from '@tanstack/vue-query';
+import { Views, useUserInfo, useViewController } from '~/pages/Users/composables';
 import { queries } from '~/queries';
+import type { ListParams, UsersListParams } from '~/types';
 
-const { $server, $toast, $user } = useNuxtApp();
-const { id: userId } = $user.value!;
+const { $api, $toast } = useNuxtApp();
 
-const {
-  usersData,
-  inviteData,
-} = useTable();
-const { toggleAssignments } = useAssignments();
-const { activeUser, isUserInfoOpen, setUserInfo } = useUserInfo();
-const { getCompleteUser } = useHelpers();
-const { activeView, tabs, Views } = useViewController();
+const { isOpen: isUserInfoOpen, showUserInfo, user } = useUserInfo();
+const { activeRole, activeView, setView, tabs } = useViewController();
 const queryClient = useQueryClient();
 
-function getRole(view: string): Role {
-  switch (view) {
-    case Views.EMPLOYEES:
-      return 'employee';
-    case Views.ADMINS:
-      return 'admin';
-    case Views.CLIENTS:
-      return 'client';
-    default:
-      return 'employee';
-  }
-}
+const usersTablePage = ref(1);
+const invitesTablePage = ref(1);
 
-function usePageData() {
-  const users = useQuery({
-    ...queries.users.page({
-      userIds: [userId],
-      role: getRole(activeView.value),
-      page: 1,
-      size: 10,
-    }),
-    enabled: activeView.value !== Views.INVITES,
-  });
+const activeUsersListParams = computed<UsersListParams>(() => ({
+  role: activeRole.value,
+  page: usersTablePage.value,
+  size: 10,
+}));
 
-  const invites = useQuery({
-    ...queries.invites.page(1, 10),
-  });
+const activeInvitesListParams = computed<ListParams>(() => ({
+  page: invitesTablePage.value,
+  size: 10,
+}));
 
-  return {
-    users,
-  };
-}
-const { data, status: usersQueryStatus } = useQuery({
-  queryKey: [usersKeys.all],
-  queryFn: async () => {
-    const usersResponse = await $server.users.fetch.query({ userId });
-    const geopointIds = Object.values(usersResponse.users).map(user => user.geopoint_id);
+// @ts-expect-error queryKeyFactory type error
+const { data: usersResponse, isFetching: isUsersFetching } = useQuery({
+  ...queries.users.list(activeUsersListParams),
+  placeholderData: keepPreviousData,
+});
 
-    const geopointsResponse = await $server.geopoints.get.query({ ids: geopointIds });
-    const { geopoints } = geopointsResponse;
-
-    const userIds = Object.values(usersResponse.users).map(user => user.id);
-    const assignmentResponse = await $server.assignments.fetch.query({ userIds });
-    const { assignments } = assignmentResponse;
-
-    const assignmentsByUserId = Object.values(assignments).reduce(
-      (acc: Record<string, Record<string, Assignment>>, assignment) => {
-        if (!acc[assignment.employee_id]) {
-          acc[assignment.employee_id] = {
-            [assignment.id]: assignment,
-          };
-        }
-        if (acc[assignment.employee_id])
-          acc[assignment.employee_id][assignment.id] = assignment;
-
-        if (!acc[assignment.client_id]) {
-          acc[assignment.client_id] = {
-            [assignment.id]: assignment,
-          };
-        }
-        if (acc[assignment.client_id])
-          acc[assignment.client_id][assignment.id] = assignment;
-
-        return acc;
-      },
-      {},
-    );
-
-    const users = Object.values(usersResponse.users).reduce(
-      (acc: Record<string, CompleteUser>, user) => {
-        const completeUser = buildCompleteUser(user, geopoints[user.geopoint_id], assignmentsByUserId[user.id]);
-
-        acc[user.id] = completeUser;
-
-        return acc;
-      },
-      {},
-    );
-
-    function reduceByRole(role: Role) {
-      return Object.values(users).filter(user => user.role === role).reduce(
-        (acc: Record<string, CompleteUser>, user) => {
-          acc[user.id] = user;
-
-          return acc;
-        },
-        {},
-      );
-    }
-
-    return {
-      admins: reduceByRole('admin'),
-      clients: reduceByRole('client'),
-      employees: reduceByRole('employee'),
-      invites: usersResponse.invites,
-    };
-  },
-  staleTime: 1000 * 60 * 2,
+// @ts-expect-error queryKeyFactory type error
+const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
+  ...queries.invites.list(activeInvitesListParams),
+  enabled: false,
+  placeholderData: keepPreviousData,
 });
 
 const deleteInviteMutation = useMutation({
-  mutationFn: async (id: string) => await $server.auth.deleteInvite.mutate({ ids: [id] }),
+  mutationFn: async (id: string) => await $api.auth.deleteInvite.mutate({ ids: [id] }),
   onSuccess: () => {
     queryClient.invalidateQueries({
       queryKey: [],
@@ -131,7 +51,7 @@ const deleteInviteMutation = useMutation({
 });
 
 const deleteUserMutation = useMutation({
-  mutationFn: async (id: string) => await $server.users.delete.mutate({ userIds: [id] }),
+  mutationFn: async (id: string) => await $api.users.delete.mutate({ userIds: [id] }),
   onSuccess: () => {
     queryClient.invalidateQueries({
       queryKey: [],
@@ -146,99 +66,16 @@ const deleteUserMutation = useMutation({
   },
 });
 
-function useAssignments() {
-  const isAssignmentsDetailsOpen = ref(false);
-
-  function toggleAssignments(id?: string) {
-    isAssignmentsDetailsOpen.value = !isAssignmentsDetailsOpen.value;
-    if (id)
-      activeUser.value = getCompleteUser(id);
-  }
-
-  return {
-    isAssignmentsDetailsOpen,
-    toggleAssignments,
-  };
-}
-
-function useTable() {
-  const usersData = computed(() => {
-    const dataMap = new Map<string, CompleteUser[]>();
-    dataMap.set(Views.EMPLOYEES, Object.values(data.value!.employees));
-    dataMap.set(Views.ADMINS, Object.values(data.value!.admins));
-    dataMap.set(Views.CLIENTS, Object.values(data.value!.clients));
-
-    return dataMap;
-  });
-
-  const inviteData = computed(() => Object.values(data.value!.invites ?? {}));
-
-  return {
-    usersData,
-    inviteData,
-  };
-}
-
-function useUserInfo() {
-  const activeUser = ref<CompleteUser>(initCompleteUser());
-  const isUserInfoOpen = ref(false);
-
-  function setUserInfo(id: string) {
-    isUserInfoOpen.value = true;
-    return activeUser.value = getCompleteUser(id);
-  }
-
-  return {
-    activeUser,
-    isUserInfoOpen,
-    setUserInfo,
-  };
-}
-
-function useViewController() {
-  enum Views {
-    EMPLOYEES = 'Employees',
-    ADMINS = 'Admins',
-    CLIENTS = 'Clients',
-    INVITES = 'Invites',
-  }
-
-  const activeView = ref(Views.EMPLOYEES);
-  const tabs: Record<string, Views> = {};
-  tabs[Views.EMPLOYEES] = Views.EMPLOYEES;
-  tabs[Views.ADMINS] = Views.ADMINS;
-  tabs[Views.CLIENTS] = Views.CLIENTS;
-  tabs[Views.INVITES] = Views.INVITES;
-
-  return {
-    activeView,
-    Views,
-    tabs,
-  };
-}
-
-function useHelpers() {
-  function getCompleteUser(id: string) {
-    switch (activeView.value) {
-      case Views.EMPLOYEES:
-        return data.value!.employees[id];
-      case Views.ADMINS:
-        return data.value!.admins[id];
-      case Views.CLIENTS:
-        return data.value!.clients[id];
-      default:
-        return initCompleteUser();
-    }
-  }
-
-  return {
-    getCompleteUser,
-  };
-}
-
 definePageMeta({
   layout: 'main',
   name: 'Users',
+});
+
+watchEffect(() => {
+  if (activeView.value !== Views.INVITES)
+    usersTablePage.value = 1;
+  else
+    invitesTablePage.value = 1;
 });
 </script>
 
@@ -251,9 +88,9 @@ definePageMeta({
   </div>
   <div class="space-y-1">
     <Tabs
-      v-model:modelValue="activeView"
+      v-model="activeView"
       class="w-full"
-      @update:model-value="(newValue: string) => activeView = tabs[newValue]"
+      @update:model-value="(newView: Views) => setView(newView)"
     >
       <TabsList>
         <TabsTrigger
@@ -264,26 +101,24 @@ definePageMeta({
         </TabsTrigger>
       </TabsList>
     </Tabs>
-    <p v-if="usersQueryStatus === 'pending'">
-      Loading...
-    </p>
-    <div v-if="usersQueryStatus === 'success'">
-      <UsersDataTable
-        v-if="activeView !== Views.INVITES"
-        :data="usersData.get(activeView)"
-        @info="(id: string) => setUserInfo(id)"
-        @assignments="(id: string) => toggleAssignments(id)"
-      />
-      <InvitesDataTable
-        v-else
-        :data="inviteData"
-        @delete="(id: string) => deleteInviteMutation.mutate(id)"
-      />
-      <UserInfo
-        v-model:open="isUserInfoOpen"
-        v-model:user="activeUser"
-        @delete="(id: string) => deleteUserMutation.mutate(id)"
-      />
-    </div>
+    <UsersDataTable
+      v-if="activeView !== Views.INVITES"
+      v-model:page="usersTablePage"
+      :data="usersResponse?.list"
+      :has-next-page="usersResponse?.hasNextPage"
+      :loading="isUsersFetching"
+      @show-info="(id: string) => showUserInfo(usersResponse!.list.find((user) => user.id === id))"
+    />
+    <InvitesDataTable
+      v-if="activeView === Views.INVITES"
+      v-model:page="invitesTablePage"
+      :data="invitesResponse?.list"
+      :has-next-page="invitesResponse?.hasNextPage"
+      :loading="isInvitesFetching"
+    />
+    <UserInfo
+      v-model:open="isUserInfoOpen"
+      :user="user"
+    />
   </div>
 </template>

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { AppRoutes } from '~/types';
-
 definePageMeta({
   layout: 'default',
 });
@@ -27,10 +25,12 @@ useHead({
     <h1 class="text-5xl font-extrabold sm:text-[5rem]">
       abc &#x2022; Healthcare
     </h1>
-    <h2 class="text-3xl">As simple as that</h2>
+    <h2 class="text-3xl">
+      As simple as that
+    </h2>
     <NuxtLink
-      class="bg-primary text-secondary rounded-lg px-4 py-2"
-      :to="AppRoutes.SIGN_IN"
+      class="bg-primary hover:cursor-pointer text-secondary rounded-lg px-4 py-2"
+      :to="{ name: 'Login' }"
     >
       Sign In
     </NuxtLink>

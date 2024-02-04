@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import { useQueryClient } from '@tanstack/vue-query';
-import type { UserQueryData } from '~/types';
+import { queries } from '~/queries';
 
-const userData = computed(() => useQueryClient().getQueryData(['user']) as UserQueryData);
+const { $user } = useNuxtApp();
+
+const { data: user, status } = useQuery(queries.app.user($user.value!.id));
 
 definePageMeta({
   layout: 'main',
+  name: 'Home',
 });
 </script>
 
 <template>
-  <div class="text-center">
+  <div
+    v-if="status === 'success' && user"
+    class="text-center"
+  >
     <h1 class="text-left text-2xl font-semibold">
-      Hi, {{ userData.first_name }}
+      Hi, {{ user.first_name }}
     </h1>
   </div>
 </template>

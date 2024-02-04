@@ -1,35 +1,64 @@
-<script setup lang="ts" generic="TData, TValue">
+<script setup lang="ts" generic="TValue">
 import type { ColumnDef } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table';
 import { columns as defaultColumns } from '~/components/dataTables/users/usersDataTableColumns';
-import type { CompleteUser } from '~/types';
+import type { User } from '~/types';
 
 const props = defineProps({
   columns: {
-    type: Array as PropType<ColumnDef<TData, TValue>[]>,
+    type: Array as PropType<ColumnDef<User, TValue>[]>,
     default: () => defaultColumns,
   },
   data: {
-    type: Array as PropType<TData[]>,
+    type: Array as PropType<User[]>,
     default: () => [],
+  },
+  hasNextPage: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  page: {
+    type: Number,
+    default: 1,
+  },
+  size: {
+    type: Number,
+    default: 10,
   },
 });
 
-const emits = defineEmits(['info', 'assignments']);
+const emit = defineEmits(['update:page', 'update:size', 'showInfo', 'showAssignments']);
 
-const useTable = useVueTable({
+const localPage = useVModel(props, 'page', emit);
+const localSize = useVModel(props, 'size', emit);
+
+const table = useVueTable({
   get data() { return props.data; },
   get columns() { return props.columns; },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
 });
+
+function goToNextPage() {
+  table.nextPage();
+  localPage.value = table.getState().pagination.pageIndex + 1;
+}
+
+function goToPreviousPage() {
+  table.previousPage();
+  localPage.value = table.getState().pagination.pageIndex + 1;
+}
 </script>
 
 <template>
   <Table>
     <TableHeader>
       <TableRow
-        v-for="headerGroup in useTable.getHeaderGroups()"
+        v-for="headerGroup in table.getHeaderGroups()"
         :key="headerGroup.id"
       >
         <TableHead
@@ -45,9 +74,16 @@ const useTable = useVueTable({
       </TableRow>
     </TableHeader>
     <TableBody>
-      <template v-if="useTable.getRowModel().rows?.length">
+      <template v-if="loading">
+        <TableRow v-for="_row in Array.from({ length: localSize })">
+          <TableCell v-for="_cell in Array.from({ length: 4 })">
+            <Skeleton class="w-auto h-[20px] rounded-full" />
+          </TableCell>
+        </TableRow>
+      </template>
+      <template v-else>
         <TableRow
-          v-for="row in useTable.getRowModel().rows "
+          v-for="row in table.getRowModel().rows "
           :key="row.id"
           :data-state="row.getIsSelected() ? 'selected' : undefined"
         >
@@ -62,29 +98,34 @@ const useTable = useVueTable({
           </TableCell>
           <TableCell>
             <UsersDataTableActions
-              :id="(row.original as CompleteUser).id"
-              @info="(id: string) => emits('info', id)"
-              @assignments="(id: string) => emits('assignments', id)"
+              :id="(row.original as User).id"
+              @click-info="(id: string) => emit('showInfo', id)"
+              @click-assignments="(id: string) => emit('showAssignments', id)"
             />
           </TableCell>
         </TableRow>
       </template>
     </TableBody>
   </Table>
-  <div class="flex items-center justify-end py-4 space-x-2">
+  <div class="flex items-center justify-between py-4 space-x-4">
     <Button
       variant="outline"
       size="sm"
-      :disabled="!useTable.getCanPreviousPage()"
-      @click="useTable.previousPage()"
+      :disabled="localPage < 2"
+      @click="goToPreviousPage"
     >
       Previous
     </Button>
+    <div>
+      <p class="bg-secondary text-primary rounded-md px-7 py-1 text-center">
+        {{ localPage }}
+      </p>
+    </div>
     <Button
       variant="outline"
       size="sm"
-      :disabled="!useTable.getCanNextPage()"
-      @click="useTable.nextPage()"
+      :disabled="!hasNextPage"
+      @click="goToNextPage"
     >
       Next
     </Button>

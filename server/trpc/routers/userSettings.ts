@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure } from '../trpc';
+import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
 import { userSettingsSchema } from '~/types';
 
 export const userSettingsRouter = createTRPCRouter({
-  get: publicProcedure
+  get: authorizedProcedure
     .input(z.object({
       userIds: z.array(z.string().uuid()),
     }))
@@ -21,7 +21,7 @@ export const userSettingsRouter = createTRPCRouter({
         userSettings: data,
       };
     }),
-  update: publicProcedure
+  update: authorizedProcedure
     .input(z.object({
       userSettings: z.array(userSettingsSchema),
     }))

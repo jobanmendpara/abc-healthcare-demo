@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useQueryClient } from '@tanstack/vue-query';
 import { useVModel } from '@vueuse/core';
-import type { CompleteUser } from '~/types';
+import type { User } from '~/types';
 
 const props = defineProps({
   open: {
@@ -17,7 +16,7 @@ const { formData } = useForm();
 const { isOpen } = useDialog();
 
 function useForm() {
-  const formData = ref(initCompleteUser());
+  const formData = ref(initUser());
 
   return {
     formData,
@@ -29,9 +28,9 @@ function useDialog() {
 
   watchEffect(() => {
     if (isOpen.value)
-      formData.value = queryClient.getQueryData<CompleteUser>(['user'])!;
+      formData.value = queryClient.getQueryData<User>(['user'])!;
     else
-      formData.value = initCompleteUser();
+      formData.value = initUser();
   });
 
   return {

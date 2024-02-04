@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { NavItem, Role } from '~/types';
-import { AppRoutes } from '~/types';
+import type { ListParams, NavItem, Role } from '~/types';
 
 const props = defineProps({
   isDarkMode: {
@@ -20,13 +19,18 @@ const isDarkMode = props.isDarkMode;
 const navItems = computed<NavItem[]>(() => [
   {
     label: 'Home',
-    route: AppRoutes.HOME,
+    name: 'Home',
     icon: 'ph:house',
     visible: true,
   },
   {
     label: 'Users',
-    route: AppRoutes.USERS,
+    name: 'Users',
+    params: {
+      role: 'employee',
+      page: 1,
+      size: 10,
+    } as ListParams,
     icon: 'ph:users-three',
     visible: props.role === 'admin',
   },
@@ -41,7 +45,7 @@ const navItems = computed<NavItem[]>(() => [
           <NuxtLink
             v-for="item in navItems"
             :key="item.label"
-            :to="item.route"
+            :to="{ name: item.name }"
           >
             <NavigationMenuItem
               v-if="item.visible"
@@ -77,7 +81,7 @@ const navItems = computed<NavItem[]>(() => [
             </NavigationMenuItem>
           </div>
           <NuxtLink
-            :to="AppRoutes.LOGIN"
+            :to="{ name: 'Login' }"
             class="w-full hover:cursor-pointer"
             @click="emit('signOut')"
           >

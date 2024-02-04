@@ -1,23 +1,6 @@
-import { initTRPC } from '@trpc/server';
-import type { H3Event } from 'h3';
+import { TRPCError, initTRPC } from '@trpc/server';
 import superjson from 'superjson';
-import type { AppDatabaseClient, Database } from '~/types';
-import { serverSupabaseServiceRole } from '#supabase/server';
-
-interface CreateContextOptions {
-  db: AppDatabaseClient
-};
-
-function createInnerTRPCContext(opts: CreateContextOptions) {
-  return { ...opts };
-}
-
-export async function createTRPCContext(event: H3Event) {
-  // INFO: Type error if type assertion is removed. May need to revisit later.
-  return createInnerTRPCContext({
-    db: serverSupabaseServiceRole<Database['public']>(event) as unknown as AppDatabaseClient,
-  });
-}
+import type { createTRPCContext } from './context';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -27,5 +10,29 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 });
 
 export const createTRPCRouter = t.router;
-
 export const publicProcedure = t.procedure;
+
+export const authorizedProcedure = publicProcedure
+  .use(async ({
+    ctx,
+    next,
+  }) => {
+    const { db, token } = ctx;
+
+    if (!token)
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+
+    const { data: { user: auth }, error } = await db.auth.getUser(token);
+    if (error)
+      throw new Error(error.message);
+    if (!auth)
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+
+    const { data: requestor, error: userInfoError } = await db.from('users').select().eq('id', auth.id).single();
+    if (userInfoError)
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    if (!requestor)
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+
+    return next({ ctx: { db, requestor } });
+  });

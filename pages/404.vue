@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  name: '404',
+});
+</script>
 
 <template>
   <div class="flex flex-col items-center justify-center gap-12 px-4 py-16">

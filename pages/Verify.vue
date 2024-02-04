@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { AppRoutes } from '~/types';
-
 const { $db, $toast, $user } = useNuxtApp();
-const { query } = useRoute();
 
 const token = ref<string>('');
-const { phone } = query;
+const { phone } = useRoute().query;
 
 async function submit() {
   const { error } = await $db.auth.verifyOtp({
@@ -13,7 +10,7 @@ async function submit() {
     type: 'sms',
     phone: `1${phone!.toString() ?? ''}`,
     options: {
-      redirectTo: AppRoutes.HOME,
+      redirectTo: routesNames.home,
     },
   });
 
@@ -23,12 +20,13 @@ async function submit() {
 
 definePageMeta({
   middleware: ['verify-sign-in'],
+  name: 'Verify',
 });
 
 // WARN: Consider a moving redirection to submit()
 watchEffect(() => {
   if ($user.value)
-    navigateTo('/home');
+    navigateTo({ name: 'Home' });
 });
 </script>
 

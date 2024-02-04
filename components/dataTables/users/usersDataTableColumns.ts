@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/vue-table';
-import type { CompleteUser } from '~/types';
+import type { User } from '~/types';
 
-export const columns: ColumnDef<CompleteUser>[] = [
+export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'first_name',
     header: 'First Name',

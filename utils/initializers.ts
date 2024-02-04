@@ -1,4 +1,4 @@
-import type { CompleteUser, Geopoint, User, UserSettings } from '~/types';
+import type { Geopoint, User, UserSettings } from '~/types';
 
 export function initGeopoint(): Geopoint {
   return {
@@ -21,14 +21,10 @@ export function initUser(): User {
     geopoint_id: '',
     role: 'employee',
     is_active: false,
+    geopoint: initGeopoint(),
+    assignments: [],
   };
 };
-
-export function initCompleteUser(): CompleteUser {
-  const newUser: CompleteUser = { ...initUser(), geopoint: initGeopoint() };
-
-  return newUser;
-}
 
 export function initUserSettings(id: string): UserSettings {
   return {

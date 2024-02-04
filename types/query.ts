@@ -1,6 +1,5 @@
-import type { CompleteUser } from './user';
-import type { UserSettings } from './userSettings';
+import type { User, UserSettings } from '~/types';
 
-export type UserQueryData = CompleteUser & {
+export type UserQueryData = User & {
   settings: Omit<UserSettings, 'id'>
 };

@@ -3,19 +3,21 @@ import { createTRPCNuxtClient, httpBatchLink } from 'trpc-nuxt/client';
 
 import type { AppRouter } from '~~/server/trpc/root';
 
+export const api = createTRPCNuxtClient<AppRouter>({
+  transformer: superjson,
+  links: [
+    httpBatchLink({
+      url: '/api/trpc',
+    }),
+  ],
+});
+
 export default defineNuxtPlugin(() => {
-  const server = createTRPCNuxtClient<AppRouter>({
-    transformer: superjson,
-    links: [
-      httpBatchLink({
-        url: '/api/trpc',
-      }),
-    ],
-  });
+  const clientAPI = api;
 
   return {
     provide: {
-      server,
+      api: clientAPI,
     },
   };
 });

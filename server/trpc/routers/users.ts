@@ -1,35 +1,56 @@
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure } from '../trpc';
-import { initUserSettings } from '~/utils/initializers';
-import type { Tables } from '~/types';
+import { TRPCError } from '@trpc/server';
+import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
+import { getCompleteUsers } from '~/server/db/helpers';
+import { calculatePageRange, initUserSettings } from '~/utils';
+import type { User } from '~/types';
 import { roleEnumSchema, userSchema } from '~/types';
 
 export const usersRouter = createTRPCRouter({
-  create: publicProcedure
-    .input(z.object({
-      users: z.array(userSchema),
-    }))
-    .output(z.void())
-    .mutation(async ({ ctx: { db }, input: { users } }) => {
-      const insertUserQuery = await db.from('users').insert(users).select();
+  create: authorizedProcedure
+    .input(
+      z.object({
+        user: userSchema,
+      }),
+    ).output(
+      z.void(),
+    ).mutation(async ({
+      ctx: { db, requestor },
+      input: { user },
+    }) => {
+      if (requestor.role !== 'admin')
+        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+      const newUser: Omit<User, 'geopoint' | 'assignments'> = user;
+      const geopoint = user.geopoint;
+      const insertUserQuery = await db.from('users').insert(newUser).select();
       if (insertUserQuery.error)
         throw new Error(insertUserQuery.error.message);
-      if (!insertUserQuery.data)
-        throw new Error('No data returned.');
 
-      const initialUserSettings = users.map(({ id }) => initUserSettings(id));
+      const insertGeopointQuery = await db.from('geopoints').insert(geopoint).select();
+      if (insertGeopointQuery.error)
+        throw new Error(insertGeopointQuery.error.message);
+
+      const initialUserSettings = initUserSettings(user.id);
       const insertUserSettingsQuery = await db.from('user_settings').insert(initialUserSettings).select();
       if (insertUserSettingsQuery.error)
         throw new Error(insertUserSettingsQuery.error.message);
-      if (!insertUserSettingsQuery.data)
-        throw new Error('No data returned.');
-    }),
-  delete: publicProcedure
-    .input(z.object({
-      userIds: z.array(z.string().uuid()),
-    }))
-    .output(z.void())
-    .mutation(async ({ ctx: { db }, input }) => {
+    },
+    ),
+  delete: authorizedProcedure
+    .input(
+      z.object({
+        userIds: z.array(z.string().uuid()),
+      }),
+    ).output(
+      z.void(),
+    )
+    .mutation(async ({
+      ctx: { db, requestor },
+      input,
+    }) => {
+      if (requestor.role !== 'admin')
+        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+
       let assignmentsId: string[] = [];
 
       const deleteUserSettingsQuery = await db.from('user_settings').delete().in('id', input.userIds).select();
@@ -57,102 +78,74 @@ export const usersRouter = createTRPCRouter({
         if (deleteTimecardsQuery.error)
           throw new Error(deleteTimecardsQuery.error.message);
       });
-    }),
-  fetch: publicProcedure
-    .input(z.object({
-      userId: z.string().uuid(),
-    }))
-    .output(z.object({
-      users: z.record(z.string().uuid(), userSchema),
-      invites: z.record(z.string().uuid(), z.object({
-        id: z.string().uuid(),
-        email: z.string().email(),
+    },
+    ),
+  list: authorizedProcedure
+    .input(
+      z.object({
         role: roleEnumSchema,
-      })).optional(),
+        page: z.number().int().positive(),
+        size: z.number().int().positive(),
+      }),
+    ).output(z.object({
+      list: z.array(userSchema),
+      hasNextPage: z.boolean(),
     }))
-    .query(async ({ ctx: { db }, input: { userId } }) => {
-      let invites: Record<string, Tables<'invites'>> = {};
-      let users: Record<string, Tables<'users'>> = {};
-      const getRequestor = await db.from('users').select().eq('id', userId).single();
+    .query(async ({
+      ctx: { db, requestor },
+      input: { role, page, size },
+    }) => {
+      if (requestor.role !== 'admin')
+        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      if (getRequestor.error)
-        throw new Error(getRequestor.error.message);
-      if (!getRequestor.data)
-        throw new Error('No data returned.');
+      const { start, end } = calculatePageRange(page, size);
 
-      const { role } = getRequestor.data;
+      const { data: users, error: usersError } = await db.from('users').select().order('last_name', { ascending: true }).eq('role', role).range(start, end);
+      if (usersError)
+        throw new Error(usersError.message);
+      if (!users)
+        throw new Error('No users returned.');
 
-      if (role === 'admin') {
-        const getAllUsers = await db.from('users').select().order('last_name', { ascending: true });
-        if (getAllUsers.error)
-          throw new Error(getAllUsers.error.message);
-        if (!getAllUsers.data)
-          throw new Error('No data returned.');
+      const { data: nextPage, error: nextPageError } = await db.from('users').select().eq('role', role).range(end, end + 1);
+      if (nextPageError)
+        throw new Error(nextPageError.message);
 
-        const getAllInvites = await db.from('invites').select();
-        if (getAllInvites.error)
-          throw new Error(getAllInvites.error.message);
-        if (!getAllInvites.data)
-          throw new Error('No data returned.');
-
-        invites = getAllInvites.data.reduce((acc: Record<string, Tables<'invites'>>, invite) => {
-          acc[invite.id] = invite;
-
-          return acc;
-        }, {});
-
-        users = getAllUsers.data.reduce((acc: Record<string, Tables<'users'>>, user) => {
-          acc[user.id] = user;
-
-          return acc;
-        }, {});
-      }
-      else {
-        const getAssignedUsersIds = await db.from('assignments').select(`employee_id`).eq('employee_id', userId);
-        if (getAssignedUsersIds.error)
-          throw new Error(getAssignedUsersIds.error.message);
-        if (!getAssignedUsersIds.data)
-          throw new Error('No data returned.');
-
-        const userIdsList = getAssignedUsersIds.data.map(({ employee_id }) => employee_id);
-        const getAssignedUsers = await db.from('users').select().in('id', userIdsList);
-        if (getAssignedUsers.error)
-          throw new Error(getAssignedUsers.error.message);
-        if (!getAssignedUsers.data)
-          throw new Error('No data returned.');
-
-        getAssignedUsers.data.push(getRequestor.data);
-
-        users = getAssignedUsers.data.reduce((acc: Record<string, Tables<'users'>>, user) => {
-          acc[user.id] = user;
-
-          return acc;
-        }, {});
-      }
-
-      delete users[userId];
-
-      return role === 'admin' ? { users, invites } : { users };
-    }),
-  get: publicProcedure
-    .input(z.object({
-      userIds: z.array(z.string().uuid()),
-      role: roleEnumSchema,
-      page: z.number().int().positive(),
-      size: z.number().int().positive(),
-    }))
-    .output(z.object({
-      users: z.array(userSchema),
-    }))
-    .query(async ({ ctx: { db }, input: { userIds } }) => {
-      const { data, error } = await db.from('users').select().in('id', userIds);
-      if (error)
-        throw new Error(error.message);
-      if (!data)
-        throw new Error('No data returned.');
+      const list = await getCompleteUsers(db, users);
 
       return {
-        users: data,
+        list,
+        hasNextPage: nextPage.length > 0,
+      };
+    }),
+  getById: authorizedProcedure
+    .input(
+      z.object({
+        userIds: z.array(z.string().uuid()),
+      }),
+    ).output(
+      z.object({
+        data: z.map(z.string().uuid(), userSchema),
+      }),
+    ).query(async ({
+      ctx: { db, requestor },
+      input: { userIds },
+    }) => {
+      if (requestor.role !== 'admin')
+        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+
+      const { data: users, error } = await db.from('users').select().in('id', userIds);
+      if (error)
+        throw new Error(error.message);
+
+      const completeUsers = await getCompleteUsers(db, users);
+
+      const data = completeUsers.reduce((acc: Map<string, User>, user) => {
+        acc.set(user.id, user);
+        return acc;
+      }, new Map<string, User>());
+
+      return {
+        data,
       };
     }),
 });

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { useMutation } from '@tanstack/vue-query';
-import { AppRoutes } from '~/types';
 import type { Geopoint, Role, SignUpFormData, User } from '~/types';
 
-const { $server, $toast } = useNuxtApp();
+const { $api, $toast } = useNuxtApp();
 const route = useRoute();
 
 // WARN: Remove before Prod
@@ -54,7 +52,7 @@ function signUpFormDataToUserObject(userId: string, role: Role, formData: SignUp
 }
 
 const signUpMutation = useMutation({
-  mutationFn: async (data: SignUpFormData) => await $server.auth.signUp.mutate(data.credentials),
+  mutationFn: async (data: SignUpFormData) => await $api.auth.signUp.mutate(data.credentials),
   onMutate: async (data) => {
     if (!validateEmail(data.credentials.email))
       throw new Error('Please enter a valid email.');
@@ -79,7 +77,7 @@ const signUpMutation = useMutation({
 });
 
 const createUserMutation = useMutation({
-  mutationFn: async (user: User) => await $server.users.create.mutate({ users: [user] }),
+  mutationFn: async (user: User) => await $api.users.create.mutate({ users: [user] }),
   onSuccess: () => {
     $toast.success('User created');
   },
@@ -106,7 +104,7 @@ async function submit(localData: SignUpFormData) {
     onSettled: () => {
       localData = initSignUpFormData();
 
-      navigateTo(AppRoutes['/']);
+      navigateTo({ name: 'index' });
     },
   });
 }
@@ -114,6 +112,7 @@ async function submit(localData: SignUpFormData) {
 definePageMeta({
   layout: 'default',
   middleware: ['verify-invite'],
+  name: 'SignUp',
 });
 
 onBeforeMount(() => {

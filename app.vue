@@ -1,7 +1,9 @@
 <script setup lang="ts">
-</script>
+import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
+</script>>
 
 <template>
+  <VueQueryDevtools class="text-2xl"/>
   <Toaster />
   <NuxtLayout>
     <NuxtPage />

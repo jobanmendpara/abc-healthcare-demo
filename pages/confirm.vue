@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  name: 'Confirm',
+});
 </script>
 
 <template>

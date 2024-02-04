@@ -8,35 +8,28 @@ import {
   dehydrate,
   hydrate,
 } from '@tanstack/vue-query';
+import { toast } from 'vue-sonner';
 
 import { defineNuxtPlugin, useState } from '#imports';
 
 export default defineNuxtPlugin((nuxt) => {
-  const $toast = nuxt.vueApp.config.globalProperties.$toast;
   const vueQueryState = useState<DehydratedState | null>('vue-query');
 
-  // Modify your Vue Query global settings here
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 2,
       },
       mutations: {
-        throwOnError: true,
         onError: (error) => {
-          $toast.error({
-            severity: 'error',
-            summary: 'Error',
-            detail: error.message,
-            life: 2000,
-          });
+          toast.error(error.message);
         },
       },
     },
   });
   const options: VueQueryPluginOptions = { queryClient };
 
-  nuxt.vueApp.use(VueQueryPlugin, options);
+  // nuxt.vueApp.use(VueQueryPlugin, options);
 
   if (process.server) {
     nuxt.hooks.hook('app:rendered', () => {
