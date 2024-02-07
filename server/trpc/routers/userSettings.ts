@@ -10,7 +10,8 @@ export const userSettingsRouter = createTRPCRouter({
     .output(z.object({
       userSettings: z.array(userSettingsSchema),
     }))
-    .query(async ({ ctx: { db }, input: { userIds } }) => {
+    .query(async ({ ctx, input: { userIds } }) => {
+      const { db } = ctx;
       const { data, error } = await db.from('user_settings').select().in('id', userIds);
       if (error)
         throw new Error(error.message);

@@ -7,3 +7,10 @@ export interface NavItem {
   visible: boolean
   icon?: string
 }
+
+export enum Views {
+  EMPLOYEES = 'Employees',
+  ADMINS = 'Admins',
+  CLIENTS = 'Clients',
+  INVITES = 'Invites',
+}

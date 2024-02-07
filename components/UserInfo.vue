@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { AlertDialogDescription } from 'radix-vue';
 import type { User } from '~/types';
 
 const props = defineProps({
@@ -13,7 +12,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['delete', 'update:open', 'update:user']);
+const emit = defineEmits(['deleteUser', 'update:open', 'update:user']);
 
 const { $toast } = useNuxtApp();
 const { copy, email, isOpen } = useDialog();
@@ -104,7 +103,7 @@ function useDialog() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction @click="$emit('delete', user.id)">
+              <AlertDialogAction @click="$emit('deleteUser', user.id)">
                 Delete User
               </AlertDialogAction>
               <AlertDialogCancel>

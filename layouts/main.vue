@@ -9,8 +9,10 @@ const queryClient = useQueryClient();
 const { isOpen, show } = useAccountSettings();
 
 const { isDarkMode, toggleDarkMode } = useDarkMode();
+
 const { data: user, status } = useQuery({
   ...queries.app.user($user.value!.id),
+  refetchOnMount: false,
 });
 
 const toggleThemeMutation = useMutation({

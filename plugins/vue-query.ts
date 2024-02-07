@@ -4,7 +4,6 @@ import type {
 } from '@tanstack/vue-query';
 import {
   QueryClient,
-  VueQueryPlugin,
   dehydrate,
   hydrate,
 } from '@tanstack/vue-query';

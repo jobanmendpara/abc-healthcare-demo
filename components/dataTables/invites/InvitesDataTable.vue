@@ -2,15 +2,15 @@
 import type { ColumnDef } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table';
 import { columns as defaultColumns } from '~/components/dataTables/invites/inviteDataTableColumns';
-import type { InviteFormData } from '~/types';
+import type { Invite } from '~/types';
 
 const props = defineProps({
   columns: {
-    type: Array as PropType<ColumnDef<InviteFormData, TValue>[]>,
+    type: Array as PropType<ColumnDef<Invite, TValue>[]>,
     default: () => defaultColumns,
   },
   data: {
-    type: Array as PropType<InviteFormData[]>,
+    type: Array as PropType<Invite[]>,
     default: () => [],
   },
   hasNextPage: {
@@ -27,10 +27,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:page', 'update:size', 'delete']);
+const emit = defineEmits(['update:page', 'update:size', 'deleteInvite']);
 
 const localPage = useVModel(props, 'page', emit);
-const localSize = useVModel(props, 'size', emit);
 
 const table = useVueTable({
   get data() { return props.data; },
@@ -87,8 +86,8 @@ function goToPreviousPage() {
           </TableCell>
           <TableCell>
             <InviteDataTableActions
-              :id="(row.original as InviteFormData).id"
-              @delete="(id: string) => emit('delete', id)"
+              :id="(row.original as Invite).id"
+              @delete="(id: string) => emit('deleteInvite', id)"
             />
           </TableCell>
         </TableRow>

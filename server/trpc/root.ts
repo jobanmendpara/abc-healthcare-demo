@@ -1,5 +1,6 @@
 import { createTRPCRouter } from './trpc';
 import {
+  assignmentsRouter,
   authRouter,
   invitesRouter,
   userSettingsRouter,
@@ -7,6 +8,7 @@ import {
 } from '~/server/trpc/routers';
 
 export const appRouter = createTRPCRouter({
+  assignments: assignmentsRouter,
   auth: authRouter,
   invites: invitesRouter,
   users: usersRouter,

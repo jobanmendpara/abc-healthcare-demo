@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { assignmentSchema, geopointSchema, roleEnumSchema } from '~/types';
+import { geopointSchema, roleEnumSchema } from '~/types';
 
 export const usersTableSchema = z.object({
   id: z.string(),
@@ -16,6 +16,5 @@ export const usersTableSchema = z.object({
 export const userSchema = z.object({
   ...usersTableSchema.shape,
   geopoint: geopointSchema,
-  assignments: z.array(assignmentSchema),
 });
 export interface User extends z.infer<typeof userSchema> {}

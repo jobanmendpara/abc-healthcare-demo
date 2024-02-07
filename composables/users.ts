@@ -1,10 +1,17 @@
 import type { Role, User } from '~/types';
+import { Views } from '~/types';
 
-export enum Views {
-  EMPLOYEES = 'Employees',
-  ADMINS = 'Admins',
-  CLIENTS = 'Clients',
-  INVITES = 'Invites',
+export function useAssignments() {
+  const isOpen = ref(false);
+
+  function showAssignments() {
+    isOpen.value = true;
+  }
+
+  return {
+    isOpen,
+    showAssignments,
+  };
 }
 
 export function useUserInfo() {

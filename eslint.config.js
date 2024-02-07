@@ -12,6 +12,7 @@ export default antfu(
       'presets',
       'package.json',
       'nuxt.config.ts',
+      'components/ui/*',
       'README.md',
     ],
     stylistic: {

@@ -28,6 +28,12 @@ export const queries = createQueryKeyStore({
       },
     }),
   },
+  assignments: {
+    user: (userId: Ref<string>) => ({
+      queryKey: [userId],
+      queryFn: async () => await api.assignments.getByUserId.query({ userId: userId.value }),
+    }),
+  },
   invites: {
     list: (input: ComputedRef<ListParams>) => ({
       queryKey: [input] as const,

@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/vue-table';
-import type { InviteFormData } from '~/types';
+import type { Invite } from '~/types';
 
-export const columns: ColumnDef<InviteFormData>[] = [
+export const columns: ColumnDef<Invite>[] = [
   {
     accessorKey: 'email',
     header: 'Email',

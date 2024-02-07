@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { routesNames } from '@typed-router';
 import type { ListParams, NavItem, Role } from '~/types';
 
 const props = defineProps({

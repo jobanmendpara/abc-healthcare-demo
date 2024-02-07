@@ -6,12 +6,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['delete']);
+const emit = defineEmits(['deleteInvite']);
 
 const actions = [
   {
     label: 'Delete',
-    action: () => emit('delete', props.id),
+    action: () => emit('deleteInvite', props.id),
   },
 ];
 </script>

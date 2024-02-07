@@ -6,7 +6,7 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['clickAssignments', 'clickInfo']);
+const emits = defineEmits(['clickMenu', 'clickAssignments', 'clickInfo']);
 
 const actions = [
   {
@@ -22,7 +22,9 @@ const actions = [
 
 <template>
   <div class="space-x-1">
-    <DropdownMenu>
+    <DropdownMenu
+      @update:open="$emit('clickMenu', props.id)"
+    >
       <DropdownMenuTrigger>
         <Button variant="outline">
           &#x2022;

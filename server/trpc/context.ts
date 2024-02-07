@@ -12,11 +12,10 @@ function createInnerTRPCContext(opts: CreateContextOptions) {
   return { ...opts };
 }
 
-export async function createTRPCContext(event: H3Event) {
+export async function createTRPCContext(event: H3Event): Promise<CreateContextOptions> {
   let token: string | undefined;
   let refresh: string | undefined;
 
-  // INFO: Type error if type assertion is removed. May need to revisit later.
   const db = serverSupabaseServiceRole<Database['public']>(event) as unknown as AppDatabaseClient;
   const cookie = event.headers.get('Cookie');
 

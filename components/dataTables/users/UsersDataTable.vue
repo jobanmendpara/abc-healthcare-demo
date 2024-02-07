@@ -31,7 +31,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:page', 'update:size', 'showInfo', 'showAssignments']);
+const emit = defineEmits(['clickMenu', 'update:page', 'update:size', 'showInfo', 'showAssignments']);
 
 const localPage = useVModel(props, 'page', emit);
 const localSize = useVModel(props, 'size', emit);
@@ -99,6 +99,7 @@ function goToPreviousPage() {
           <TableCell>
             <UsersDataTableActions
               :id="(row.original as User).id"
+              @click-menu="(id: string) => emit('clickMenu', id)"
               @click-info="(id: string) => emit('showInfo', id)"
               @click-assignments="(id: string) => emit('showAssignments', id)"
             />

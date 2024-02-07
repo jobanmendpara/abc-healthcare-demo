@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { appRouter } from '../root';
+import { appRouter } from '~~/server/trpc/root';
 import { authorizedProcedure, createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
-import { deleteInvite, inviteUser } from '~/server/db/helpers';
 import { inviteRequest, loginCredentialsSchema, roleEnumSchema, userSchema } from '~/types';
 
 export const authRouter = createTRPCRouter({
@@ -20,7 +19,15 @@ export const authRouter = createTRPCRouter({
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      deleteInvite(db, ids);
+      const deleteInviteResults = await db.from('invites').delete().in('id', ids);
+      if (deleteInviteResults.error)
+        throw new Error(deleteInviteResults.error.message);
+
+      ids.forEach(async (id) => {
+        const deleteAuthResults = await db.auth.admin.deleteUser(id);
+        if (deleteAuthResults.error)
+          throw new Error(deleteAuthResults.error.message);
+      });
     }),
   invite: authorizedProcedure
     .input(
@@ -36,7 +43,32 @@ export const authRouter = createTRPCRouter({
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      inviteUser(db, input);
+      const { email, redirectTo, role } = input;
+
+      const checkIfUserExistsQueryResult = await db.from('users').select().eq('email', email);
+      if (checkIfUserExistsQueryResult.error)
+        throw new Error(checkIfUserExistsQueryResult.error.message);
+      if (checkIfUserExistsQueryResult.data.length > 0)
+        throw new Error('User already exists.');
+
+      const inviteUserResults = await db.auth.admin.inviteUserByEmail(email, {
+        redirectTo,
+      });
+      if (inviteUserResults.error)
+        throw new Error(inviteUserResults.error.message);
+
+      const { id } = inviteUserResults.data.user;
+
+      await db.from('invites').upsert(
+        {
+          id,
+          email,
+          role,
+        },
+        {
+          onConflict: 'email',
+        },
+      ).select();
     }),
   loginWithCredentials: publicProcedure
     .input(z.object({
@@ -89,6 +121,7 @@ export const authRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
       const { email, password, phone, user } = input;
+      const caller = appRouter.createCaller(ctx);
 
       const getInviteResults = await db.from('invites').select().eq('email', email).single();
       if (getInviteResults.error)
@@ -117,7 +150,6 @@ export const authRouter = createTRPCRouter({
       const role = getInviteResults.data.role;
       await db.from('invites').delete().eq('email', email);
 
-      const caller = appRouter.createCaller(ctx);
       await caller.users.create({ user });
 
       return {

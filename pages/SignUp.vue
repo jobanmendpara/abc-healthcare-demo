@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Geopoint, Role, SignUpFormData, User } from '~/types';
+import type { Role, SignUpFormData, User } from '~/types';
 
 const { $api, $toast } = useNuxtApp();
 const route = useRoute();
@@ -131,7 +131,8 @@ onBeforeMount(() => {
           <Input
             id="firstName"
             v-model="formData.first_name"
-            class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
+            class="w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:shadow-outline
+                  focus:outline-none"
             :class="isFirstNameValid ? 'border-green-500' : 'border-red-500'"
             type="text"
           />
@@ -146,7 +147,8 @@ onBeforeMount(() => {
           <Input
             id="middleName"
             v-model="formData.middle_name"
-            class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none"
+            class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight shadow
+                    focus:outline-none"
             type="text"
           />
           <Label
