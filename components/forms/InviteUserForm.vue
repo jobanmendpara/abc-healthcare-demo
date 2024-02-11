@@ -1,45 +1,47 @@
 <script setup lang="ts">
-import type { InviteFormData, Role } from '~/types';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import { invitesTableSchema } from '~/types';
 
-const { $api, $toast, $user } = useNuxtApp();
-const queryClient = useQueryClient();
-const email = ref<string>('');
-const role = ref<Role>('employee');
-
-const { isOpen } = useDialog();
-
-const { mutate: submit, isPending } = useMutation({
-  mutationFn: async (inviteFormData: Omit<InviteFormData, 'id'>) => await $api.auth.invite.mutate({
-    id: $user.value!.id,
-    ...inviteFormData,
-  }),
-  onMutate: (inviteFormData) => {
-    if (!validateEmail(inviteFormData.email))
-      throw new Error('Please enter a valid email.');
-
-    return inviteFormData;
+const props = defineProps({
+  open: {
+    type: Boolean,
+    required: false,
   },
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: [usersKeys.all],
-    });
-    email.value = '';
-    role.value = 'employee';
-    isOpen.value = false;
-
-    $toast.success('Invite sent!');
-  },
-  onError: (error) => {
-    $toast.error(error.message);
+  isMutationPending: {
+    type: Boolean,
+    required: false,
   },
 });
 
+const emit = defineEmits(['submit', 'update:open']);
+
+const formSchema = toTypedSchema(invitesTableSchema);
+
+const form = useForm({
+  validationSchema: formSchema,
+});
+
+const { isOpen } = useDialog();
+
 function useDialog() {
-  const isOpen = ref(false);
+  const isOpen = useVModel(props, 'open', emit);
 
   return {
     isOpen,
   };
+}
+
+async function onSubmit() {
+  form.setFieldValue('id', crypto.randomUUID());
+  const inviteValidationResult = await form.validate();
+
+  if (!inviteValidationResult.valid)
+    return;
+  if (!inviteValidationResult.values)
+    return;
+
+  emit('submit', inviteValidationResult.values);
 }
 </script>
 
@@ -51,49 +53,72 @@ function useDialog() {
       </Button>
     </DialogTrigger>
     <DialogContent>
-      <DialogHeader>
+      <DialogTitle>
         Invite User
-      </DialogHeader>
+      </DialogTitle>
+      <DialogDescription>
+        Please enter an email and select a role to send an invite to a new user.
+      </DialogDescription>
       <form
         class="space-y-4"
-        @submit.prevent="submit({ email, role })"
+        @submit.prevent="onSubmit()"
       >
-        <Label for="email">
-          Email
-        </Label>
-        <Input
-          id="email"
-          v-model="email"
-          class="w-full px-3 py-2"
-          type="email"
-          placeholder="johndoe@acme.org"
-        />
-        <Select v-model="role">
-          <SelectTrigger>
-            <SelectValue placeholder="Select Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Roles</SelectLabel>
-              <SelectItem
-                v-for="role in ['employee', 'admin', 'client']"
-                :key="role"
-                :value="role"
-              >
-                {{ role.charAt(0).toUpperCase() + role.slice(1) }}
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <FormField
+          v-slot="{ componentField }"
+          name="email"
+        >
+          <FormItem>
+            <FormLabel for="email">
+              Email
+            </FormLabel>
+            <FormControl>
+              <Input
+                id="email"
+                v-bind="componentField"
+                class="w-full px-3 py-2"
+                type="email"
+                placeholder="johndoe@acme.org"
+              />
+            </FormControl>
+          </FormItem>
+        </FormField>
+        <FormField
+          v-slot="{ componentField }"
+          name="role"
+        >
+          <FormItem>
+            <FormLabel for="role">
+              Role
+            </FormLabel>
+            <FormControl>
+              <Select v-bind="componentField">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Roles</SelectLabel>
+                    <SelectItem
+                      v-for="role in ['employee', 'admin', 'client']"
+                      :key="role"
+                      :value="role"
+                    >
+                      {{ role.charAt(0).toUpperCase() + role.slice(1) }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItem>
+        </FormField>
         <Button
           class="w-full p-2"
           type="submit"
-          :disabled="isPending"
+          :disabled="props.isMutationPending"
         >
           Send Invite
         </Button>
       </form>
-      <DialogFooter />
     </DialogContent>
   </Dialog>
 </template>

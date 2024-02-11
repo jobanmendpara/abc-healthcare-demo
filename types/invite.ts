@@ -7,9 +7,3 @@ export const invitesTableSchema = z.object({
   role: roleEnumSchema,
 });
 export interface Invite extends z.infer<typeof invitesTableSchema> { }
-
-export const inviteRequest = z.object({
-  ...invitesTableSchema.shape,
-  redirectTo: z.string().url(),
-});
-export interface InviteRequest extends z.infer<typeof inviteRequest> { }

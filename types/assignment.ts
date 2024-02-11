@@ -18,3 +18,10 @@ export const assignmentSchema = z.object({
   employee: assignmentUserSchema,
 });
 export type Assignment = z.infer<typeof assignmentSchema>;
+
+export const assignmentChangesSchema = z.object({
+  id: z.string().uuid(),
+  added: z.array(z.string().uuid()),
+  removed: z.array(z.string().uuid()),
+});
+export interface AssignmentChanges extends z.infer<typeof assignmentChangesSchema> {}

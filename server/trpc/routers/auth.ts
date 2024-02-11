@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { appRouter } from '~~/server/trpc/root';
 import { authorizedProcedure, createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
-import { inviteRequest, loginCredentialsSchema, roleEnumSchema, userSchema } from '~/types';
+import { invitesTableSchema, loginCredentialsSchema, roleEnumSchema, userSchema } from '~/types';
 
 export const authRouter = createTRPCRouter({
   deleteInvite: authorizedProcedure
@@ -31,7 +31,7 @@ export const authRouter = createTRPCRouter({
     }),
   invite: authorizedProcedure
     .input(
-      inviteRequest,
+      invitesTableSchema,
     )
     .output(
       z.void(),
@@ -43,7 +43,8 @@ export const authRouter = createTRPCRouter({
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      const { email, redirectTo, role } = input;
+      const { id: token, email, role } = input;
+      const redirectTo = `${useRuntimeConfig().public.baseUrl}/signup?token=${token}`;
 
       const checkIfUserExistsQueryResult = await db.from('users').select().eq('email', email);
       if (checkIfUserExistsQueryResult.error)
@@ -64,6 +65,7 @@ export const authRouter = createTRPCRouter({
           id,
           email,
           role,
+          token,
         },
         {
           onConflict: 'email',

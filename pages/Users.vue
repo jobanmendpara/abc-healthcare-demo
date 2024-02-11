@@ -2,17 +2,20 @@
 import { keepPreviousData } from '@tanstack/vue-query';
 import { queries } from '~/queries';
 import { Views } from '~/types';
+import type { Assignment, AssignmentChanges, AssignmentUser } from '~/types';
 
 const { $api, $toast, $user } = useNuxtApp();
 
-const { isOpen: isUserInfoOpen, showUserInfo, user } = useUserInfo();
+const { isOpen: isUserInfoOpen, showUserInfo } = useUserInfo();
 const { isOpen: isAssignmentsOpen, showAssignments } = useAssignments();
 const { activeRole, activeView, setView, tabs } = useViewController();
 const queryClient = useQueryClient();
 
 const usersTablePage = ref(1);
 const invitesTablePage = ref(1);
-const localUserId = ref($user.value!.id);
+const localUser = ref<Omit<User, 'settings'>>(await useQueryClient().fetchQuery(queries.app.user($user.value!.id)));
+const isInviteFormOpen = ref(false);
+const localUserId = computed(() => localUser.value.id);
 
 const activeUsersListParams = computed<UsersListParams>(() => ({
   role: activeRole.value,
@@ -40,16 +43,41 @@ const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
 });
 
 // @ts-expect-error queryKeyFactory type error
-const { data: assignmentsData } = useQuery({
+const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
   ...queries.assignments.user(localUserId),
-  staleTime: 1000 * 60,
+  staleTime: 0,
+  placeholderData: {
+    assignable: [],
+    assigned: [],
+  },
+  select: ({ assignable, assigned }: { assignable: AssignmentUser[], assigned: Assignment[] }) => {
+    const formattedAssignments = assigned.reduce((acc: AssignmentUser[], assignment) => {
+      if (localUser.value.role === 'admin')
+        return acc;
+
+      const { id, name } = assignment[
+        `${localUser.value.role === 'employee' ? 'client' : 'employee'}`
+      ];
+      acc.push({
+        id,
+        name,
+      });
+
+      return acc;
+    }, []);
+
+    return {
+      assigned: formattedAssignments,
+      assignable,
+    };
+  },
 });
 
 const deleteInviteMutation = useMutation({
   mutationFn: async (id: string) => await $api.auth.deleteInvite.mutate({ ids: [id] }),
   onSuccess: () => {
     queryClient.invalidateQueries({
-      queryKey: [],
+      queryKey: queries.invites.list._def,
     });
     $toast.success('Invite deleted');
   },
@@ -74,6 +102,38 @@ const deleteUserMutation = useMutation({
   },
 });
 
+const inviteUserMutation = useMutation({
+  mutationFn: async (inviteFormData: Invite) => await $api.auth.invite.mutate(inviteFormData),
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: queries.invites.list._def,
+    });
+    isInviteFormOpen.value = false;
+    $toast.success('Invite sent');
+  },
+  onError: (error) => {
+    $toast.error(error);
+  },
+});
+
+const updateAssignmentsMutation = useMutation({
+  mutationFn: async (assignmentChanges: AssignmentChanges) => await $api.assignments.update.mutate(assignmentChanges),
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      ...queries.assignments.user(localUserId),
+    });
+    isAssignmentsOpen.value = false;
+    $toast.success('Assignments updated');
+  },
+  onError: (error) => {
+    $toast.error(error);
+  },
+});
+
+function setUser(id: string) {
+  localUser.value = usersResponse.value?.list.find(user => user.id === id) || initUser();
+}
+
 definePageMeta({
   layout: 'main',
   name: 'Users',
@@ -92,7 +152,11 @@ watchEffect(() => {
     Users
   </h1>
   <div class="flex-basis-1/2 flex justify-end flex-grow px-5">
-    <InviteUserForm />
+    <InviteUserForm
+      v-model:open="isInviteFormOpen"
+      :is-mutation-pending="inviteUserMutation.status.value === 'pending'"
+      @submit="(invite: Invite) => inviteUserMutation.mutate(invite)"
+    />
   </div>
   <div class="space-y-1">
     <Tabs
@@ -115,8 +179,8 @@ watchEffect(() => {
       :data="usersResponse?.list"
       :has-next-page="usersResponse?.hasNextPage"
       :loading="isUsersFetching"
-      @click-menu="(id: string) => localUserId = id"
-      @show-info="showUserInfo(usersResponse!.list.find((user) => user.id === localUserId) || initUser())"
+      @click-menu="(id: string) => setUser(id)"
+      @show-info="showUserInfo(localUser)"
       @show-assignments="showAssignments()"
     />
     <InvitesDataTable
@@ -129,14 +193,19 @@ watchEffect(() => {
     />
     <UserInfo
       v-model:open="isUserInfoOpen"
-      :user="user"
+      :user="localUser"
       @delete-user="(id: string) => deleteUserMutation.mutate(id)"
     />
     <AssignmentsPickList
-      v-if="assignmentsData"
+      v-if="assignmentsQueryStatus !== 'pending'"
       v-model:open="isAssignmentsOpen"
-      :assigned="assignmentsData.assigned"
-      :assignable="assignmentsData.assignable"
+      :initial-assigned="assignmentsData!.assigned"
+      :initial-assignable="assignmentsData!.assignable"
+      :user="localUser"
+      @submit="(assignmentChanges: Omit<AssignmentChanges, 'id'>) => updateAssignmentsMutation.mutate({
+        id: localUser.id,
+        ...assignmentChanges,
+      })"
     />
   </div>
 </template>

@@ -71,16 +71,19 @@ export interface Database {
           email: string
           id: string
           role: Database['public']['Enums']['role_enum']
+          token: string | null
         }
         Insert: {
           email: string
           id: string
           role?: Database['public']['Enums']['role_enum']
+          token?: string | null
         }
         Update: {
           email?: string
           id?: string
           role?: Database['public']['Enums']['role_enum']
+          token?: string | null
         }
         Relationships: [
           {
@@ -218,7 +221,7 @@ export interface Database {
       [_ in never]: never
     }
   }
-}
+};
 
 export type Tables<
   PublicTableNameOrOptions extends

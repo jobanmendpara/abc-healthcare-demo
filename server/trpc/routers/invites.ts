@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
+import { authorizedProcedure, createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
 import { invitesTableSchema } from '~/types';
 import { calculatePageRange } from '~/utils/calculators';
 
@@ -30,4 +30,21 @@ export const invitesRouter = createTRPCRouter({
       hasNextPage: nextPage.length > 0,
     };
   }),
+  verify: publicProcedure
+    .input(
+      z.string().uuid(),
+    )
+    .output(
+      z.boolean(),
+    )
+    .query(async ({
+      ctx: { db },
+      input,
+    }) => {
+      const { data, error } = await db.from('invites').select().eq('token', input);
+      if (error)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+
+      return data.length > 0;
+    }),
 });

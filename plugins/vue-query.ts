@@ -1,6 +1,5 @@
 import type {
   DehydratedState,
-  VueQueryPluginOptions,
 } from '@tanstack/vue-query';
 import {
   QueryClient,
@@ -26,7 +25,7 @@ export default defineNuxtPlugin((nuxt) => {
       },
     },
   });
-  const options: VueQueryPluginOptions = { queryClient };
+  // const options: VueQueryPluginOptions = { queryClient };
 
   // nuxt.vueApp.use(VueQueryPlugin, options);
 
