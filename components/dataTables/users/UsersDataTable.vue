@@ -99,6 +99,7 @@ function goToPreviousPage() {
           <TableCell>
             <UsersDataTableActions
               :id="(row.original as User).id"
+              :role="(row.original as User).role"
               @click-menu="(id: string) => emit('clickMenu', id)"
               @click-info="(id: string) => emit('showInfo', id)"
               @click-assignments="(id: string) => emit('showAssignments', id)"
