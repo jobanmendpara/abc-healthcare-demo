@@ -17,6 +17,9 @@ export const assignmentsRouter = createTRPCRouter({
       const { userId } = input;
       const { db } = ctx;
 
+      if (ctx.requestor.role !== 'admin')
+        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+
       const getUserRole = await db.from('users').select('role').eq('id', userId).single();
       if (getUserRole.error && !getUserRole.data)
         throw new TRPCError({ code: 'NOT_FOUND' });
@@ -105,9 +108,12 @@ export const assignmentsRouter = createTRPCRouter({
       z.void(),
     )
     .mutation(async ({
-      ctx: { db },
+      ctx: { db, requestor },
       input,
     }) => {
+      if (requestor.role !== 'admin')
+        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+
       const getUserRoleQuery = await db.from('users').select('role').eq('id', input.id).single();
       if (getUserRoleQuery.error && !getUserRoleQuery.data)
         throw new TRPCError({ code: 'NOT_FOUND' });

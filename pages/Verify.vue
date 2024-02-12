@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { routesNames } from '@typed-router';
+
 const { $db, $toast, $user } = useNuxtApp();
 
 const token = ref<string>('');

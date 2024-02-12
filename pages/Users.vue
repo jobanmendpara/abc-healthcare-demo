@@ -137,6 +137,7 @@ function setUser(id: string) {
 definePageMeta({
   layout: 'main',
   name: 'Users',
+  middleware: ['verify-admin'],
 });
 
 watchEffect(() => {
