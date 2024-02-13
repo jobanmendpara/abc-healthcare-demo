@@ -2,7 +2,12 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { appRouter } from '~~/server/trpc/root';
 import { authorizedProcedure, createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
-import { invitesTableSchema, loginCredentialsSchema, roleEnumSchema, userSchema } from '~/types';
+import {
+  emailLoginSchema,
+  invitesTableSchema,
+  roleEnumSchema,
+  signUpFormDataSchema,
+} from '~/types';
 
 export const authRouter = createTRPCRouter({
   deleteInvite: authorizedProcedure
@@ -72,16 +77,16 @@ export const authRouter = createTRPCRouter({
         },
       ).select();
     }),
-  loginWithCredentials: publicProcedure
-    .input(z.object({
-      credentials: loginCredentialsSchema,
-    }))
+  loginWithEmail: publicProcedure
+    .input(
+      emailLoginSchema,
+    )
     .output(z.object({
       user: z.unknown(),
       session: z.unknown(),
     }))
-    .mutation(async ({ ctx: { db }, input: { credentials } }) => {
-      const { data, error } = await db.auth.signInWithPassword(credentials);
+    .mutation(async ({ ctx: { db }, input }) => {
+      const { data, error } = await db.auth.signInWithPassword(input);
 
       if (error)
         throw new Error(error.message);
@@ -110,19 +115,16 @@ export const authRouter = createTRPCRouter({
       return data;
     }),
   signUp: publicProcedure
-    .input(z.object({
-      email: z.string().email(),
-      password: z.string().min(8),
-      phone: z.string().min(10),
-      user: userSchema,
-    }))
+    .input(
+      signUpFormDataSchema,
+    )
     .output(z.object({
       userId: z.string().uuid(),
       role: roleEnumSchema,
     }))
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
-      const { email, password, phone, user } = input;
+      const { email, password, phone } = input;
       const caller = appRouter.createCaller(ctx);
 
       const getInviteResults = await db.from('invites').select().eq('email', email).single();
@@ -152,7 +154,16 @@ export const authRouter = createTRPCRouter({
       const role = getInviteResults.data.role;
       await db.from('invites').delete().eq('email', email);
 
-      await caller.users.create({ user });
+      await caller.users.create({
+        user: {
+          ...input,
+          id: authResponse.data.user.id,
+          role,
+          is_active: true,
+          geopoint_id: input.geopoint.id,
+          phone_number: input.phone,
+        },
+      });
 
       return {
         userId: authResponse.data.user.id,

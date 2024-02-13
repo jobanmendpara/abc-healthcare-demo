@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { appRouter } from '../root';
 import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
 import { calculatePageRange, initUserSettings } from '~/utils';
-import type { User } from '~/types';
+import type { Tables, User } from '~/types';
 import { roleEnumSchema, userSchema } from '~/types';
 
 export const usersRouter = createTRPCRouter({
@@ -20,15 +20,27 @@ export const usersRouter = createTRPCRouter({
     }) => {
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
-      const newUser: Omit<User, 'geopoint' | 'assignments'> = user;
+      const newUser: Tables<'users'> = {
+        id: user.id,
+        role: user.role,
+        first_name: user.first_name,
+        middle_name: user.middle_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone_number: user.phone_number,
+        is_active: true,
+        geopoint_id: user.geopoint_id,
+      };
       const geopoint = user.geopoint;
+      const insertGeopointQuery = await db.from('geopoints').upsert(geopoint, {
+        onConflict: 'id',
+      }).select();
+      if (insertGeopointQuery.error)
+        throw new Error(insertGeopointQuery.error.message);
+
       const insertUserQuery = await db.from('users').insert(newUser).select();
       if (insertUserQuery.error)
         throw new Error(insertUserQuery.error.message);
-
-      const insertGeopointQuery = await db.from('geopoints').insert(geopoint).select();
-      if (insertGeopointQuery.error)
-        throw new Error(insertGeopointQuery.error.message);
 
       const initialUserSettings = initUserSettings(user.id);
       const insertUserSettingsQuery = await db.from('user_settings').insert(initialUserSettings).select();

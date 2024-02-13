@@ -10,6 +10,18 @@ export function initGeopoint(): Geopoint {
   };
 };
 
+export function initSignUpFormData(): SignUpFormData {
+  return {
+    email: '',
+    password: '',
+    phone: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    geopoint: initGeopoint(),
+  };
+}
+
 export function initUser(): User {
   return {
     id: '',
@@ -22,7 +34,6 @@ export function initUser(): User {
     role: 'employee',
     is_active: false,
     geopoint: initGeopoint(),
-    assignments: [],
   };
 };
 
