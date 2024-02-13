@@ -145,12 +145,9 @@ export const usersRouter = createTRPCRouter({
         data: z.map(z.string().uuid(), userSchema),
       }),
     ).query(async ({
-      ctx: { db, requestor },
+      ctx: { db },
       input: { userIds },
     }) => {
-      if (requestor.role !== 'admin')
-        throw new TRPCError({ code: 'PRECONDITION_FAILED' });
-
       const { data: users, error } = await db.from('users').select().in('id', userIds).order('last_name', { ascending: true });
       if (error)
         throw new Error(error.message);
@@ -187,14 +184,10 @@ export const usersRouter = createTRPCRouter({
 
       const completeUsers = users.reduce((acc: Set<User>, user) => {
         const geopoint = geopoints.find(geopoint => geopoint.id === user.geopoint_id) ?? initGeopoint();
-        const assignments = user.role === 'employee'
-          ? employeeAssignments.filter(assignment => assignment.employee_id === user.id)
-          : clientAssignments.filter(assignment => assignment.client_id === user.id);
 
         acc.add({
           ...user,
           geopoint,
-          assignments,
         });
 
         return acc;
