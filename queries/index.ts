@@ -1,8 +1,9 @@
 import type { inferQueryKeyStore } from '@lukemorales/query-key-factory';
 import { createQueryKeyStore } from '@lukemorales/query-key-factory';
+import type { PageParams } from '@supabase/supabase-js';
 import { api } from '~/plugins/server';
 import { useSupabaseUser } from '#imports';
-import type { ListParams, UsersListParams } from '~/types';
+import type { UsersListParams } from '~/types';
 
 const supabaseUser = useSupabaseUser();
 
@@ -35,7 +36,7 @@ export const queries = createQueryKeyStore({
     }),
   },
   invites: {
-    list: (input: ComputedRef<ListParams>) => ({
+    list: (input: ComputedRef<PageParams>) => ({
       queryKey: [input] as const,
       queryFn: async () => await api.invites.list.query(input.value),
     }),

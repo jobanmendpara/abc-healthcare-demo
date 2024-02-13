@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
+import type { PageParams } from '@supabase/supabase-js';
 import { queries } from '~/queries';
 import { Views } from '~/types';
 import type { Assignment, AssignmentChanges, AssignmentUser } from '~/types';
@@ -20,12 +21,12 @@ const localUserId = computed(() => localUser.value.id);
 const activeUsersListParams = computed<UsersListParams>(() => ({
   role: activeRole.value,
   page: usersTablePage.value,
-  size: 10,
+  perPage: 10,
 }));
 
-const activeInvitesListParams = computed<ListParams>(() => ({
+const activeInvitesListParams = computed<PageParams>(() => ({
   page: invitesTablePage.value,
-  size: 10,
+  perPage: 10,
 }));
 
 // @ts-expect-error queryKeyFactory type error

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { ListParams, NavItem, Role } from '~/types';
+import type { PageParams } from '@supabase/supabase-js';
+import type { NavItem, Role } from '~/types';
 
 const props = defineProps({
   isDarkMode: {
@@ -29,8 +30,8 @@ const navItems = computed<NavItem[]>(() => [
     params: {
       role: 'employee',
       page: 1,
-      size: 10,
-    } as ListParams,
+      perPage: 10,
+    } as PageParams,
     icon: 'ph:users-three',
     visible: props.role === 'admin',
   },

@@ -97,8 +97,8 @@ export const usersRouter = createTRPCRouter({
     .input(
       z.object({
         role: roleEnumSchema,
-        page: z.number().int().positive(),
-        size: z.number().int().positive(),
+        page: z.number().int().positive().default(1),
+        perPage: z.number().int().positive().default(10),
       }),
     ).output(z.object({
       list: z.array(userSchema),
@@ -106,7 +106,7 @@ export const usersRouter = createTRPCRouter({
     }))
     .query(async ({
       ctx,
-      input: { role, page, size },
+      input: { role, page, perPage },
     }) => {
       const { db, requestor } = ctx;
       const caller = appRouter.createCaller(ctx);
@@ -114,7 +114,7 @@ export const usersRouter = createTRPCRouter({
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      const { start, end } = calculatePageRange(page, size);
+      const { start, end } = calculatePageRange(page, perPage);
 
       const { data: users, error: usersError } = await db.from('users').select().order('last_name', { ascending: true }).eq('role', role).range(start, end);
       if (usersError)

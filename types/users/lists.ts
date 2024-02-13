@@ -1,5 +1,6 @@
-import type { ListParams, Role } from '~/types';
+import type { PageParams } from '@supabase/supabase-js';
+import type { Role } from '~/types';
 
-export interface UsersListParams extends ListParams {
+export interface UsersListParams extends PageParams {
   role: Role
 }
