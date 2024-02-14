@@ -15,11 +15,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits(['submit', 'showPasswordChange']);
 
 const { $toast } = useNuxtApp();
 
-const { isOpen } = useDialog();
+const isOpen = useVModel(props, 'open', emit);
 
 const schema = z.object({
   first_name: z.string().min(1).max(255),
@@ -42,14 +42,6 @@ const form = useForm({
   },
   keepValuesOnUnmount: true,
 });
-
-function useDialog() {
-  const isOpen = useVModel(props, 'open', emit);
-
-  return {
-    isOpen,
-  };
-}
 
 async function onSubmit() {
   const formValidationResult = await form.validate();
@@ -202,6 +194,14 @@ watchEffect(() => {
           Save
         </Button>
       </form>
+      <div class="text-center">
+        <Button
+          variant="link"
+          @click="$emit('showPasswordChange')"
+        >
+          Change Password
+        </Button>
+      </div>
     </DialogContent>
   </Dialog>
 </template>

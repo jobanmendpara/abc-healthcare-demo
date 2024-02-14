@@ -25,7 +25,7 @@ const form = useForm({
 const { isOpen } = useDialog();
 
 function useDialog() {
-  const isOpen = useVModel(props, 'open', emit);
+  const isOpen = ref(false);
 
   return {
     isOpen,

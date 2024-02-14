@@ -23,3 +23,9 @@ export const signUpFormDataSchema = z.object({
   ...emailLoginSchema.shape,
 });
 export type SignUpFormData = z.infer<typeof signUpFormDataSchema>;
+
+export const changePasswordRequestSchema = z.object({
+  oldPassword: z.string(),
+  newPassword: z.string().min(8).regex(/\d/).regex(/[!@#$%^&*(),.?":{}|<>]/).regex(/[a-z]/).regex(/[A-Z]/),
+});
+export interface ChangePasswordRequest extends z.infer<typeof changePasswordRequestSchema> {}

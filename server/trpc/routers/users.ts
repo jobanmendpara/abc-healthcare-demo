@@ -265,5 +265,11 @@ export const usersRouter = createTRPCRouter({
         throw new Error(updateUserQuery.error.message);
       if (!updateUserQuery.data)
         throw new Error('No user updated.');
+
+      const updateAuthQuery = await db.auth.admin.updateUserById(input.id, {
+        email: input.email,
+      });
+      if (updateAuthQuery.error)
+        throw new Error(updateAuthQuery.error.message);
     }),
 });

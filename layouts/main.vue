@@ -6,40 +6,14 @@ const { $api, $toast, $user } = useNuxtApp();
 const { auth } = useSupabaseClient();
 const queryClient = useQueryClient();
 
-const { isOpen, show } = useAccountSettings();
+const { isOpen: isAccountSettingsOpen, show: showAccountSettings } = useDialog();
+const { isOpen: isPasswordChangeOpen, show: showPasswordChange } = useDialog();
 
 const { isDarkMode, toggleDarkMode } = useDarkMode();
 
 const { data: user, status } = useQuery({
   ...queries.app.user($user.value!.id),
   refetchOnMount: false,
-});
-
-const updateUserMutation = useMutation({
-  mutationFn: async (user: Partial<User>) => await $api.users.update.mutate(user),
-  onSuccess: () => {
-    queryClient.invalidateQueries(queries.app.user($user.value!.id));
-    $toast.success('User updated successfully');
-    isOpen.value = false;
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-});
-
-const toggleThemeMutation = useMutation({
-  mutationFn: async () => await $api.userSettings.update.mutate({
-    userSettings: [{ id: $user.value!.id, is_dark_mode: !isDarkMode.value }],
-  }),
-  onSuccess: () => {
-    queryClient.invalidateQueries(queries.app.user($user.value!.id));
-  },
-  onError: (error) => {
-    $toast.error(error);
-  },
-  onSettled: () => {
-    toggleDarkMode(!isDarkMode.value);
-  },
 });
 
 const signOutMutation = useMutation({
@@ -56,18 +30,50 @@ function useDarkMode() {
   };
 }
 
-function useAccountSettings() {
-  const isOpen = ref(false);
+const toggleThemeMutation = useMutation({
+  mutationFn: async () => await $api.userSettings.update.mutate({
+    userSettings: [{ id: $user.value!.id, is_dark_mode: !isDarkMode.value }],
+  }),
+  onSuccess: () => {
+    queryClient.invalidateQueries(queries.app.user($user.value!.id));
+  },
+  onError: (error) => {
+    $toast.error(error);
+  },
+  onSettled: () => {
+    toggleDarkMode(!isDarkMode.value);
+  },
+});
 
-  function show() {
-    isOpen.value = true;
+const updateUserMutation = useMutation({
+  mutationFn: async (user: Partial<User>) => await $api.users.update.mutate(user),
+  onSuccess: () => {
+    queryClient.invalidateQueries(queries.app.user($user.value!.id));
+    $toast.success('User updated successfully');
+    isAccountSettingsOpen.value = false;
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+});
+
+const updatePasswordMutation = useMutation({
+  mutationFn: async ({ oldPassword, newPassword }: { oldPassword: string, newPassword: string }) =>
+    await $api.auth.updatePassword.mutate({ newPassword, oldPassword }),
+  onSuccess: () => {
+    $toast.success('Password updated successfully');
+    isPasswordChangeOpen.value = false;
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+});
+
+watchEffect(() => {
+  if (isPasswordChangeOpen.value) {
+    isAccountSettingsOpen.value = false;
   }
-
-  return {
-    isOpen,
-    show,
-  };
-}
+});
 </script>
 
 <template>
@@ -80,14 +86,19 @@ function useAccountSettings() {
       :role="user.role"
       @sign-out="signOutMutation.mutate"
       @toggle-dark-mode="toggleThemeMutation.mutate"
-      @show-account-settings="show"
+      @show-account-settings="showAccountSettings"
     />
     <main class="container pt-3 overflow-auto scrollbar-width-none">
       <slot />
       <AccountSettings
-        v-model:open="isOpen"
+        v-model:open="isAccountSettingsOpen"
         :user="user"
         @submit="(user: Partial<User>) => updateUserMutation.mutate(user)"
+        @show-password-change="showPasswordChange"
+      />
+      <PasswordChange
+        v-model:open="isPasswordChangeOpen"
+        @submit="(val: ChangePasswordRequest) => updatePasswordMutation.mutate(val)"
       />
     </main>
   </body>

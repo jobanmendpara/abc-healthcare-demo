@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   },
   imports: {
     autoImport: true,
-    dirs: [ 'types/*.ts', 'types/**/*.ts'],
+    dirs: [ 'types/*.ts', 'types/**/*.ts' ],
   },
   modules: [
     '@hebilicious/vue-query-nuxt',

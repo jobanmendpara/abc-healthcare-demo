@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { appRouter } from '~~/server/trpc/root';
 import { authorizedProcedure, createTRPCRouter, publicProcedure } from '~/server/trpc/trpc';
 import {
+  changePasswordRequestSchema,
   emailLoginSchema,
   invitesTableSchema,
   roleEnumSchema,
@@ -169,6 +170,30 @@ export const authRouter = createTRPCRouter({
         userId: authResponse.data.user.id,
         role,
       };
+    }),
+  updatePassword: authorizedProcedure
+    .input(
+      changePasswordRequestSchema,
+    )
+    .output(
+      z.void(),
+    )
+    .mutation(async ({
+      ctx: { db, requestor },
+      input: { oldPassword, newPassword },
+    }) => {
+      const verifyLoginQuery = await db.auth.signInWithPassword({
+        email: requestor.email,
+        password: oldPassword,
+      });
+      if (verifyLoginQuery.error)
+        throw new Error(verifyLoginQuery.error.message);
+
+      const updatePasswordQuery = await db.auth.admin.updateUserById(requestor.id, {
+        password: newPassword,
+      });
+      if (updatePasswordQuery.error)
+        throw new Error(updatePasswordQuery.error.message);
     }),
   verifyAdmin: authorizedProcedure
     .input(
