@@ -15,6 +15,18 @@ const { data: user, status } = useQuery({
   refetchOnMount: false,
 });
 
+const updateUserMutation = useMutation({
+  mutationFn: async (user: Partial<User>) => await $api.users.update.mutate(user),
+  onSuccess: () => {
+    queryClient.invalidateQueries(queries.app.user($user.value!.id));
+    $toast.success('User updated successfully');
+    isOpen.value = false;
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+});
+
 const toggleThemeMutation = useMutation({
   mutationFn: async () => await $api.userSettings.update.mutate({
     userSettings: [{ id: $user.value!.id, is_dark_mode: !isDarkMode.value }],
@@ -72,7 +84,11 @@ function useAccountSettings() {
     />
     <main class="container pt-3 overflow-auto scrollbar-width-none">
       <slot />
-      <AccountSettings v-model:open="isOpen" />
+      <AccountSettings
+        v-model:open="isOpen"
+        :user="user"
+        @submit="(user: Partial<User>) => updateUserMutation.mutate(user)"
+      />
     </main>
   </body>
 </template>

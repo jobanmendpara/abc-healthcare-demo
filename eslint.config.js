@@ -43,6 +43,7 @@ export default antfu(
       'plugin:vue/vue3-recommended',
     ],
     rules: {
+      'curly': 'off',
       '@typescript-eslint/consistent-type-imports': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',

@@ -33,14 +33,14 @@ const activeInvitesListParams = computed<PageParams>(() => ({
 const { data: usersResponse, isFetching: isUsersFetching } = useQuery({
   ...queries.users.list(activeUsersListParams),
   placeholderData: keepPreviousData,
-  staleTime: 1000 * 60,
+  staleTime: 1000 * 60 * 3,
 });
 
 // @ts-expect-error queryKeyFactory type error
 const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
   ...queries.invites.list(activeInvitesListParams),
   placeholderData: keepPreviousData,
-  staleTime: 1000 * 60,
+  staleTime: 1000 * 60 * 3,
 });
 
 // @ts-expect-error queryKeyFactory type error

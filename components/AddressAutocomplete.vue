@@ -109,6 +109,13 @@ async function useAutocomplete() {
     selectGeopoint,
   };
 }
+
+onMounted(() => {
+  if (props.value) {
+    currentValue.value = props.value;
+    buttonText.value = currentValue.value.formatted_address;
+  }
+});
 </script>
 
 <template>

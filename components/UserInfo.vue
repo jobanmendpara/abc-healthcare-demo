@@ -87,6 +87,18 @@ function useDialog() {
             />
           </div>
         </div>
+        <div class="flex items-center gap-2">
+          <b>Address: </b>
+          <div
+            class="inline-flex items-center gap-2 hover:cursor-pointer"
+            @click="copy(user.geopoint.formatted_address || '')"
+          >
+            <p>{{ user.geopoint.formatted_address }}</p>
+            <Icon
+              name="ph:copy"
+            />
+          </div>
+        </div>
       </div>
       <DialogFooter>
         <AlertDialog>
