@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { routesNames } from '@typed-router';
 import type { AuthTokenResponse } from '@supabase/supabase-js';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';

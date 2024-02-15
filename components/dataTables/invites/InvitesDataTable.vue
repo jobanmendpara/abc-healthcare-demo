@@ -1,5 +1,7 @@
 <script setup lang="ts" generic="TValue">
 import type { ColumnDef } from '@tanstack/vue-table';
+
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table';
 import { columns as defaultColumns } from '~/components/dataTables/invites/inviteDataTableColumns';
 import type { Invite } from '~/types';
