@@ -3,7 +3,6 @@ export default defineNuxtConfig({
   app: {
     head: {},
   },
-  plugins: [],
   css: ['~/assets/global.css'],
   typescript: {
     shim: false,
@@ -63,7 +62,14 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/confirm',
       // TODO: Find a better way to pass these in to allow for easier refactor
-      exclude: ['/', '404', '/login', '/signup', '/verify']
+      exclude: [
+        '/',
+        '404',
+        '/MagicLink',
+        '/Login',
+        '/SignUp',
+        '/PasswordlessLogin'
+      ]
     },
   },
   pinia: {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { routesNames } from '@typed-router';
 import type { AuthTokenResponse } from '@supabase/supabase-js';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -40,30 +41,14 @@ const emailLoginMutation = useMutation({
   },
 });
 
-const phoneLoginMutation = useMutation({
-  mutationFn: async (phone: string) => await $api.auth.loginWithPhone.mutate({ phone }),
-  onSuccess: () => {
-    navigateTo({
-      name: 'Verify',
-      query: {
-        phone: form.values.phone,
-      },
-    });
-    $toast.success('Check your phone for a confirmation code');
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-});
-
 async function onEmailLoginSubmit() {
   const { valid: isEmailValid } = await form.validateField('email');
-  // const { valid: isPasswordValid } = await form.validateField('password');
+  const { valid: isPasswordValid } = await form.validateField('password');
 
-  // if (!isEmailValid || !isPasswordValid) {
-  //   $toast.error('Invalid form data');
-  //   return;
-  // }
+  if (!isEmailValid || !isPasswordValid) {
+    $toast.error('Invalid form data');
+    return;
+  }
 
   emailLoginMutation.mutate({
     email: form.values.email!,
@@ -71,30 +56,15 @@ async function onEmailLoginSubmit() {
   });
 }
 
-async function onPhoneLoginSubmit() {
-  const { valid: isPhoneValid } = await form.validateField('phone');
-
-  if (!isPhoneValid) {
-    $toast.error('Invalid form data');
-    return;
-  }
-
-  if (!form.values.phone) {
-    $toast.error('Invalid form data');
-    return;
-  }
-
-  phoneLoginMutation.mutate(form.values.phone!);
-}
-
 definePageMeta({
   layout: 'default',
+  middleware: ['verify-magic-link'],
   name: 'Login',
 });
 </script>
 
 <template>
-  <div class="container mx-auto my-16 rounded-lg p-8 shadow-md sm:w-full md:w-1/3">
+  <div class="container mx-auto my-16 rounded-lg p-8 shadow-md space-y-2 sm:w-full md:w-1/3">
     <form
       class="space-y-5"
       @submit.prevent="onEmailLoginSubmit"
@@ -147,39 +117,13 @@ definePageMeta({
         Sign In with Email
       </Button>
     </form>
-    <p class="py-5 text-center">
-      or
-    </p>
-    <form
-      class="space-y-5"
-      @submit.prevent="onPhoneLoginSubmit"
-    >
-      <FormField
-        v-slot="{ componentField }"
-        name="phone"
+    <div class="text-center">
+      <NuxtLink
+        class="hover:cursor-pointer px-4 py-2"
+        :to="{ name: 'PasswordlessLogin' }"
       >
-        <FormItem>
-          <FormLabel
-            class="mb-2 block text-sm font-bold"
-            for="phone"
-          >
-            Phone Number
-          </FormLabel>
-          <FormControl>
-            <Input
-              id="phone"
-              v-bind="componentField"
-              type="tel"
-              placeholder="1235559999"
-            />
-          </FormControl>
-        </FormItem>
-      </FormField>
-      <Button class="mb-4 w-full px-4 py-2 font-bold">
-        Sign In With Phone
-      </Button>
-    </form>
+        Passwordless Login
+      </NuxtLink>
+    </div>
   </div>
 </template>
-
-<style scoped></style>

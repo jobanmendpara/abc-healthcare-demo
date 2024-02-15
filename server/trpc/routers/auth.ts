@@ -115,6 +115,56 @@ export const authRouter = createTRPCRouter({
 
       return data;
     }),
+  getMagicLink: publicProcedure
+    .input(z.object({
+      email: z.string().email(),
+    }))
+    .output(
+      z.void(),
+    )
+    .mutation(async ({
+      ctx: { db },
+      input,
+    }) => {
+      const existingUser = await db.from('users').select().eq('email', input.email).single();
+      if (existingUser.error)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      if (!existingUser.data)
+        throw new TRPCError({ code: 'NOT_FOUND' });
+
+      const magicLink = await db.auth.signInWithOtp({
+        email: input.email,
+        options: {
+          emailRedirectTo: `${useRuntimeConfig().public.baseUrl}/login?email=${input.email}`,
+          shouldCreateUser: false,
+        },
+      });
+      if (magicLink.error)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+    }),
+  loginWithMagicLink: publicProcedure
+    .input(z.object({
+      email: z.string().email(),
+      token: z.string(),
+    }))
+    .output(z.object({
+      user: z.unknown(),
+      session: z.unknown(),
+    }))
+    .mutation(async ({
+      ctx: { db },
+      input,
+    }) => {
+      const { data, error } = await db.auth.verifyOtp({
+        type: 'magiclink',
+        email: input.email,
+        token: input.token,
+      });
+      if (error)
+        throw new Error(error.message);
+
+      return data;
+    }),
   signUp: publicProcedure
     .input(
       signUpFormDataSchema,
