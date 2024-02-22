@@ -9,14 +9,19 @@ import {
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
+interface Props extends /* @vue-ignore */ SelectContentProps {
+  class?: string
+}
+interface Emits extends /* @vue-ignore */ SelectContentEmits {}
+
 const props = withDefaults(
-  defineProps<SelectContentProps & { class?: string }>(), {
+  defineProps<Props>(), {
     position: 'popper',
     sideOffset: 4,
     avoidCollisions: true,
   },
 )
-const emits = defineEmits<SelectContentEmits>()
+const emits = defineEmits<Emits>()
 
 const forwarded = useForwardPropsEmits(props, emits)
 </script>

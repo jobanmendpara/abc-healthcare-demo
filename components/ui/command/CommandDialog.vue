@@ -4,8 +4,11 @@ import type { DialogRootEmits, DialogRootProps } from 'radix-vue'
 import Command from './Command.vue'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
-const props = defineProps<DialogRootProps>()
-const emits = defineEmits<DialogRootEmits>()
+interface Props extends /* @vue-ignore */ DialogRootProps { }
+interface Emits extends /* @vue-ignore */ DialogRootEmits { }
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
 
 const emitsAsProps = useEmitAsProps(emits)
 </script>

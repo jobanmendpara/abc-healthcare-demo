@@ -2,10 +2,12 @@
 import { DropdownMenuLabel, type DropdownMenuLabelProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<DropdownMenuLabelProps & {
+interface Props extends /* @vue-ignore */ DropdownMenuLabelProps {
   inset?: boolean
   class?: string
-}>()
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

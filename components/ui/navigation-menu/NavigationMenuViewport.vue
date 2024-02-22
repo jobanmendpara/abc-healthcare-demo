@@ -5,7 +5,9 @@ import {
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<NavigationMenuViewportProps>()
+interface Props extends /* @vue-ignore */ NavigationMenuViewportProps {}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

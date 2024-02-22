@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     shim: false,
   },
   build: {
-    transpile: ['trpc-nuxt'],
+    transpile: ['trpc-nuxt', 'vue-sonner'],
   },
   imports: {
     autoImport: true,

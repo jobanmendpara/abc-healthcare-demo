@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { DropdownMenuTrigger, type DropdownMenuTriggerProps } from 'radix-vue'
 
-const props = defineProps<DropdownMenuTriggerProps>()
+interface Props extends /* @vue-ignore */ DropdownMenuTriggerProps {}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

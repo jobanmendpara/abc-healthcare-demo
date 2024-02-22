@@ -7,7 +7,11 @@ import { ChevronDown } from 'lucide-vue-next'
 import { navigationMenuTriggerStyle } from '.'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<NavigationMenuTriggerProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ NavigationMenuTriggerProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

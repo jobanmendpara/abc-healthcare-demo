@@ -9,8 +9,14 @@ import {
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<AlertDialogContentProps & { class?: string }>()
-const emits = defineEmits<AlertDialogContentEmits>()
+interface Props extends /* @vue-ignore */ AlertDialogContentProps {
+  class?: string
+}
+
+interface Emits extends /* @vue-ignore */ AlertDialogContentEmits {}
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
 
 const emitsAsProps = useEmitAsProps(emits)
 </script>

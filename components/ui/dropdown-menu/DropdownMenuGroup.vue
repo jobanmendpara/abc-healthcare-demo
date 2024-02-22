@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { DropdownMenuGroup, type DropdownMenuGroupProps } from 'radix-vue'
 
-const props = defineProps<DropdownMenuGroupProps>()
+interface Props extends /* @vue-ignore */ DropdownMenuGroupProps {}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

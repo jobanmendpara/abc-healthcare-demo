@@ -9,8 +9,13 @@ import {
 import { Check } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
 
-const props = defineProps<DropdownMenuCheckboxItemProps & { class?: string }>();
-const emits = defineEmits<DropdownMenuCheckboxItemEmits>();
+interface Props extends /* @vue-ignore */ DropdownMenuCheckboxItemProps {
+  class?: string;
+}
+interface Emits extends /* @vue-ignore */ DropdownMenuCheckboxItemEmits {}
+
+const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 </script>
 
 <template>

@@ -2,7 +2,11 @@
 import { NavigationMenuIndicator, type NavigationMenuIndicatorProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<NavigationMenuIndicatorProps>()
+interface Props extends /* @vue-ignore */ NavigationMenuIndicatorProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

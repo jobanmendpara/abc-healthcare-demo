@@ -51,7 +51,7 @@ const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
     assignable: [],
     assigned: [],
   },
-  select: ({ assignable, assigned }: { assignable: AssignmentUser[], assigned: Assignment[] }) => {
+  select: ({ assignable, assigned }: { assignable: AssignmentUser[]; assigned: Assignment[] }) => {
     const formattedAssignments = assigned.reduce((acc: AssignmentUser[], assignment) => {
       if (localUser.value.role === 'admin')
         return acc;

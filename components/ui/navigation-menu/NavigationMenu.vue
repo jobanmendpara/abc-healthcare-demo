@@ -7,17 +7,21 @@ import {
 import NavigationMenuViewport from './NavigationMenuViewport.vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<NavigationMenuRootProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ NavigationMenuRootProps {
+  class?: string
+}
 
-const emits = defineEmits<NavigationMenuRootEmits>()
+interface Emits extends /* @vue-ignore */ NavigationMenuRootEmits {}
+
+const props = defineProps<Props>()
+
+const emits = defineEmits<Emits>()
 </script>
 
 <template>
-  <NavigationMenuRoot
-    v-bind="props"
+  <NavigationMenuRoot v-bind="props"
     :class="cn('relative z-10 flex max-w-max flex-1 items-center justify-center', props.class)"
-    @update:model-value="emits('update:modelValue', $event)"
-  >
+    @update:model-value="emits('update:modelValue', $event)">
     <slot />
     <NavigationMenuViewport />
   </NavigationMenuRoot>

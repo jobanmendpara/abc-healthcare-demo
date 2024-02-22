@@ -6,8 +6,11 @@ import {
   useForwardPropsEmits,
 } from 'radix-vue'
 
-const props = defineProps<DropdownMenuSubProps>()
-const emits = defineEmits<DropdownMenuSubEmits>()
+interface Props extends /* @vue-ignore */ DropdownMenuSubProps {}
+interface Emits extends /* @vue-ignore */ DropdownMenuSubEmits {}
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
 
 const forwarded = useForwardPropsEmits(props, emits)
 </script>

@@ -11,8 +11,13 @@ import {
 import { X } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
 
-const props = defineProps<DialogContentProps & { class?: string }>();
-const emits = defineEmits<DialogContentEmits>();
+interface Props extends /* @vue-ignore */ DialogContentProps {
+  class?: string;
+}
+interface Emits extends /* @vue-ignore */ DialogContentEmits { }
+
+const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 
 const emitsAsProps = useEmitAsProps(emits);
 </script>

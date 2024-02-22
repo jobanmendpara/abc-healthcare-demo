@@ -2,7 +2,11 @@
 import { SelectSeparator, type SelectSeparatorProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<SelectSeparatorProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ SelectSeparatorProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

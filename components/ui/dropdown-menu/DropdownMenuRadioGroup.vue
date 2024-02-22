@@ -5,9 +5,12 @@ import {
   type DropdownMenuRadioGroupProps,
 } from 'radix-vue'
 
-const props = defineProps<DropdownMenuRadioGroupProps>()
+interface Props extends /* @vue-ignore */ DropdownMenuRadioGroupProps {}
+interface Emits extends /* @vue-ignore */ DropdownMenuRadioGroupEmits {}
 
-const emits = defineEmits<DropdownMenuRadioGroupEmits>()
+const props = defineProps<Props>()
+
+const emits = defineEmits<Emits>()
 </script>
 
 <template>

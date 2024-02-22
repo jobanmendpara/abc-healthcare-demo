@@ -8,13 +8,19 @@ import {
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
+interface Props extends /* @vue-ignore */ PopoverContentProps {
+  class?: string
+}
+
+interface Emits extends /* @vue-ignore */ PopoverContentEmits {}
+
 const props = withDefaults(
-  defineProps<PopoverContentProps & { class?: string }>(),
+  defineProps<Props>(),
   {
     sideOffset: 4,
   },
 )
-const emits = defineEmits<PopoverContentEmits>()
+const emits = defineEmits<Emits>()
 
 const forwarded = useForwardPropsEmits(props, emits)
 </script>

@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
   const { auth } = useSupabaseClient();
 
   const magicLinkLoginMutation = useMutation({
-    mutationFn: async ({ email, token }: { email: string, token: string }) => await api.auth.loginWithMagicLink.mutate({ email, token }) as AuthTokenResponse['data'],
+    mutationFn: async ({ email, token }: { email: string; token: string }) => await api.auth.loginWithMagicLink.mutate({ email, token }) as AuthTokenResponse['data'],
     onSuccess: async (data) => {
       if (!data.session)
         throw new Error('No session found in response');

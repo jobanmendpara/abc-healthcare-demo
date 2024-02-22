@@ -2,8 +2,14 @@
 import { TabsRoot, useForwardPropsEmits } from 'radix-vue'
 import type { TabsRootEmits, TabsRootProps } from 'radix-vue'
 
-const props = defineProps<TabsRootProps>()
-const emits = defineEmits<TabsRootEmits>()
+interface Props extends /* @vue-ignore */ TabsRootProps {
+  class?: string
+}
+
+interface Emits extends /* @vue-ignore */ TabsRootEmits {}
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
 
 const forwarded = useForwardPropsEmits(props, emits)
 </script>

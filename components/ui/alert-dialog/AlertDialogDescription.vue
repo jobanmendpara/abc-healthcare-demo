@@ -5,7 +5,11 @@ import {
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<AlertDialogDescriptionProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ AlertDialogDescriptionProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

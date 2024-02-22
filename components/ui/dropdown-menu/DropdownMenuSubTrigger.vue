@@ -6,7 +6,11 @@ import {
 import { ChevronRight } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<DropdownMenuSubTriggerProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ DropdownMenuSubTriggerProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

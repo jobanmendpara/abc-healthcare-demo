@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { AlertDialogAction, type AlertDialogActionProps } from 'radix-vue'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import { cn } from '~/lib/utils'
+import { buttonVariants } from '~/components/ui/button'
 
-const props = defineProps<AlertDialogActionProps>()
+interface Props extends /* @vue-ignore */ AlertDialogActionProps { }
+
+const props = defineProps<Props>()
 </script>
 
 <template>

@@ -3,9 +3,9 @@ import { serverSupabaseServiceRole } from '#supabase/server';
 import type { AppDatabaseClient, Database } from '~/types';
 
 interface CreateContextOptions {
-  db: AppDatabaseClient
-  token?: string
-  refresh?: string
+  db: AppDatabaseClient;
+  token?: string;
+  refresh?: string;
 };
 
 function createInnerTRPCContext(opts: CreateContextOptions) {

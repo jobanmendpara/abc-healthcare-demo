@@ -7,9 +7,14 @@ import {
 } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<NavigationMenuContentProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ NavigationMenuContentProps {
+  class?: string
+}
+interface Emits extends /* @vue-ignore */ NavigationMenuContentEmits { }
 
-const emits = defineEmits<NavigationMenuContentEmits>()
+const props = defineProps<Props>()
+
+const emits = defineEmits<Emits>()
 </script>
 
 <template>

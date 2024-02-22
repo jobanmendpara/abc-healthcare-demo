@@ -11,5 +11,5 @@ export const timecardSchema = z.object({
   is_active: z.boolean(),
 });
 export type Timecard = Omit<z.infer<typeof timecardSchema>, 'geopoint_id'> & {
-  geopoint: z.infer<typeof geopointSchema> | null
+  geopoint: z.infer<typeof geopointSchema> | null;
 };
