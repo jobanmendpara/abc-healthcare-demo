@@ -3,7 +3,9 @@ import type { ComboboxEmptyProps } from 'radix-vue'
 import { ComboboxEmpty } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<ComboboxEmptyProps>()
+interface Props extends /* @vue-ignore */ ComboboxEmptyProps { }
+
+const props = defineProps<Props>()
 </script>
 
 <template>

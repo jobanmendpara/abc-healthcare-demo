@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 interface ButtonVariantProps extends VariantProps<typeof buttonVariants> {}
 
-interface Props extends PrimitiveProps {
+interface Props extends /* @vue-ignore */ PrimitiveProps {
   variant?: ButtonVariantProps['variant']
   size?: ButtonVariantProps['size']
   as?: string

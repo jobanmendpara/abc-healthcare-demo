@@ -9,9 +9,14 @@ import {
 import { Circle } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<DropdownMenuRadioItemProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ DropdownMenuRadioItemProps {
+  class?: string
+}
+interface Emits extends /* @vue-ignore */ DropdownMenuRadioItemEmits { }
 
-const emits = defineEmits<DropdownMenuRadioItemEmits>()
+const props = defineProps<Props>()
+
+const emits = defineEmits<Emits>()
 </script>
 
 <template>

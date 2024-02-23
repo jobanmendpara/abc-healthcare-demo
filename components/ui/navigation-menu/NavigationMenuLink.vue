@@ -6,8 +6,11 @@ import {
   useEmitAsProps,
 } from 'radix-vue'
 
-const props = defineProps<NavigationMenuLinkProps>()
-const emits = defineEmits<NavigationMenuLinkEmits>()
+interface Props extends /* @vue-ignore */ NavigationMenuLinkProps {}
+interface Emits extends /* @vue-ignore */ NavigationMenuLinkEmits {}
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
 </script>
 
 <template>

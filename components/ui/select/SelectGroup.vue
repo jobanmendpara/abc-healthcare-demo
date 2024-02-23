@@ -2,7 +2,11 @@
 import { SelectGroup, type SelectGroupProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<SelectGroupProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ SelectGroupProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

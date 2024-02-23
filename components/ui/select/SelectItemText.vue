@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { SelectItemText, type SelectItemTextProps } from 'radix-vue'
 
-const props = defineProps<SelectItemTextProps>()
+interface Props extends /* @vue-ignore */ SelectItemTextProps {}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

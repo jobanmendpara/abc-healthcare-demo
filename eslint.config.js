@@ -9,6 +9,7 @@ export default antfu(
   {
     ignores: [
       '*.json',
+      '.github/',
       'presets',
       'package.json',
       'nuxt.config.ts',
@@ -43,7 +44,16 @@ export default antfu(
       'plugin:vue/vue3-recommended',
     ],
     rules: {
-      'curly': 'off',
+      '@typescript-eslint/member-delimiter-style': ['error', {
+        multiline: {
+          delimiter: 'semi',
+          requireLast: true,
+        },
+        singleline: {
+          delimiter: 'semi',
+          requireLast: false,
+        },
+      }],
       '@typescript-eslint/consistent-type-imports': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -52,8 +62,19 @@ export default antfu(
           varsIgnorePattern: '^_',
         },
       ],
+      'curly': 'off',
       'node/prefer-global/process': 'off',
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'style/member-delimiter-style': ['error', {
+        multiline: {
+          delimiter: 'semi',
+          requireLast: true,
+        },
+        singleline: {
+          delimiter: 'semi',
+          requireLast: false,
+        },
+      }],
       'unused-imports/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error',
       'vue/multi-word-component-names': 'off',

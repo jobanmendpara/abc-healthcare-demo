@@ -8,7 +8,11 @@ import {
 import { Check } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<SelectItemProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ SelectItemProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

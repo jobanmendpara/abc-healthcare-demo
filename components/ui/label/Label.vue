@@ -2,7 +2,11 @@
 import { Label, type LabelProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<LabelProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ LabelProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

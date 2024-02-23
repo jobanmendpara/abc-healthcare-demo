@@ -58,7 +58,7 @@ const updateUserMutation = useMutation({
 });
 
 const updatePasswordMutation = useMutation({
-  mutationFn: async ({ oldPassword, newPassword }: { oldPassword: string, newPassword: string }) =>
+  mutationFn: async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }) =>
     await $api.auth.updatePassword.mutate({ newPassword, oldPassword }),
   onSuccess: () => {
     $toast.success('Password updated successfully');

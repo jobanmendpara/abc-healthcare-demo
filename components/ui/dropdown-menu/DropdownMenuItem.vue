@@ -2,7 +2,12 @@
 import { DropdownMenuItem, type DropdownMenuItemProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<DropdownMenuItemProps & { inset?: boolean; class?: string }>()
+interface Props extends /* @vue-ignore */ DropdownMenuItemProps {
+  inset?: boolean
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

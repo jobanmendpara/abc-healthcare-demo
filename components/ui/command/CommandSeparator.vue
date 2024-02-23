@@ -3,7 +3,9 @@ import type { ComboboxSeparatorProps } from 'radix-vue'
 import { ComboboxSeparator } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<ComboboxSeparatorProps>()
+interface Props extends /* @vue-ignore */ ComboboxSeparatorProps { }
+
+const props = defineProps<Props>()
 </script>
 
 <template>

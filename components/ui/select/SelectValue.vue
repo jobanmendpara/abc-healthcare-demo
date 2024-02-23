@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { SelectValue, type SelectValueProps } from 'radix-vue'
 
-const props = defineProps<SelectValueProps>()
+interface Props extends /* @vue-ignore */ SelectValueProps {}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

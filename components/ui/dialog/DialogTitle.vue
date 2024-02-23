@@ -2,7 +2,11 @@
 import { DialogTitle, type DialogTitleProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<DialogTitleProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ DialogTitleProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

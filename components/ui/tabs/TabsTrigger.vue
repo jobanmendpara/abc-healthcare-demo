@@ -2,7 +2,11 @@
 import { TabsTrigger, type TabsTriggerProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<TabsTriggerProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ TabsTriggerProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

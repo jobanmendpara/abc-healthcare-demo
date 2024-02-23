@@ -3,8 +3,11 @@ import type { ComboboxRootEmits, ComboboxRootProps } from 'radix-vue';
 import { ComboboxRoot, useForwardPropsEmits } from 'radix-vue';
 import { cn } from '@/lib/utils';
 
-const props = defineProps<ComboboxRootProps>();
-const emits = defineEmits<ComboboxRootEmits>();
+interface Props extends /* @vue-ignore */ ComboboxRootProps { }
+interface Emits extends /* @vue-ignore */ ComboboxRootEmits { }
+
+const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 
 const forwarded = useForwardPropsEmits(props, emits);
 </script>

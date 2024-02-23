@@ -2,7 +2,11 @@
 import { TabsList, type TabsListProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<TabsListProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ TabsListProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>

@@ -3,7 +3,9 @@ import { Search } from 'lucide-vue-next';
 import { ComboboxInput, type ComboboxInputProps } from 'radix-vue';
 import { cn } from '@/lib/utils';
 
-const props = defineProps<ComboboxInputProps>();
+interface Props extends /* @vue-ignore */ ComboboxInputProps { }
+
+const props = defineProps<Props>();
 </script>
 
 <script lang="ts">

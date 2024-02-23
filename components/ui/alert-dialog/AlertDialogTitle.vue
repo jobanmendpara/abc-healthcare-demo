@@ -2,7 +2,11 @@
 import { AlertDialogTitle, type AlertDialogTitleProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
-const props = defineProps<AlertDialogTitleProps & { class?: string }>()
+interface Props extends /* @vue-ignore */ AlertDialogTitleProps {
+  class?: string
+}
+
+const props = defineProps<Props>()
 </script>
 
 <template>
