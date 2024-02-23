@@ -113,7 +113,7 @@ definePageMeta({
         </FormField>
       </div>
       <AddressAutocomplete
-        :value="form.values.geopoint"
+        :value="form.values.geopoint ?? initSignUpFormData().geopoint"
         @select="(val: Geopoint) => form.setFieldValue('geopoint', val)"
       />
       <FormField

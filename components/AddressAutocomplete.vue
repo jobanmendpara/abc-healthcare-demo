@@ -4,7 +4,7 @@ import type { Geopoint } from '~/types';
 
 const props = defineProps({
   value: {
-    type: Object as PropType<Geopoint>,
+    type: Object as PropType<Partial<Geopoint>>,
     required: true,
   },
 });
@@ -31,7 +31,7 @@ function usePopover() {
 
 async function useAutocomplete() {
   const buttonText = ref<string | null>();
-  const currentValue = ref<Geopoint | null>(props.value);
+  const currentValue = ref<Partial<Geopoint> | null>(props.value);
   const searchTerm = ref('');
   const loader = new Loader({
     apiKey: useRuntimeConfig().public.gmapsApiKey,
@@ -146,7 +146,7 @@ onMounted(() => {
               <CommandItem
                 v-for="(geopoint, index) in geopoints"
                 :key="geopoint.id"
-                :value="geopoint.formatted_address"
+                :value="geopoint.formatted_address ?? ''"
                 @select="selectGeopoint(geopoint)"
               >
                 <span v-if="index < 5">
