@@ -22,7 +22,7 @@ useHead({
 
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center gap-16">
-    <h1 class="text-5xl font-extrabold sm:text-[5rem]">
+    <h1 class="text-4xl font-extrabold">
       abc &#x2022; Healthcare
     </h1>
     <h2 class="text-3xl">

@@ -6,12 +6,12 @@
   font-family: 'Geist';
   font-weight: normal;
   font-style: normal;
-  src: './fonts/Geist_Variable.woff2';
+  src: '../public/fonts/Geist_Variable.woff2';
 }
 
 @layer base {
   :root {
-    font-family: 'Geist';
+    font-family: 'Geist', system-ui;
 
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
