@@ -3,6 +3,7 @@ import {
   assignmentsRouter,
   authRouter,
   invitesRouter,
+  timecardsRouter,
   userSettingsRouter,
   usersRouter,
 } from '~/server/trpc/routers';
@@ -11,6 +12,7 @@ export const appRouter = createTRPCRouter({
   assignments: assignmentsRouter,
   auth: authRouter,
   invites: invitesRouter,
+  timecards: timecardsRouter,
   users: usersRouter,
   userSettings: userSettingsRouter,
 });

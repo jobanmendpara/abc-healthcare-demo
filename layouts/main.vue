@@ -13,6 +13,7 @@ const { isDarkMode, toggleDarkMode } = useDarkMode();
 
 const { data: user, status } = useQuery({
   ...queries.app.user($user.value!.id),
+  staleTime: Number.POSITIVE_INFINITY,
   refetchOnMount: false,
 });
 
@@ -79,7 +80,7 @@ watchEffect(() => {
 <template>
   <body
     v-if="status === 'success' && user"
-    :class="`${isDarkMode ? 'dark' : ''} h-screen overflow-hidden mx-auto grid grid-cols-[auto,1fr] gap-2`"
+    :class="`${isDarkMode ? 'dark' : ''} h-screen overflow-hidden mx-auto grid grid-rows-[auto,1fr] grid-cols-1 md:grid-rows-1 md:grid-cols-[auto,1fr]`"
   >
     <NavBar
       :is-dark-mode="isDarkMode"

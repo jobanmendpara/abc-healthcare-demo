@@ -40,9 +40,9 @@ const navItems = computed<NavItem[]>(() => [
 
 <template>
   <NavigationMenu class="bg-secondary text-primary">
-    <NavigationMenuList class="w-full h-screen text-center flex flex-col justify-between">
-      <div class="w-full flex flex-col justify-between h-full">
-        <div>
+    <NavigationMenuList class="w-screen md:w-full md:h-screen text-center">
+      <div class="w-full md:h-full flex flex-row md:flex-col justify-between items-center">
+        <div class="md:w-full">
           <NuxtLink
             v-for="item in navItems"
             :key="item.label"
@@ -52,7 +52,7 @@ const navItems = computed<NavItem[]>(() => [
               v-if="item.visible"
               class="flex items-center gap-2 hover:cursor-pointer hover:bg-primary hover:text-secondary px-3 py-2"
             >
-              <Icon :name="item.icon" />
+              <Icon :name="item.icon ?? ''" />
               <NavigationMenuLink>
                 {{ item.label }}
               </NavigationMenuLink>

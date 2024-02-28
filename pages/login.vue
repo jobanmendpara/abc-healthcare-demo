@@ -17,9 +17,9 @@ const formSchema = z.object({
 const form = useForm({
   validationSchema: toTypedSchema(formSchema),
   initialValues: {
+    // WARN TODO: Remove before prod
     email: '',
     password: '',
-    phone: '',
   },
 });
 

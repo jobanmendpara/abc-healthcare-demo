@@ -89,9 +89,12 @@ watchEffect(() => {
 <template>
   <Dialog v-model:open="isOpen">
     <DialogContent>
-      <DialogHeader>
+      <DialogTitle>
         Account Settings
-      </DialogHeader>
+      </DialogTitle>
+      <DialogDescription>
+        The information you provide here is viewable by your admin.
+      </DialogDescription>
       <form
         class="space-y-5"
         @submit.prevent="onSubmit"

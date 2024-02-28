@@ -126,7 +126,7 @@ export const usersRouter = createTRPCRouter({
       if (nextPageError)
         throw new Error(nextPageError.message);
 
-      const { data } = await caller.users.getById({ userIds: users.map(user => user.id) });
+      const data = await caller.users.getById({ userIds: users.map(user => user.id) });
 
       const list: User[] = Array.from(data.values());
 
@@ -141,9 +141,7 @@ export const usersRouter = createTRPCRouter({
         userIds: z.array(z.string().uuid()),
       }),
     ).output(
-      z.object({
-        data: z.map(z.string().uuid(), userSchema),
-      }),
+      z.map(z.string().uuid(), userSchema),
     ).query(async ({
       ctx: { db },
       input: { userIds },
@@ -198,9 +196,7 @@ export const usersRouter = createTRPCRouter({
         return acc;
       }, new Map<string, User>());
 
-      return {
-        data,
-      };
+      return data;
     }),
   update: authorizedProcedure
     .input(

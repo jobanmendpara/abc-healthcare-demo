@@ -9,13 +9,14 @@ const supabaseUser = useSupabaseUser();
 
 export const queries = createQueryKeyStore({
   app: {
-    user: (userId: string) => ({
+    user: (userId: string | Ref<string>) => ({
       queryKey: [userId],
       queryFn: async () => {
-        const userResponse = await api.users.getById.query({ userIds: [userId] });
-        const userSettingsResponse = await api.userSettings.get.query({ userIds: [userId] });
+        const userResponse = await api.users.getById.query({ userIds: [toValue(userId)] });
+        const userSettingsResponse = await api.userSettings.get.query({ userIds: [toValue(userId)] });
+        const assignments = await api.assignments.getByUserId.query({ userId: toValue(userId) });
 
-        const user = userResponse.data.get(supabaseUser.value!.id);
+        const user = userResponse.get(supabaseUser.value!.id);
         if (!user)
           throw new Error('User not found');
         const settings = userSettingsResponse.userSettings.find(setting => setting.id === user.id);
@@ -24,6 +25,7 @@ export const queries = createQueryKeyStore({
 
         return {
           ...user,
+          assignments: assignments.assigned as Assignment[],
           settings,
         };
       },
@@ -41,11 +43,21 @@ export const queries = createQueryKeyStore({
       queryFn: async () => await api.invites.list.query(input.value),
     }),
   },
+  timecards: {
+    active: (userId: MaybeRef<string>) => ({
+      queryKey: [userId] as const,
+      queryFn: async () => await api.timecards.getActive.query(),
+    }),
+  },
   users: {
     all: null,
     list: (input: ComputedRef<UsersListParams>) => ({
       queryKey: [input] as const,
       queryFn: async () => await api.users.list.query(input.value),
+    }),
+    id: (input: string[] | Ref<string[]> | ComputedRef<string[]>) => ({
+      queryKey: [input] as const,
+      queryFn: async () => await api.users.getById.query({ userIds: toValue(input) }),
     }),
   },
 });
