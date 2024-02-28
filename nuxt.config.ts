@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
   imports: {
     autoImport: true,
-    dirs: [ 'types/*.ts', 'types/**/*.ts' ],
+    dirs: ['types/*.ts', 'types/**/*.ts'],
   },
   modules: [
     '@hebilicious/vue-query-nuxt',
@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@vueuse/nuxt',
+    'dayjs-nuxt',
     'shadcn-nuxt',
     'nuxt-icon',
     'nuxt-typed-router',
@@ -53,6 +54,12 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
+  dayjs: {
+    locales: ['en'],
+    plugins: ['relativeTime', 'utc', 'timezone'],
+    defaultLocale: 'en',
+    defaultTimezone: 'America/New_York',
+  },
   supabase: {
     url: process.env.SUPABASE_URL,
     key: process.env.SUPABASE_ANON_KEY,

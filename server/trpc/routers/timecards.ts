@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import dayjs from 'dayjs';
 import { timecardSchema } from '~/types';
 import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
 import { calculateEuclideanDistance } from '~/utils';
@@ -59,8 +60,8 @@ export const timecardsRouter = createTRPCRouter({
         id: crypto.randomUUID(),
         is_active: true,
         assignment_id: input.assignmentId,
-        started_at: (new Date()).toLocaleString(),
-        created_at: (new Date()).toLocaleString(),
+        started_at: dayjs().format(),
+        created_at: dayjs().format(),
       });
       if (insertTimecardError) {
         throw new Error('Error while creating timecard');
@@ -79,12 +80,11 @@ export const timecardsRouter = createTRPCRouter({
       ctx: { db },
       input,
     }) => {
-      const endedAt = (new Date()).toLocaleString();
       const {
         data: newTimecard,
         error: updateTimecardError,
       } = await db.from('timecards').update({
-        ended_at: endedAt,
+        ended_at: dayjs().format(),
         is_active: false,
       }).eq('id', input.timecardId).select().single();
       if (updateTimecardError) {
