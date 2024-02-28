@@ -164,7 +164,7 @@ watchEffect(() => {
     <Tabs
       v-model="activeView"
       class="w-full"
-      @update:model-value="(newView: Views) => setView(newView)"
+      @update:model-value="(newView) => setView(newView as Views)"
     >
       <TabsList>
         <TabsTrigger

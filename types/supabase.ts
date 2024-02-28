@@ -97,31 +97,28 @@ export type Database = {
       }
       timecards: {
         Row: {
-          assignment_id: string | null
-          created_at: string | null
+          assignment_id: string
+          created_at: string
           ended_at: string | null
-          geopoint_id: string | null
           id: string
-          is_active: boolean | null
-          started_at: string | null
+          is_active: boolean
+          started_at: string
         }
         Insert: {
-          assignment_id?: string | null
-          created_at?: string | null
+          assignment_id: string
+          created_at?: string
           ended_at?: string | null
-          geopoint_id?: string | null
           id?: string
-          is_active?: boolean | null
-          started_at?: string | null
+          is_active?: boolean
+          started_at?: string
         }
         Update: {
-          assignment_id?: string | null
-          created_at?: string | null
+          assignment_id?: string
+          created_at?: string
           ended_at?: string | null
-          geopoint_id?: string | null
           id?: string
-          is_active?: boolean | null
-          started_at?: string | null
+          is_active?: boolean
+          started_at?: string
         }
         Relationships: [
           {
@@ -129,13 +126,6 @@ export type Database = {
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "assignments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "timecards_geopoint_id_fkey"
-            columns: ["geopoint_id"]
-            isOneToOne: false
-            referencedRelation: "geopoints"
             referencedColumns: ["id"]
           }
         ]

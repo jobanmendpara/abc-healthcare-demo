@@ -42,7 +42,7 @@ const navItems = computed<NavItem[]>(() => [
   <NavigationMenu class="bg-secondary text-primary">
     <NavigationMenuList class="w-screen md:w-full md:h-screen text-center">
       <div class="w-full md:h-full flex flex-row md:flex-col justify-between items-center">
-        <div>
+        <div class="md:w-full">
           <NuxtLink
             v-for="item in navItems"
             :key="item.label"

@@ -13,6 +13,7 @@ const { isDarkMode, toggleDarkMode } = useDarkMode();
 
 const { data: user, status } = useQuery({
   ...queries.app.user($user.value!.id),
+  staleTime: Number.POSITIVE_INFINITY,
   refetchOnMount: false,
 });
 
