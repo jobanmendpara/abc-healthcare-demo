@@ -13,7 +13,7 @@ interface Props extends /* @vue-ignore */ AlertDialogContentProps {
   class?: string
 }
 
-interface Emits extends AlertDialogContentEmits {}
+interface Emits extends /* @vue-ignore */ AlertDialogContentEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

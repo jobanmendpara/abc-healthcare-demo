@@ -6,7 +6,7 @@ interface Props extends /* @vue-ignore */ TabsRootProps {
   class?: string
 }
 
-interface Emits extends TabsRootEmits {}
+interface Emits extends /* @vue-ignore */ TabsRootEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

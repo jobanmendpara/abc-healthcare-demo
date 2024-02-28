@@ -7,7 +7,7 @@ import {
 } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ NavigationMenuLinkProps {}
-interface Emits extends NavigationMenuLinkEmits {}
+interface Emits extends /* @vue-ignore */ NavigationMenuLinkEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

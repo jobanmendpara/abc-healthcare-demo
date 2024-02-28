@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 interface Props extends /* @vue-ignore */ DialogContentProps {
   class?: string;
 }
-interface Emits extends DialogContentEmits { }
+interface Emits extends /* @vue-ignore */ DialogContentEmits { }
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
