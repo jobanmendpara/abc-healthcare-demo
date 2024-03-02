@@ -30,7 +30,7 @@ function usePopover() {
 }
 
 async function useAutocomplete() {
-  const buttonText = ref<string | null>();
+  const buttonText = ref('Select Address');
   const currentValue = ref<Partial<Geopoint> | null>(props.value);
   const searchTerm = ref('');
   const loader = new Loader({
@@ -88,13 +88,13 @@ async function useAutocomplete() {
 
   function reset() {
     currentValue.value = null;
-    buttonText.value = null;
+    buttonText.value = 'Select Address';
   }
 
   function selectGeopoint(geopoint: Geopoint) {
     emits('select', geopoint);
     currentValue.value = geopoint;
-    buttonText.value = currentValue.value.formatted_address;
+    buttonText.value = currentValue.value.formatted_address ?? 'Select Address';
     isOpen.value = false;
     geopoints.value = new Set<Geopoint>();
   }
@@ -113,7 +113,7 @@ async function useAutocomplete() {
 onMounted(() => {
   if (props.value) {
     currentValue.value = props.value;
-    buttonText.value = currentValue.value.formatted_address;
+    buttonText.value = currentValue.value.formatted_address ?? 'Select Address';
   }
 });
 </script>
@@ -127,7 +127,7 @@ onMounted(() => {
             :class="(currentValue ?? initGeopoint()).formatted_address ? '' : 'bg-red-500 hover:bg-red-700'"
             @click.prevent=""
           >
-            {{ buttonText ?? 'Select Address' }}
+            {{ buttonText }}
           </Button>
           <Button
             variant="outline"
