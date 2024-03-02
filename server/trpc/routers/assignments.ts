@@ -22,11 +22,11 @@ export const assignmentsRouter = createTRPCRouter({
       if (!allowedRoles.includes(ctx.requestor.role))
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      const getUserRole = await db.from('users').select('role').eq('id', userId).single();
-      if (getUserRole.error && !getUserRole.data)
+      const requestedUserRole = await db.from('users').select('role').eq('id', userId).single();
+      if (requestedUserRole.error && !requestedUserRole.data)
         throw new TRPCError({ code: 'NOT_FOUND' });
 
-      const sourceRole: Enums<'role_enum'> = `${getUserRole.data.role}`;
+      const sourceRole: Enums<'role_enum'> = `${requestedUserRole.data.role}`;
       const destinationRole = sourceRole === 'employee' ? 'client' : 'employee';
 
       if (sourceRole !== 'employee' && sourceRole !== 'client') {
@@ -86,7 +86,7 @@ export const assignmentsRouter = createTRPCRouter({
       const { data: assignableUsers, error: assignableUsersError } = await db
         .from('users')
         .select('id, first_name, last_name')
-        .eq('role', getUserRole.data.role === 'employee' ? 'client' : 'employee')
+        .eq('role', destinationRole)
         .not('id', 'in', `(${assignedUserIds.join(',')})`);
       if (assignableUsersError && !assignableUsers)
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', cause: assignableUsersError });
@@ -116,15 +116,15 @@ export const assignmentsRouter = createTRPCRouter({
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-      const getUserRoleQuery = await db.from('users').select('role').eq('id', input.id).single();
-      if (getUserRoleQuery.error && !getUserRoleQuery.data)
+      const requestedUserRoleQuery = await db.from('users').select('role').eq('id', input.id).single();
+      if (requestedUserRoleQuery.error && !requestedUserRoleQuery.data)
         throw new TRPCError({ code: 'NOT_FOUND' });
 
-      const oppositeField = getUserRoleQuery.data.role === 'employee' ? 'client' : 'employee';
+      const oppositeField = requestedUserRoleQuery.data.role === 'employee' ? 'client' : 'employee';
 
       const deleteAssignments = await db.from('assignments')
         .delete()
-        .eq(`${getUserRoleQuery.data.role}_id`, input.id)
+        .eq(`${requestedUserRoleQuery.data.role}_id`, input.id)
         .in(`${oppositeField}_id`, input.removed.map(id => id));
       if (deleteAssignments.error)
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', cause: deleteAssignments.error });
