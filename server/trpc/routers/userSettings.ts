@@ -4,15 +4,12 @@ import { userSettingsSchema } from '~/types';
 
 export const userSettingsRouter = createTRPCRouter({
   get: authorizedProcedure
-    .input(z.object({
-      userIds: z.array(z.string().uuid()),
-    }))
     .output(z.object({
       userSettings: z.array(userSettingsSchema),
     }))
-    .query(async ({ ctx, input: { userIds } }) => {
-      const { db } = ctx;
-      const { data, error } = await db.from('user_settings').select().in('id', userIds);
+    .query(async ({ ctx }) => {
+      const { db, requestor } = ctx;
+      const { data, error } = await db.from('user_settings').select().eq('id', requestor.id);
       if (error)
         throw new Error(error.message);
       if (!data)

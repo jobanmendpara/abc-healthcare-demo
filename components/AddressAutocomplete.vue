@@ -113,7 +113,9 @@ async function useAutocomplete() {
 onMounted(() => {
   if (props.value) {
     currentValue.value = props.value;
-    buttonText.value = currentValue.value.formatted_address ?? 'Select Address';
+    buttonText.value = (currentValue.value.formatted_address ?? '').length > 0
+      ? currentValue.value.formatted_address ?? ''
+      : 'Select Address';
   }
 });
 </script>
@@ -125,7 +127,6 @@ onMounted(() => {
         <div class="space-x-2 mb-4">
           <Button
             :class="(currentValue ?? initGeopoint()).formatted_address ? '' : 'bg-red-500 hover:bg-red-700'"
-            @click.prevent=""
           >
             {{ buttonText }}
           </Button>

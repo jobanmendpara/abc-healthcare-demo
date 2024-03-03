@@ -9,11 +9,11 @@ const supabaseUser = useSupabaseUser();
 
 export const queries = createQueryKeyStore({
   app: {
-    user: (userId: string | Ref<string>) => ({
+    user: (userId: string | Ref<string> | ComputedRef<string>) => ({
       queryKey: [userId],
       queryFn: async () => {
         const userResponse = await api.users.getById.query({ userIds: [toValue(userId)] });
-        const userSettingsResponse = await api.userSettings.get.query({ userIds: [toValue(userId)] });
+        const userSettingsResponse = await api.userSettings.get.query();
         const assignments = await api.assignments.getByUserId.query({ userId: toValue(userId) });
 
         const user = userResponse.get(supabaseUser.value!.id);

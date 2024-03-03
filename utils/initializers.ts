@@ -6,7 +6,7 @@ export function initGeopoint(): Geopoint {
     latitude: 0,
     longitude: 0,
     apt_number: '',
-    formatted_address: 'Select Address',
+    formatted_address: '',
   };
 };
 

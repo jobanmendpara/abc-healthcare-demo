@@ -4,9 +4,7 @@ import { phoneSchema } from './general';
 
 export const emailLoginSchema = z.object({
   email: z.string().email(),
-  // WARN TODO: Implement below password validation prior to prod
-  password: z.string(),
-  // password: z.string().min(8).regex(/\d/).regex(/[!@#$%^&*(),.?":{}|<>]/).regex(/[a-z]/).regex(/[A-Z]/),
+  password: z.string().min(8).regex(/\d/).regex(/[!@#$%^&*(),.?":{}|<>]/).regex(/[a-z]/).regex(/[A-Z]/),
 });
 export type EmailLogin = z.infer<typeof emailLoginSchema>;
 
@@ -20,6 +18,7 @@ export const signUpFormDataSchema = z.object({
   last_name: z.string().min(1).max(255),
   geopoint: geopointSchema,
   phone: phoneSchema,
+  confirmPassword: z.string(),
   ...emailLoginSchema.shape,
 });
 export type SignUpFormData = z.infer<typeof signUpFormDataSchema>;

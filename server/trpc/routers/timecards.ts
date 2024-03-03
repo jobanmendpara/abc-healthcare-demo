@@ -19,6 +19,10 @@ export const timecardsRouter = createTRPCRouter({
       ctx: { db, requestor },
       input,
     }) => {
+      if (requestor.role !== 'employee') {
+        throw new TRPCError({ code: 'UNAUTHORIZED' });
+      }
+
       const { data: assignment, error: selectAssignmentError } = await db.from('assignments').select().eq('id', input.assignmentId).single();
       if (selectAssignmentError) {
         throw new Error('Error while finding assignment');
@@ -77,9 +81,13 @@ export const timecardsRouter = createTRPCRouter({
       z.void(),
     )
     .mutation(async ({
-      ctx: { db },
+      ctx: { db, requestor },
       input,
     }) => {
+      if (requestor.role !== 'employee') {
+        throw new TRPCError({ code: 'UNAUTHORIZED' });
+      }
+
       const {
         data: newTimecard,
         error: updateTimecardError,

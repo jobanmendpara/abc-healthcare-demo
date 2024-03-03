@@ -5,6 +5,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 const { $api, $toast } = useNuxtApp();
 const formSchema = toTypedSchema(signUpFormDataSchema);
 
+const route = useRoute();
 const form = useForm({
   validationSchema: formSchema,
   initialValues: initSignUpFormData(),
@@ -37,10 +38,34 @@ async function onSubmit() {
   signUpUserMutation.mutate(signUpValidationResult.values);
 }
 
+watchEffect(() => {
+  if (form.values.password !== form.values.confirmPassword) {
+    form.setErrors({
+      confirmPassword: 'Passwords do not match',
+    });
+  }
+  else {
+    form.setErrors({
+      confirmPassword: undefined,
+    });
+  }
+});
+
 definePageMeta({
   layout: 'default',
   middleware: ['verify-invite'],
   name: 'SignUp',
+});
+
+onMounted(() => {
+  form.setErrors({
+    confirmPassword: undefined,
+  });
+
+  const email = route.query.email;
+  if (email) {
+    form.setFieldValue('email', email as string);
+  }
 });
 </script>
 
@@ -55,9 +80,7 @@ definePageMeta({
           v-slot="{ componentField }"
           name="first_name"
         >
-          <FormItem
-            class="w-full"
-          >
+          <FormItem class="w-full">
             <FormLabel for="first_name">
               First Name
             </FormLabel>
@@ -75,9 +98,7 @@ definePageMeta({
           v-slot="{ componentField }"
           name="middle_name"
         >
-          <FormItem
-            class="w-full"
-          >
+          <FormItem class="w-full">
             <FormLabel for="middle_name">
               Middle Name
             </FormLabel>
@@ -95,9 +116,7 @@ definePageMeta({
           v-slot="{ componentField }"
           name="last_name"
         >
-          <FormItem
-            class="w-full"
-          >
+          <FormItem class="w-full">
             <FormLabel for="last_name">
               Last Name
             </FormLabel>
@@ -126,6 +145,7 @@ definePageMeta({
           </FormLabel>
           <FormControl>
             <Input
+              disabled="true"
               id="email"
               v-bind="componentField"
               type="email"
@@ -163,6 +183,22 @@ definePageMeta({
           <FormControl>
             <Input
               id="password"
+              v-bind="componentField"
+              type="password"
+              placeholder="********"
+              autocomplete="current-password"
+            />
+          </FormControl>
+        </FormItem>
+      </FormField>
+      <FormField
+        v-slot="{ componentField }"
+        name="confirmPassword"
+      >
+        <FormItem>
+          <FormLabel>Confirm Password</FormLabel>
+          <FormControl>
+            <Input
               v-bind="componentField"
               type="password"
               placeholder="********"
