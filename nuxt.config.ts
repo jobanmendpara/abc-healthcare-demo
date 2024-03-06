@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@hebilicious/vue-query-nuxt',
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
+    '@nuxt/image',
     '@pinia/nuxt',
     '@vueuse/nuxt',
     'dayjs-nuxt',
