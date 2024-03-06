@@ -14,7 +14,7 @@ useHead({
   link: [
     {
       rel: 'icon',
-      href: '/favicon.ico',
+      href: 'favicon/favicon.ico',
     },
   ],
 });
