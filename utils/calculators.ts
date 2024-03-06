@@ -1,3 +1,8 @@
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
+
 export function calculatePageRange(page: number, size: number): { start: number; end: number } {
   const start = (page - 1) * size;
   const end = start + size - 1;
@@ -16,23 +21,22 @@ export function calculateEuclideanDistance(coord1: [number, number], coord2: [nu
 }
 
 export function calculateTimeElapsed(dateString: string): string {
-  const inputDate = new Date(dateString);
-  const now = new Date();
+  const inputDate = dayjs(dateString);
+  const now = dayjs();
+  const diff = now.diff(inputDate, 'milliseconds');
 
-  let diffInSeconds = Math.abs((now.getTime() - inputDate.getTime()) / 1000);
+  const millisecondsElapsed = dayjs.duration(diff);
 
-  const days = Math.floor(diffInSeconds / 86400);
-  diffInSeconds -= days * 86400;
+  const days = millisecondsElapsed.days();
+  const hours = millisecondsElapsed.hours();
+  const minutes = millisecondsElapsed.minutes();
+  const seconds = millisecondsElapsed.seconds();
 
-  const hours = Math.floor(diffInSeconds / 3600) % 24;
-  diffInSeconds -= hours * 3600;
-  const minutes = Math.floor(diffInSeconds / 60) % 60;
-  diffInSeconds -= minutes * 60;
-  const seconds = Math.floor(diffInSeconds % 60);
+  const paddedHours = String(hours).padStart(2, '0');
+  const paddedMinutes = String(minutes).padStart(2, '0');
+  const paddedSeconds = String(seconds).padStart(2, '0');
 
-  const finalHours = (`00${hours}`).slice(-2);
-  const finalMinutes = (`00${minutes}`).slice(-2);
-  const finalSeconds = (`00${seconds}`).slice(-2);
-
-  return days > 0 ? `+${days} day(s) ${finalHours}:${finalMinutes}:${finalSeconds}` : `${finalHours}:${finalMinutes}:${finalSeconds}`;
+  return days > 0
+    ? `+${days} day(s) ${paddedHours}:${paddedMinutes}:${paddedSeconds}`
+    : `${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
 }
