@@ -151,5 +151,14 @@ definePageMeta({
         Employee
       </Button>
     </div>
+    <div
+      class="text-center w-full hover:underline"
+    >
+      <NuxtLink
+        :to="{ name: 'index' }"
+      >
+        Back
+      </NuxtLink>
+    </div>
   </div>
 </template>
