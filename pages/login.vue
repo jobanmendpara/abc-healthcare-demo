@@ -57,7 +57,7 @@ async function onEmailLoginSubmit() {
 
 definePageMeta({
   layout: 'default',
-  middleware: ['verify-magic-link'],
+  middleware: ['verify-magic-link', 'verify-pre-auth'],
   name: 'Login',
 });
 </script>
