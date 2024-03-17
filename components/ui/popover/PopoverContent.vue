@@ -12,7 +12,7 @@ interface Props extends /* @vue-ignore */ PopoverContentProps {
   class?: string
 }
 
-interface Emits extends /* @vue-ignore */ PopoverContentEmits {}
+interface Emits extends PopoverContentEmits {}
 
 const props = withDefaults(
   defineProps<Props>(),

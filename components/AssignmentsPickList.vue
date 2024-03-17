@@ -57,7 +57,7 @@ function onSubmit() {
 }
 
 function getSorted(list: AssignmentUser[]) {
-  return list.sort((a, b) => a.name.localeCompare(b.name));
+  return list.sort((a, b) => a.last_name.localeCompare(b.last_name));
 }
 
 function reset() {
@@ -103,7 +103,7 @@ watch(
                 class="even:bg-secondary p-1 flex w-full justify-between items-center"
               >
                 <p>
-                  {{ item.name }}
+                  {{ `${item.first_name} ${item.last_name}` }}
                 </p>
                 <Button @click="addToAssigned(item)">
                   Add
@@ -122,7 +122,7 @@ watch(
                 class="even:bg-secondary p-1 flex w-full justify-between items-center"
               >
                 <p>
-                  {{ item.name }}
+                  {{ `${item.first_name} ${item.last_name}` }}
                 </p>
                 <Button @click="addToAssignable(item)">
                   Remove

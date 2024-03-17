@@ -48,10 +48,14 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    envType: process.env.NODE_ENV,
     public: {
+      nodeEnv: process.env.NODE_ENV,
       baseUrl: process.env.BASE_URL || 'http://localhost:3000/',
       gmapsApiKey: process.env.NUXT_PUBLIC_GMAPS_API_KEY,
+      adminEmail: process.env.ADMIN_EMAIL,
+      adminPassword: process.env.ADMIN_PASSWORD,
+      employeeEmail: process.env.EMPLOYEE_EMAIL,
+      employeePassword: process.env.EMPLOYEE_PASSWORD,
     },
   },
   ssr: false,

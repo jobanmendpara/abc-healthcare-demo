@@ -1,6 +1,7 @@
 import type { inferQueryKeyStore } from '@lukemorales/query-key-factory';
 import { createQueryKeyStore } from '@lukemorales/query-key-factory';
 import type { PageParams } from '@supabase/supabase-js';
+import type { DatePickerRangeObject } from 'v-calendar/dist/types/src/use/datePicker';
 import { api } from '~/plugins/server';
 import { useSupabaseUser } from '#imports';
 import type { UsersListParams } from '~/types';
@@ -9,8 +10,8 @@ const supabaseUser = useSupabaseUser();
 
 export const queries = createQueryKeyStore({
   app: {
-    user: (userId: string | Ref<string> | ComputedRef<string>) => ({
-      queryKey: [userId],
+    user: (userId: MaybeRef<string>) => ({
+      queryKey: [userId] as const,
       queryFn: async () => {
         const userResponse = await api.users.getById.query({ userIds: [toValue(userId)] });
         const userSettingsResponse = await api.userSettings.get.query();
@@ -32,15 +33,15 @@ export const queries = createQueryKeyStore({
     }),
   },
   assignments: {
-    user: (userId: Ref<string>) => ({
-      queryKey: [userId],
-      queryFn: async () => await api.assignments.getByUserId.query({ userId: userId.value }),
+    user: (userId: MaybeRef<string>) => ({
+      queryKey: [userId] as const,
+      queryFn: async () => await api.assignments.getByUserId.query({ userId: toValue(userId) }),
     }),
   },
   invites: {
-    list: (input: ComputedRef<PageParams>) => ({
+    list: (input: MaybeRef<PageParams>) => ({
       queryKey: [input] as const,
-      queryFn: async () => await api.invites.list.query(input.value),
+      queryFn: async () => await api.invites.list.query(toValue(input)),
     }),
   },
   timecards: {
@@ -48,14 +49,18 @@ export const queries = createQueryKeyStore({
       queryKey: [userId] as const,
       queryFn: async () => await api.timecards.getActive.query(),
     }),
+    list: (input: MaybeRef<PageParams & { dateRange: DatePickerRangeObject }>) => ({
+      queryKey: [input] as const,
+      queryFn: async () => await api.timecards.list.query(toValue(input)),
+    }),
   },
   users: {
     all: null,
-    list: (input: ComputedRef<UsersListParams>) => ({
+    list: (input: MaybeRef<UsersListParams>) => ({
       queryKey: [input] as const,
-      queryFn: async () => await api.users.list.query(input.value),
+      queryFn: async () => await api.users.list.query(toValue(input)),
     }),
-    id: (input: string[] | Ref<string[]> | ComputedRef<string[]>) => ({
+    id: (input: MaybeRef<string[]>) => ({
       queryKey: [input] as const,
       queryFn: async () => await api.users.getById.query({ userIds: toValue(input) }),
     }),

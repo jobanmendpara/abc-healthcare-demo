@@ -20,6 +20,7 @@ export const usersRouter = createTRPCRouter({
     }) => {
       if (requestor.role !== 'admin')
         throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+      // FIX
       const newUser: Tables<'users'> = {
         id: user.id,
         role: user.role,
@@ -116,15 +117,24 @@ export const usersRouter = createTRPCRouter({
 
       const { start, end } = calculatePageRange(page, perPage);
 
-      const { data: users, error: usersError } = await db.from('users').select().order('last_name', { ascending: true }).eq('role', role).range(start, end);
+      const { data: users, error: usersError } = await db.from('users')
+        .select()
+        .order('last_name', { ascending: true })
+        .eq('role', role)
+        .range(start, end);
       if (usersError)
         throw new Error(usersError.message);
       if (!users)
         throw new Error('No users returned.');
 
-      const { data: nextPage, error: nextPageError } = await db.from('users').select().eq('role', role).range(end, end + 1);
+      const { data: nextPage, error: nextPageError } = await db.from('users')
+        .select()
+        .eq('role', role)
+        .range(end, end + 1);
       if (nextPageError)
         throw new Error(nextPageError.message);
+      if (!nextPage)
+        throw new Error('No next page returned.');
 
       const data = await caller.users.getById({ userIds: users.map(user => user.id) });
 

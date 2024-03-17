@@ -19,6 +19,10 @@ const { data: user, status } = useQuery({
 
 const signOutMutation = useMutation({
   mutationFn: async () => await auth.signOut({ scope: 'local' }),
+  onSuccess: () => {
+    $toast.success('Signed out successfully');
+    navigateTo({ name: 'Login' });
+  },
 });
 
 function useDarkMode() {

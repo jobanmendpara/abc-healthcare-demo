@@ -55,7 +55,8 @@ export const assignmentsRouter = createTRPCRouter({
       const assignedUsersMap = assignedUsers.reduce((acc: Map<string, AssignmentUser>, user) => {
         const newAssignmentUser: AssignmentUser = {
           id: user.id,
-          name: `${user.first_name} ${user.last_name}`,
+          first_name: user.first_name,
+          last_name: user.last_name,
         };
         acc.set(user.id, newAssignmentUser);
 
@@ -93,7 +94,8 @@ export const assignmentsRouter = createTRPCRouter({
 
       const assignable: AssignmentUser[] = assignableUsers.map(user => ({
         id: user.id,
-        name: `${user.first_name} ${user.last_name}`,
+        first_name: user.first_name,
+        last_name: user.last_name,
       }));
 
       return {

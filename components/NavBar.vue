@@ -35,6 +35,12 @@ const navItems = computed<NavItem[]>(() => [
     icon: 'ph:users-three',
     visible: props.role === 'admin',
   },
+  {
+    label: 'Timecards',
+    name: 'Timecards',
+    icon: 'ph:clock',
+    visible: true,
+  },
 ]);
 </script>
 
@@ -59,7 +65,7 @@ const navItems = computed<NavItem[]>(() => [
             </NavigationMenuItem>
           </NuxtLink>
         </div>
-        <div>
+        <div class="w-full">
           <div class="flex items-center">
             <NavigationMenuItem
               class="px-3 py-2 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
@@ -81,18 +87,15 @@ const navItems = computed<NavItem[]>(() => [
               <Icon name="ph:gear" />
             </NavigationMenuItem>
           </div>
-          <NuxtLink
-            :to="{ name: 'Login' }"
-            class="w-full hover:cursor-pointer"
-            @click="emit('signOut')"
-          >
-            <NavigationMenuItem class="flex items-center gap-1 hover:bg-primary hover:text-secondary px-3 py-2">
+          <NavigationMenuItem class="px-3 py-2 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary">
+            <NavigationMenuLink
+              class="flex justify-center items-center gap-2"
+              @click="emit('signOut')"
+            >
+              <p>Sign Out</p>
               <Icon name="ph:sign-out" />
-              <NavigationMenuLink>
-                Sign Out
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NuxtLink>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
         </div>
       </div>
     </NavigationMenuList>

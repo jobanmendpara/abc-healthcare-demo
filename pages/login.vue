@@ -8,6 +8,7 @@ import { emailLoginSchema, phoneLoginSchema } from '~/types';
 
 const { $api, $toast } = useNuxtApp();
 const { auth } = useSupabaseClient();
+const config = useRuntimeConfig();
 
 const formSchema = z.object({
   ...emailLoginSchema.shape,
@@ -17,7 +18,6 @@ const formSchema = z.object({
 const form = useForm({
   validationSchema: toTypedSchema(formSchema),
   initialValues: {
-    // WARN TODO: Remove before prod
     email: '',
     password: '',
   },
@@ -123,6 +123,33 @@ definePageMeta({
       >
         Passwordless Login
       </NuxtLink>
+    </div>
+    <div
+      v-if="useRuntimeConfig().public.nodeEnv === 'development'"
+      class="flex p-5 justify-center gap-5"
+    >
+      <Button
+        @click="() => {
+          form.setValues({
+            email: useRuntimeConfig().public.adminEmail,
+            password: useRuntimeConfig().public.adminPassword,
+          });
+          onEmailLoginSubmit();
+        }"
+      >
+        Admin
+      </Button>
+      <Button
+        @click="() => {
+          form.setValues({
+            email: useRuntimeConfig().public.employeeEmail,
+            password: useRuntimeConfig().public.employeePassword,
+          });
+          onEmailLoginSubmit();
+        }"
+      >
+        Employee
+      </Button>
     </div>
   </div>
 </template>
