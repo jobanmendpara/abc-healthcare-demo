@@ -18,7 +18,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits([]);
+const emit = defineEmits(['update:dateRange']);
 
 const localDateRange = useVModel(props, 'dateRange', emit);
 const isOpen = ref(false);

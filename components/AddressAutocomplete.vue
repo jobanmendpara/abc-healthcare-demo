@@ -5,10 +5,13 @@ import type { Geopoint } from '~/types';
 const props = defineProps({
   value: {
     type: Object as PropType<Partial<Geopoint>>,
-    required: true,
+    default: () => initGeopoint(),
   },
 });
-const emits = defineEmits(['select']);
+
+const emit = defineEmits({
+  select: (value: Geopoint) => value,
+});
 
 const {
   autocomplete,
@@ -19,19 +22,12 @@ const {
   searchTerm,
   selectGeopoint,
 } = await useAutocomplete();
-const { isOpen } = usePopover();
 
-function usePopover() {
-  const isOpen = ref(false);
-
-  return {
-    isOpen,
-  };
-}
+const isOpen = ref(false);
 
 async function useAutocomplete() {
   const buttonText = ref('Select Address');
-  const currentValue = ref<Partial<Geopoint> | null>(props.value);
+  const currentValue = ref<Partial<Geopoint>>(props.value);
   const searchTerm = ref('');
   const loader = new Loader({
     apiKey: useRuntimeConfig().public.gmapsApiKey,
@@ -87,12 +83,12 @@ async function useAutocomplete() {
   }
 
   function reset() {
-    currentValue.value = null;
+    currentValue.value = initGeopoint();
     buttonText.value = 'Select Address';
   }
 
   function selectGeopoint(geopoint: Geopoint) {
-    emits('select', geopoint);
+    emit('select', geopoint);
     currentValue.value = geopoint;
     buttonText.value = currentValue.value.formatted_address ?? 'Select Address';
     isOpen.value = false;
@@ -123,10 +119,11 @@ onMounted(() => {
 <template>
   <Popover v-model:open="isOpen">
     <div class="w-full text-center">
-      <PopoverTrigger>
+      <PopoverTrigger as-child>
         <div class="space-x-2 mb-4">
           <Button
             :class="(currentValue ?? initGeopoint()).formatted_address ? '' : 'bg-red-500 hover:bg-red-700'"
+            @click.prevent=""
           >
             {{ buttonText }}
           </Button>
@@ -140,7 +137,11 @@ onMounted(() => {
       </PopoverTrigger>
       <PopoverContent>
         <Command v-model:search-term="searchTerm">
-          <CommandInput @input="async (event: Event) => await autocomplete(event)" />
+          <CommandInput
+            id="address"
+            name="address"
+            @input="async (event: Event) => await autocomplete(event)"
+          />
           <CommandEmpty>No Address Found</CommandEmpty>
           <CommandList>
             <CommandGroup>

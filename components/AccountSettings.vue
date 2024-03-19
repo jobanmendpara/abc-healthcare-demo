@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useVModel } from '@vueuse/core';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
@@ -15,7 +14,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['submit', 'showPasswordChange']);
+const emit = defineEmits({
+  'submit': (value: Partial<User>) => value,
+  'showPasswordChange': () => true,
+  'update:open': (value: boolean) => value,
+});
 
 const { $toast } = useNuxtApp();
 
@@ -64,10 +67,24 @@ async function onSubmit() {
     return;
   }
 
-  if (!formValidationResult.values)
+  if (!formValidationResult.values) {
+    $toast.error('Invalid form values');
     return;
+  }
 
-  emit('submit', { id: props.user.id, ...form.values });
+  const payload: Partial<User> = {
+    id: props.user.id,
+    first_name: formValidationResult.values.first_name,
+    middle_name: formValidationResult.values.middle_name,
+    last_name: formValidationResult.values.last_name,
+    email: formValidationResult.values.email,
+    phone_number: formValidationResult.values.phone_number,
+    geopoint: formValidationResult.values.geopoint,
+    role: props.user.role,
+    is_active: props.user.is_active,
+  };
+
+  emit('submit', payload);
 }
 
 watchEffect(() => {
@@ -113,6 +130,7 @@ watchEffect(() => {
                   id="first_name"
                   v-bind="componentField"
                   type="text"
+                  autocomplete="name"
                 />
               </FormControl>
             </FormItem>
@@ -179,9 +197,10 @@ watchEffect(() => {
             </FormLabel>
             <FormControl>
               <Input
-                id="phone"
+                id="email"
                 v-bind="componentField"
                 type="email"
+                autocomplete="email"
               />
             </FormControl>
           </FormItem>

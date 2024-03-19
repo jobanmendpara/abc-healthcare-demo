@@ -3,10 +3,9 @@ import { PopoverRoot, useForwardPropsEmits } from 'radix-vue'
 import type { PopoverRootEmits, PopoverRootProps } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ PopoverRootProps {}
-interface Emits extends PopoverRootEmits {}
 
 const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
+const emits = defineEmits<PopoverRootEmits>()
 
 const forwarded = useForwardPropsEmits(props, emits)
 </script>

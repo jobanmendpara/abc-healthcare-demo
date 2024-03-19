@@ -4,7 +4,7 @@ import { ComboboxItem, useEmitAsProps } from 'radix-vue'
 import { cn } from '@/lib/utils'
 
 interface Props extends /* @vue-ignore */ ComboboxItemProps { }
-interface Emits extends /* @vue-ignore */ ComboboxItemEmits { }
+interface Emits extends ComboboxItemEmits { }
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

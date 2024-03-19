@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 interface Props extends /* @vue-ignore */ DropdownMenuCheckboxItemProps {
   class?: string;
 }
-interface Emits extends /* @vue-ignore */ DropdownMenuCheckboxItemEmits {}
+interface Emits extends DropdownMenuCheckboxItemEmits {}
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();

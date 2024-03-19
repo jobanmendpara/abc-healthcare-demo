@@ -5,7 +5,7 @@ import Command from './Command.vue'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface Props extends /* @vue-ignore */ DialogRootProps { }
-interface Emits extends /* @vue-ignore */ DialogRootEmits { }
+interface Emits extends DialogRootEmits { }
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

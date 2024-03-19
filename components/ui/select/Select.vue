@@ -3,7 +3,7 @@ import type { SelectRootEmits, SelectRootProps } from 'radix-vue'
 import { SelectRoot, useForwardPropsEmits } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ SelectRootProps {}
-interface Emits extends /* @vue-ignore */ SelectRootEmits {}
+interface Emits extends SelectRootEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

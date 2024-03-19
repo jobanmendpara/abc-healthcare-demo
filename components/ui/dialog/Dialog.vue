@@ -2,7 +2,7 @@
 import { DialogRoot, type DialogRootEmits, type DialogRootProps, useForwardPropsEmits } from 'radix-vue';
 
 interface Props extends /* @vue-ignore */ DialogRootProps { }
-interface Emits extends /* @vue-ignore */ DialogRootEmits { }
+interface Emits extends DialogRootEmits { }
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
