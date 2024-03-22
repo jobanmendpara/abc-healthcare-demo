@@ -21,6 +21,19 @@ const { data: timecards, isFetching: isTimecardsFetching } = useQuery({
   staleTime: 0,
 });
 
+function exportTimecards(timecards: TableTimecard[]) {
+  const data = timecards.map(timecard => ({
+    'ID': timecard.id,
+    'Employee': timecard.assignment.employee.name,
+    'Client': timecard.assignment.client.name,
+    'Started At': timecard.started_at,
+    'Ended At': timecard.ended_at,
+    'Active': timecard.is_active,
+  }));
+
+  useSheet().exportToSheet(data, 'timecards');
+}
+
 definePageMeta({
   layout: 'main',
   name: 'Timecards',
@@ -31,9 +44,14 @@ definePageMeta({
   <h1 class="text-left text-2xl font-semibold">
     Timecards
   </h1>
-  <DateRangePicker v-model:dateRange="filterDateRange" />
-  <TimecardsDataTable
-    :loading="isTimecardsFetching"
-    :data="timecards"
-  />
+  <div class="space-y-5">
+    <div class="flex flex-row justify-between items-center w-full">
+      <DateRangePicker v-model:dateRange="filterDateRange" />
+    </div>
+    <TimecardsDataTable
+      :loading="isTimecardsFetching"
+      :data="timecards"
+      @export="(val: TableTimecard[]) => exportTimecards(val)"
+    />
+  </div>
 </template>

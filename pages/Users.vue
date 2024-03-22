@@ -44,7 +44,7 @@ const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
 // @ts-expect-error queryKeyFactory type error
 const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
   ...queries.assignments.user(localUserId),
-  staleTime: 0,
+  staleTime: 1000 * 60 * 3,
   placeholderData: {
     assignable: [],
     assigned: [],

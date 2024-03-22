@@ -15,9 +15,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits({
-  'submit': (value: Partial<User>) => value,
+  'submit': (_value: Partial<User>) => true,
   'showPasswordChange': () => true,
-  'update:open': (value: boolean) => value,
+  'update:open': (_value: boolean) => true,
 });
 
 const { $toast } = useNuxtApp();
@@ -80,8 +80,6 @@ async function onSubmit() {
     email: formValidationResult.values.email,
     phone_number: formValidationResult.values.phone_number,
     geopoint: formValidationResult.values.geopoint,
-    role: props.user.role,
-    is_active: props.user.is_active,
   };
 
   emit('submit', payload);

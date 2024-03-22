@@ -30,7 +30,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:page', 'update:size']);
+const emit = defineEmits(['export', 'update:page', 'update:size']);
 
 const localData = computed(() => {
   return props.data.map((timecard, index) => ({
@@ -76,6 +76,27 @@ function goToPreviousPage() {
 </script>
 
 <template>
+  <div class="flex flex-row gap-3 justify-between items-center">
+    <div class="flex flex-row justify-between items-center gap-7">
+      <Button @click="emit('export', table.getFilteredSelectedRowModel().rows.map(row => row.original))">
+        Export
+      </Button>
+      <p class="text-lg">
+        Selected: {{ table.getFilteredSelectedRowModel().rows.length }} / {{ props.data.length }}
+      </p>
+    </div>
+    <div class="space-x-3">
+      <Button @click="table.toggleAllRowsSelected(true)">
+        Select All
+      </Button>
+      <Button
+        variant="outline"
+        @click="table.toggleAllRowsSelected(false)"
+      >
+        Clear
+      </Button>
+    </div>
+  </div>
   <Table>
     <TableHeader>
       <TableRow
