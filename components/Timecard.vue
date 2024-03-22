@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Timecard } from '~/types';
-
 const props = defineProps({
   timecard: {
     type: Object as PropType<Timecard>,

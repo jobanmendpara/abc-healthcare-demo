@@ -29,6 +29,22 @@ const { data: activeTimecards } = useQuery({
   ...queries.timecards.active(user.value!.id),
   refetchInterval: 1000 * 60 * 5,
   staleTime: Number.POSITIVE_INFINITY,
+  select: (data) => {
+    if (!data)
+      return [];
+
+    const output = data.map(timecard => ({
+      ...timecard,
+      assignment: {
+        id: timecard.assignment!.id,
+        client: timecard.assignment!.client[0],
+        employee: timecard.assignment!.employee[0],
+      },
+    }));
+
+    return output;
+  },
+  enabled: user.value?.role === 'employee',
 });
 
 const clockInMutation = useMutation({
@@ -70,6 +86,13 @@ const clockOutMutation = useMutation({
   },
 });
 
+function getTimecardName(assignmentId: string) {
+  const firstName = user.value?.assignments.find(assignment => assignment.id === assignmentId)?.client.first_name;
+  const lastName = user.value?.assignments.find(assignment => assignment.id === assignmentId)?.client.last_name;
+
+  return `${firstName} ${lastName}`;
+}
+
 definePageMeta({
   layout: 'main',
   name: 'Home',
@@ -97,7 +120,7 @@ definePageMeta({
           class="flex flex-row justify-between items-center border border-gray-500 p-4 text-lg"
         >
           <p>
-            {{ assignment.client.name }}
+            {{ `${assignment.client.first_name} ${assignment.client.last_name}` }}
           </p>
           <ClockInModal
             :user="clients.get(assignment.client.id)"
@@ -111,7 +134,7 @@ definePageMeta({
       v-else-if="activeTimecards && activeTimecards.length >= 1"
       :key="timecard.id"
       :timecard="timecard"
-      :name="user?.assignments.find(assignment => assignment.id === timecard.assignment_id)?.client.name"
+      :name="getTimecardName(timecard.assignment?.id ?? '')"
       @clock-out="(id: string) => clockOutMutation.mutate(id)"
     />
   </div>

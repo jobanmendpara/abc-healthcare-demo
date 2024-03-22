@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 interface Props extends /* @vue-ignore */ SelectContentProps {
   class?: string
 }
-interface Emits extends /* @vue-ignore */ SelectContentEmits {}
+interface Emits extends SelectContentEmits {}
 
 const props = withDefaults(
   defineProps<Props>(), {

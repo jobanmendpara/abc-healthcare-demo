@@ -2,7 +2,7 @@
 import { type AlertDialogEmits, type AlertDialogProps, AlertDialogRoot, useForwardPropsEmits } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ AlertDialogProps {}
-interface Emits extends /* @vue-ignore */ AlertDialogEmits {}
+interface Emits extends AlertDialogEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

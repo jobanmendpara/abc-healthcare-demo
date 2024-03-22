@@ -6,7 +6,7 @@ import {
 } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ DropdownMenuRadioGroupProps {}
-interface Emits extends /* @vue-ignore */ DropdownMenuRadioGroupEmits {}
+interface Emits extends DropdownMenuRadioGroupEmits {}
 
 const props = defineProps<Props>()
 

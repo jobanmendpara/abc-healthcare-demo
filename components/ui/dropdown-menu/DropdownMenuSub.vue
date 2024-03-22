@@ -7,7 +7,7 @@ import {
 } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ DropdownMenuSubProps {}
-interface Emits extends /* @vue-ignore */ DropdownMenuSubEmits {}
+interface Emits extends DropdownMenuSubEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

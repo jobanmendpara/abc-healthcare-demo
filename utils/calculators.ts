@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
-dayjs.extend(duration);
-
 export function calculatePageRange(page: number, size: number): { start: number; end: number } {
   const start = (page - 1) * size;
   const end = start + size - 1;
@@ -21,6 +19,8 @@ export function calculateEuclideanDistance(coord1: [number, number], coord2: [nu
 }
 
 export function calculateTimeElapsed(dateString: string): string {
+  dayjs.extend(duration);
+
   const inputDate = dayjs(dateString);
   const now = dayjs();
   const diff = now.diff(inputDate, 'milliseconds');

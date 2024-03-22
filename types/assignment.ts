@@ -8,7 +8,8 @@ export const assignmentsTableSchema = z.object({
 
 export const assignmentUserSchema = z.object({
   id: z.string().uuid(),
-  name: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
 });
 export type AssignmentUser = z.infer<typeof assignmentUserSchema>;
 

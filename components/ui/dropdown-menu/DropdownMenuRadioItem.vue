@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 interface Props extends /* @vue-ignore */ DropdownMenuRadioItemProps {
   class?: string
 }
-interface Emits extends /* @vue-ignore */ DropdownMenuRadioItemEmits { }
+interface Emits extends DropdownMenuRadioItemEmits { }
 
 const props = defineProps<Props>()
 

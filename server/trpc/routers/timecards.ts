@@ -1,9 +1,8 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import dayjs from 'dayjs';
-import { timecardSchema } from '~/types';
 import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
-import { calculateEuclideanDistance } from '~/utils';
+import { calculateEuclideanDistance, calculatePageRange } from '~/utils';
 
 export const timecardsRouter = createTRPCRouter({
   clockIn: authorizedProcedure
@@ -64,8 +63,8 @@ export const timecardsRouter = createTRPCRouter({
         id: crypto.randomUUID(),
         is_active: true,
         assignment_id: input.assignmentId,
-        started_at: dayjs().format(),
-        created_at: dayjs().format(),
+        started_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       });
       if (insertTimecardError) {
         throw new Error('Error while creating timecard');
@@ -92,7 +91,7 @@ export const timecardsRouter = createTRPCRouter({
         data: newTimecard,
         error: updateTimecardError,
       } = await db.from('timecards').update({
-        ended_at: dayjs().format(),
+        ended_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
         is_active: false,
       }).eq('id', input.timecardId).select().single();
       if (updateTimecardError) {
@@ -104,9 +103,6 @@ export const timecardsRouter = createTRPCRouter({
     }),
   getActive: authorizedProcedure
     .input(z.void())
-    .output(
-      z.array(timecardSchema),
-    )
     .query(async ({
       ctx: { db, requestor },
     }) => {
@@ -114,7 +110,28 @@ export const timecardsRouter = createTRPCRouter({
         const {
           data: activeTimecards,
           error: selectActiveTimecardsError,
-        } = await db.from('timecards').select().eq('is_active', true);
+        } = await db.from('timecards')
+          .select(`
+            id,
+            assignment:assignments(
+              id,
+              client:users!client_id(
+                id,
+                first_name,
+                last_name
+              ),
+              employee:users!employee_id(
+                id,
+                first_name,
+                last_name
+              )
+            ),
+            started_at,
+            ended_at,
+            created_at,
+            is_active
+          `)
+          .eq('is_active', true);
         if (selectActiveTimecardsError) {
           throw new Error('Error while finding active timecards');
         }
@@ -127,22 +144,30 @@ export const timecardsRouter = createTRPCRouter({
 
       if (requestor.role === 'employee') {
         const {
-          data: assignments,
-          error: selectAssignmentsError,
-        } = await db.from('assignments').select().eq('employee_id', requestor.id);
-        if (selectAssignmentsError) {
-          throw new Error('Error while finding assignments');
-        }
-        if (!assignments) {
-          throw new Error('Assignments not found');
-        }
-
-        const assignmentIds = assignments.map(assignment => assignment.id);
-
-        const {
           data: activeTimecards,
           error: selectActiveTimecardsError,
-        } = await db.from('timecards').select().in('assignment_id', assignmentIds).eq('is_active', true);
+        } = await db.from('timecards')
+          .select(`
+            id,
+            assignment:assignments(
+              id,
+              client:users!client_id(
+                id,
+                first_name,
+                last_name
+              ),
+              employee:users!employee_id(
+                id,
+                first_name,
+                last_name
+              )
+            ),
+            started_at,
+            ended_at,
+            created_at,
+            is_active
+          `)
+          .eq('is_active', true);
         if (selectActiveTimecardsError) {
           throw new Error('Error while finding active timecards');
         }
@@ -151,6 +176,101 @@ export const timecardsRouter = createTRPCRouter({
         }
 
         return activeTimecards;
+      }
+
+      return [];
+    }),
+  list: authorizedProcedure
+    .input(z.object({
+      dateRange: z.object({
+        start: z.string(),
+        end: z.string(),
+      }),
+    }))
+    .query(async ({
+      ctx,
+      input,
+    }) => {
+      const { db, requestor } = ctx;
+      const { dateRange } = input;
+
+      const query = `
+            id,
+            assignment:assignments(
+              id,
+              client:users!client_id(
+                id,
+                first_name,
+                last_name
+              ),
+              employee:users!employee_id(
+                id,
+                first_name,
+                last_name
+              )
+            ),
+            started_at,
+            ended_at,
+            created_at,
+            is_active
+      `;
+      const statement = db.from('timecards').select(query).gte('started_at', dateRange.start).lte('ended_at', dateRange.end);
+
+      if (requestor.role === 'admin') {
+        const { data: timecards, error: selectTimecardsError } = await statement
+          .order('started_at', { ascending: false })
+          .returns<Timecard[]>();
+        ;
+        if (selectTimecardsError) {
+          throw new Error(selectTimecardsError.message);
+        }
+        if (!timecards) {
+          throw new Error('No timecards returned.');
+        }
+
+        const { data: nextPage, error: nextPageError } = await db.from('timecards')
+          .select();
+        if (nextPageError)
+          throw new Error(nextPageError.message);
+        if (!nextPage)
+          throw new Error('No next page returned.');
+
+        return timecards;
+      }
+
+      if (requestor.role === 'employee') {
+        const { data: assignments, error: selectAssignmentsError } = await db.from('assignments')
+          .select('id')
+          .eq('employee_id', requestor.id);
+        if (selectAssignmentsError) {
+          throw new Error(selectAssignmentsError.message);
+        }
+        if (!assignments) {
+          throw new Error('No assignments returned.');
+        }
+
+        const assignmentIds = assignments.map(assignment => assignment.id);
+
+        const { data: timecards, error: selectTimecardsError } = await statement
+          .in('assignment_id', assignmentIds)
+          .order('started_at', { ascending: false })
+          .returns<Timecard[]>();
+        ;
+        if (selectTimecardsError) {
+          throw new Error(selectTimecardsError.message);
+        }
+        if (!timecards) {
+          throw new Error('No timecards returned.');
+        }
+
+        const { data: nextPage, error: nextPageError } = await db.from('timecards')
+          .select();
+        if (nextPageError)
+          throw new Error(nextPageError.message);
+        if (!nextPage)
+          throw new Error('No next page returned.');
+
+        return timecards;
       }
 
       return [];

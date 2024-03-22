@@ -2,7 +2,7 @@
 import { DropdownMenuRoot, type DropdownMenuRootEmits, type DropdownMenuRootProps, useForwardPropsEmits } from 'radix-vue'
 
 interface Props extends /* @vue-ignore */ DropdownMenuRootProps {}
-interface Emits extends /* @vue-ignore */ DropdownMenuRootEmits {}
+interface Emits extends DropdownMenuRootEmits {}
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

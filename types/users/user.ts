@@ -14,7 +14,7 @@ export const usersTableSchema = z.object({
 });
 
 export const userSchema = z.object({
-  ...usersTableSchema.shape,
+  ...usersTableSchema.omit({ geopoint_id: true }).shape,
   geopoint: geopointSchema,
 });
 export interface User extends z.infer<typeof userSchema> { }

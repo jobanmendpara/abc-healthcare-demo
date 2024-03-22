@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 interface Props extends /* @vue-ignore */ DropdownMenuContentProps {
   class?: string;
 }
-interface Emits extends /* @vue-ignore */ DropdownMenuContentEmits {}
+interface Emits extends DropdownMenuContentEmits {}
 
 const props = withDefaults(
   defineProps<Props>(),

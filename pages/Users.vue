@@ -29,14 +29,12 @@ const activeInvitesListParams = computed<PageParams>(() => ({
   perPage: 10,
 }));
 
-// @ts-expect-error queryKeyFactory type error
 const { data: usersResponse, isFetching: isUsersFetching } = useQuery({
   ...queries.users.list(activeUsersListParams),
   placeholderData: keepPreviousData,
   staleTime: 1000 * 60 * 3,
 });
 
-// @ts-expect-error queryKeyFactory type error
 const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
   ...queries.invites.list(activeInvitesListParams),
   placeholderData: keepPreviousData,
@@ -46,7 +44,7 @@ const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
 // @ts-expect-error queryKeyFactory type error
 const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
   ...queries.assignments.user(localUserId),
-  staleTime: 0,
+  staleTime: 1000 * 60 * 3,
   placeholderData: {
     assignable: [],
     assigned: [],
@@ -56,12 +54,13 @@ const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
       if (localUser.value.role === 'admin')
         return acc;
 
-      const { id, name } = assignment[
+      const { id, first_name, last_name } = assignment[
         `${localUser.value.role === 'employee' ? 'client' : 'employee'}`
       ];
       acc.push({
         id,
-        name,
+        first_name,
+        last_name,
       });
 
       return acc;

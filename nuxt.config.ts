@@ -26,21 +26,7 @@ export default defineNuxtConfig({
     'nuxt-icon',
     'nuxt-typed-router',
   ],
-  nuxtTypedRouter: {
-    plugin: true,
-  },
   vite: {},
-  vueQuery: {
-    autoImports: [
-      'useQuery',
-      'useQueries',
-      'useInfiniteQuery',
-      'useMutation',
-      'useIsFetching',
-      'useIsMutating',
-      'useQueryClient'
-    ],
-  },
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -48,16 +34,20 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    envType: process.env.NODE_ENV,
     public: {
+      nodeEnv: process.env.NODE_ENV,
       baseUrl: process.env.BASE_URL || 'http://localhost:3000/',
       gmapsApiKey: process.env.NUXT_PUBLIC_GMAPS_API_KEY,
+      adminEmail: process.env.ADMIN_EMAIL,
+      adminPassword: process.env.ADMIN_PASSWORD,
+      employeeEmail: process.env.EMPLOYEE_EMAIL,
+      employeePassword: process.env.EMPLOYEE_PASSWORD,
     },
   },
   ssr: false,
   dayjs: {
     locales: ['en'],
-    plugins: ['relativeTime', 'utc', 'timezone'],
+    plugins: ['duration', 'relativeTime', 'utc', 'timezone'],
     defaultLocale: 'en',
     defaultTimezone: 'America/New_York',
   },

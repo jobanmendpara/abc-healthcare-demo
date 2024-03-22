@@ -4,7 +4,7 @@ import { ComboboxRoot, useForwardPropsEmits } from 'radix-vue';
 import { cn } from '@/lib/utils';
 
 interface Props extends /* @vue-ignore */ ComboboxRootProps { }
-interface Emits extends /* @vue-ignore */ ComboboxRootEmits { }
+interface Emits extends ComboboxRootEmits { }
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
