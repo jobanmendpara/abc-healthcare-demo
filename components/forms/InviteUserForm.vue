@@ -12,6 +12,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
+  role: {
+    type: String as PropType<Role>,
+    default: 'employee',
+  },
 });
 
 const emit = defineEmits(['submit', 'update:open']);
@@ -43,6 +47,14 @@ async function onSubmit() {
 
   emit('submit', inviteValidationResult.values);
 }
+
+watchEffect(() => {
+  if (isOpen.value) {
+    form.setValues({
+      role: props.role,
+    });
+  }
+});
 </script>
 
 <template>
@@ -99,7 +111,7 @@ async function onSubmit() {
                   <SelectGroup>
                     <SelectLabel>Roles</SelectLabel>
                     <SelectItem
-                      v-for="role in ['employee', 'admin', 'client']"
+                      v-for="role in ['employee', 'admin']"
                       :key="role"
                       :value="role"
                     >

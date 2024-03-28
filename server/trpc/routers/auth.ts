@@ -192,7 +192,7 @@ export const authRouter = createTRPCRouter({
           id: authResponse.data.user.id,
           role,
           is_active: true,
-          geopoint_id: input.geopoint.id,
+          geopoint: input.geopoint,
           phone_number: input.phone,
         },
       });
