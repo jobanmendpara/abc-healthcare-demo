@@ -15,6 +15,7 @@ export default antfu(
       'nuxt.config.ts',
       'components/ui/*',
       'README.md',
+      'supabase/*',
     ],
     stylistic: {
       semi: true,
