@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import dayjs from 'dayjs';
 import { authorizedProcedure, createTRPCRouter } from '~/server/trpc/trpc';
-import { calculateEuclideanDistance, calculatePageRange } from '~/utils';
+import { calculateEuclideanDistance } from '~/utils';
 
 export const timecardsRouter = createTRPCRouter({
   clockIn: authorizedProcedure
@@ -61,7 +61,6 @@ export const timecardsRouter = createTRPCRouter({
 
       const { error: insertTimecardError } = await db.from('timecards').insert({
         id: crypto.randomUUID(),
-        is_active: true,
         assignment_id: input.assignmentId,
         started_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
         created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),

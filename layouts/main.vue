@@ -51,7 +51,7 @@ const toggleThemeMutation = useMutation({
 });
 
 const updateUserMutation = useMutation({
-  mutationFn: async (user: Partial<User>) => await $api.users.update.mutate(user),
+  mutationFn: async (user: Partial<User>) => await $api.users.updateSelf.mutate(user),
   onSuccess: () => {
     queryClient.invalidateQueries(queries.app.user($user.value!.id));
     $toast.success('User updated successfully');

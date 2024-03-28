@@ -9,5 +9,6 @@ export const columns: ColumnDef<Invite>[] = [
   {
     accessorKey: 'role',
     header: 'Role',
+    accessorFn: row => (row.role.charAt(0).toUpperCase() + row.role.slice(1)),
   },
 ];

@@ -8,7 +8,6 @@ import { emailLoginSchema, phoneLoginSchema } from '~/types';
 
 const { $api, $toast } = useNuxtApp();
 const { auth } = useSupabaseClient();
-const config = useRuntimeConfig();
 
 const formSchema = z.object({
   ...emailLoginSchema.shape,
@@ -131,8 +130,8 @@ definePageMeta({
       <Button
         @click="() => {
           form.setValues({
-            email: useRuntimeConfig().public.adminEmail,
-            password: useRuntimeConfig().public.adminPassword,
+            email: useRuntimeConfig().public.adminEmail as unknown as string,
+            password: useRuntimeConfig().public.adminPassword as unknown as string,
           });
           onEmailLoginSubmit();
         }"
@@ -142,8 +141,8 @@ definePageMeta({
       <Button
         @click="() => {
           form.setValues({
-            email: useRuntimeConfig().public.employeeEmail,
-            password: useRuntimeConfig().public.employeePassword,
+            email: useRuntimeConfig().public.employeeEmail as unknown as string,
+            password: useRuntimeConfig().public.employeePassword as unknown as string,
           });
           onEmailLoginSubmit();
         }"
