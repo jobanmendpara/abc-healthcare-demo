@@ -195,34 +195,69 @@ watchEffect(() => {
     Users
   </h1>
   <div class="flex-basis-1/2 flex justify-end flex-grow px-5">
-    <ClientUserForm v-if="activeView === Views.CLIENTS" v-model:open="isClientUserFormOpen"
-      :is-muttion-pending="createClientUserMutation.status.value === 'pending'"
-      @submit="(user: Partial<User>) => createClientUserMutation.mutate(user)" />
-    <InviteUserForm v-else v-model:open="isInviteFormOpen"
-      :is-mutation-pending="inviteUserMutation.status.value === 'pending'" :role="activeRole"
-      @submit="(invite: Invite) => inviteUserMutation.mutate(invite)" />
+    <ClientUserForm
+      v-if="activeView === Views.CLIENTS"
+      v-model:open="isClientUserFormOpen"
+      :is-mutation-pending="createClientUserMutation.status.value === 'pending'"
+      @submit="(user: Partial<User>) => createClientUserMutation.mutate(user)"
+    />
+    <InviteUserForm
+      v-else
+      v-model:open="isInviteFormOpen"
+      :is-mutation-pending="inviteUserMutation.status.value === 'pending'"
+      :role="activeRole"
+      @submit="(invite: Invite) => inviteUserMutation.mutate(invite)"
+    />
   </div>
   <div class="space-y-1">
-    <Tabs v-model="activeView" class="w-full" @update:model-value="(newView) => setView(newView as Views)">
+    <Tabs
+      v-model="activeView"
+      class="w-full"
+      @update:model-value="(newView) => setView(newView as Views)"
+    >
       <TabsList>
-        <TabsTrigger v-for="tab in tabs" :value="tab">
+        <TabsTrigger
+          v-for="tab in tabs"
+          :value="tab"
+        >
           {{ tab }}
         </TabsTrigger>
       </TabsList>
     </Tabs>
-    <UsersDataTable v-if="activeView !== Views.INVITES" v-model:page="usersTablePage" :data="usersResponse?.list"
-      :has-next-page="usersResponse?.hasNextPage" :loading="isUsersFetching" @click-menu="(id: string) => setUser(id)"
-      @show-info="showUserInfo(localUser)" @show-assignments="showAssignments()" />
-    <InvitesDataTable v-if="activeView === Views.INVITES" v-model:page="invitesTablePage" :data="invitesResponse?.list"
-      :has-next-page="invitesResponse?.hasNextPage" :loading="isInvitesFetching"
-      @delete-invite="(id: string) => deleteInviteMutation.mutate(id)" />
-    <UserInfo v-model:open="isUserInfoOpen" :user="localUser" @delete-user="(id: string) => deleteUserMutation.mutate(id)"
-      @update-user="(editedUser: Partial<User>) => updateUserMutation.mutate(editedUser)" />
-    <AssignmentsPickList v-if="assignmentsQueryStatus !== 'pending'" v-model:open="isAssignmentsOpen"
-      :initial-assigned="assignmentsData!.assigned" :initial-assignable="assignmentsData!.assignable" :user="localUser"
+    <UsersDataTable
+      v-if="activeView !== Views.INVITES"
+      v-model:page="usersTablePage"
+      :data="usersResponse?.list"
+      :has-next-page="usersResponse?.hasNextPage"
+      :loading="isUsersFetching"
+      @click-menu="(id: string) => setUser(id)"
+      @show-info="showUserInfo(localUser)"
+      @show-assignments="showAssignments()"
+    />
+    <InvitesDataTable
+      v-if="activeView === Views.INVITES"
+      v-model:page="invitesTablePage"
+      :data="invitesResponse?.list"
+      :has-next-page="invitesResponse?.hasNextPage"
+      :loading="isInvitesFetching"
+      @delete-invite="(id: string) => deleteInviteMutation.mutate(id)"
+    />
+    <UserInfo
+      v-model:open="isUserInfoOpen"
+      :user="localUser"
+      @delete-user="(id: string) => deleteUserMutation.mutate(id)"
+      @update-user="(editedUser: Partial<User>) => updateUserMutation.mutate(editedUser)"
+    />
+    <AssignmentsPickList
+      v-if="assignmentsQueryStatus !== 'pending'"
+      v-model:open="isAssignmentsOpen"
+      :initial-assigned="assignmentsData!.assigned"
+      :initial-assignable="assignmentsData!.assignable"
+      :user="localUser"
       @submit="(assignmentChanges: Omit<AssignmentChanges, 'id'>) => updateAssignmentsMutation.mutate({
         id: localUser.id,
         ...assignmentChanges,
-      })" />
+      })"
+    />
   </div>
 </template>
