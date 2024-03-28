@@ -121,6 +121,7 @@ export const usersRouter = createTRPCRouter({
         .select()
         .order('last_name', { ascending: true })
         .eq('role', role)
+        .neq('id', requestor.id)
         .range(start, end);
       if (usersError)
         throw new Error(usersError.message);
