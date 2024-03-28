@@ -19,7 +19,6 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
-    '@pinia/nuxt',
     '@vueuse/nuxt',
     'dayjs-nuxt',
     'shadcn-nuxt',
@@ -69,9 +68,6 @@ export default defineNuxtConfig({
         '/PasswordlessLogin'
       ]
     },
-  },
-  pinia: {
-    storesDirs: ['./stores/**'],
   },
   components: {
     dirs: [
