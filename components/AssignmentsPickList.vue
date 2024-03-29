@@ -22,8 +22,11 @@ const emit = defineEmits(['update:open', 'submit']);
 
 const isOpen = useVModel(props, 'open', emit);
 
-const assigned = ref<Map<string, AssignmentUser>>(new Map<string, AssignmentUser>(props.initialAssigned.map(assignment => [assignment.id, assignment])));
-const assignable = ref<Map<string, AssignmentUser>>(new Map<string, AssignmentUser>(props.initialAssignable.map(assignment => [assignment.id, assignment])));
+const computedAssigned = computed(() => new Map<string, AssignmentUser>(props.initialAssigned.map(assignment => [assignment.id, assignment])));
+const computedAssignable = computed(() => new Map<string, AssignmentUser>(props.initialAssignable.map(assignment => [assignment.id, assignment])));
+
+const assigned = ref<Map<string, AssignmentUser>>(computedAssigned.value);
+const assignable = ref<Map<string, AssignmentUser>>(computedAssignable.value);
 
 function addToAssigned(assignmentUser: AssignmentUser) {
   assigned.value.set(assignmentUser.id, assignmentUser);
@@ -71,6 +74,12 @@ watch(
     reset();
   },
 );
+
+watchEffect(() => {
+  if (isOpen.value) {
+    reset();
+  }
+});
 </script>
 
 <template>
@@ -122,7 +131,7 @@ watch(
                 class="even:bg-secondary p-1 flex w-full justify-between items-center"
               >
                 <p>
-                  {{ `${item.first_name} ${item.last_name}` }}
+                  {{ item.first_name }} {{ item.last_name }}
                 </p>
                 <Button @click="addToAssignable(item)">
                   Remove
