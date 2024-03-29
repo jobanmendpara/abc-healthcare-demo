@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    * {
+      background-color: rgb(241, 245, 249);
+      font-family: 'Arial';
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .header {
+      color: rgb(241, 245, 249);
+      background-color: rgb(15, 23, 42);
+      padding: 8px;
+      width: 100%;
+    }
+
+    .content {
+      min-height: 64px;
+      margin: 16px 0px;
+    }
+
+    .footer {
+      width: 100%;
+      min-height: 24px;
+      background-color: rgb(15, 23, 42);
+    }
+  </style>
+</head>
+
+<body>
+  <h2 class="header">Magic Link</h2>
+
+  <section class="content">
+    <p>Follow this link to login:</p>
+    <p><a href="{{ .RedirectTo }}&token={{ .Token }}">Log In</a></p>
+  </section>
+
+  <div class="footer"></div>
+</body>
+
+</html>

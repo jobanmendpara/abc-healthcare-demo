@@ -4,15 +4,15 @@
 <head>
   <style>
     * {
-      background-color: rgb(248, 249, 250);
+      background-color: rgb(241, 245, 249);
       font-family: 'Arial';
       margin: 0px;
       padding: 0px;
     }
 
     .header {
-      color: rgb(43, 204, 146);
-      background-color: rgb(18, 23, 34);
+      color: rgb(241, 245, 249);
+      background-color: rgb(15, 23, 42);
       padding: 8px;
       width: 100%;
     }
@@ -25,19 +25,19 @@
     .footer {
       width: 100%;
       min-height: 24px;
-      background-color: rgb(18, 23, 34);
+      background-color: rgb(15, 23, 42);
     }
   </style>
 </head>
 
 <body>
-  <h2 class="header">
-    You've been invited to abc Healthcare
-  </h2>
+  <h2 class="header">Confirm Change of Email</h2>
+
   <section class="content">
-    <p>Follow this link to sign up:</p>
-    <p><a href="{{ .ConfirmationURL }}">Sign Up</a></p>
+    <p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
+    <p><a href="{{ .ConfirmationURL }}">Change Email</a></p>
   </section>
+
   <div class="footer"></div>
 </body>
 
