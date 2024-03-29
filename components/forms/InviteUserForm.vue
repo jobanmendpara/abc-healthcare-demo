@@ -46,6 +46,7 @@ async function onSubmit() {
     return;
 
   emit('submit', inviteValidationResult.values);
+  isOpen.value = false;
 }
 
 watchEffect(() => {
