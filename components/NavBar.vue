@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { PageParams } from '@supabase/supabase-js';
-import { routesNames } from '@typed-router';
-import type { Role } from '~/types';
+import type { NavItem, Role } from '~/types';
 
 const props = defineProps({
   isDarkMode: {
@@ -18,28 +17,28 @@ const emit = defineEmits(['signOut', 'toggleDarkMode', 'showAccountSettings']);
 
 const { isMedium } = useScreen();
 
-const navItems = computed(() => [
+const navItems = computed<NavItem[]>(() => [
   {
     label: 'Home',
-    name: routesNames.home,
-    icon: 'ph:house',
+    name: 'Home',
+    icon: 'lucide:home',
     visible: true,
   },
   {
     label: 'Users',
-    name: routesNames.users,
+    name: 'Users',
     params: {
       role: 'employee',
       page: 1,
       perPage: 10,
     } as { role: Role } & PageParams,
-    icon: 'ph:users-three',
+    icon: 'lucide:users-round',
     visible: props.role === 'admin',
   },
   {
     label: 'Timecards',
-    name: routesNames.timecards,
-    icon: 'ph:clock',
+    name: 'Timecards',
+    icon: 'lucide:calendar-clock',
     visible: true,
   },
 ]);
@@ -94,11 +93,11 @@ const navItems = computed(() => [
             >
               <Icon
                 v-if="isDarkMode"
-                name="ph:sun-fill"
+                name="lucide:sun"
               />
               <Icon
                 v-else
-                name="ph:moon-fill"
+                name="lucide:moon"
               />
             </div>
           </NavigationMenuItem>
@@ -110,7 +109,7 @@ const navItems = computed(() => [
               <p v-if="!isMedium">
                 Profile
               </p>
-              <Icon name="ph:user" />
+              <Icon name="lucide:user" />
             </div>
           </NavigationMenuItem>
           <NavigationMenuItem>
@@ -121,7 +120,7 @@ const navItems = computed(() => [
               <p v-if="!isMedium">
                 Sign Out
               </p>
-              <Icon name="ph:sign-out" />
+              <Icon name="lucide:log-out" />
             </NavigationMenuLink>
           </NavigationMenuItem>
         </div>
