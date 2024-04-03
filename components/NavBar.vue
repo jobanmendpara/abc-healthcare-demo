@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { PageParams } from '@supabase/supabase-js';
-import { routesNames } from '@typed-router';
-import type { Role } from '~/types';
+import type { NavItem, Role } from '~/types';
 
 const props = defineProps({
   isDarkMode: {
@@ -18,16 +17,16 @@ const emit = defineEmits(['signOut', 'toggleDarkMode', 'showAccountSettings']);
 
 const { isMedium } = useScreen();
 
-const navItems = computed(() => [
+const navItems = computed<NavItem[]>(() => [
   {
     label: 'Home',
-    name: routesNames.home,
+    name: 'Home',
     icon: 'lucide:home',
     visible: true,
   },
   {
     label: 'Users',
-    name: routesNames.users,
+    name: 'Users',
     params: {
       role: 'employee',
       page: 1,
@@ -38,7 +37,7 @@ const navItems = computed(() => [
   },
   {
     label: 'Timecards',
-    name: routesNames.timecards,
+    name: 'Timecards',
     icon: 'lucide:calendar-clock',
     visible: true,
   },
