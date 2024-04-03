@@ -7,6 +7,7 @@ import { useSupabaseUser } from '#imports';
 import type { UsersListParams } from '~/types';
 
 const supabaseUser = useSupabaseUser();
+const supabase = useSupabaseClient();
 
 export const queries = createQueryKeyStore({
   app: {
@@ -18,11 +19,15 @@ export const queries = createQueryKeyStore({
         const assignments = await api.assignments.getByUserId.query({ userId: toValue(userId) });
 
         const user = userResponse.get(supabaseUser.value!.id);
-        if (!user)
+        if (!user) {
+          supabase.auth.signOut();
           throw new Error('User not found');
+        }
         const settings = userSettingsResponse.userSettings.find(setting => setting.id === user.id);
-        if (!settings)
+        if (!settings) {
+          supabase.auth.signOut();
           throw new Error('User settings not found');
+        }
 
         return {
           ...user,
@@ -51,7 +56,12 @@ export const queries = createQueryKeyStore({
     }),
     list: (input: MaybeRef<PageParams & { dateRange: DatePickerRangeObject }>) => ({
       queryKey: [input] as const,
-      queryFn: async () => await api.timecards.list.query(toValue(input)),
+      queryFn: async () => await api.timecards.list.query({
+        dateRange: {
+          start: toValue(input).dateRange.start.toString(),
+          end: toValue(input).dateRange.end.toString(),
+        },
+      }),
     }),
   },
   users: {

@@ -25,6 +25,7 @@ INSERT INTO users (
   phone_number,
   role
 ) VALUES (
+  ''
   'johndoe@gmail.com',
   'John',
   'ChIJUUWhWpJa6IkRxyb1X3N_H1A',
