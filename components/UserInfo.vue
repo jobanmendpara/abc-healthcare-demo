@@ -129,7 +129,7 @@ watchEffect(() => {
             <p>
               <b>ID:</b> {{ user.id }}
             </p>
-            <Icon name="ph:copy" />
+            <Icon name="lucide:copy" />
           </div>
         </DialogDescription>
       </DialogHeader>
@@ -142,14 +142,14 @@ watchEffect(() => {
             @click="copy(user.email)"
           >
             <p>{{ user.email }}</p>
-            <Icon name="ph:copy" />
+            <Icon name="lucide:copy" />
           </div>
           <div
             v-if="user.email.length > 0"
             class="hover:cursor-pointer"
           >
             <Icon
-              name="ph:envelope"
+              name="lucide:mail"
               @click="email(user.email)"
             />
           </div>
@@ -162,7 +162,7 @@ watchEffect(() => {
             @click="copy(user.phone_number)"
           >
             <p>{{ formatToPhone(user.phone_number) }}</p>
-            <Icon name="ph:copy" />
+            <Icon name="lucide:copy" />
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -173,7 +173,7 @@ watchEffect(() => {
             @click="copy(user.geopoint.formatted_address || '')"
           >
             <p>{{ user.geopoint.formatted_address }}</p>
-            <Icon name="ph:copy" />
+            <Icon name="lucide:copy" />
           </div>
         </div>
       </div>

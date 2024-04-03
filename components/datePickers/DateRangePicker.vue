@@ -46,7 +46,7 @@ function resetDateRange() {
           )"
         >
           <Icon
-            name="ph:calendar-blank"
+            name="lucide:calendar"
             class="mr-2"
           />
           <span>
