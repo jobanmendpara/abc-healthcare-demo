@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PageParams } from '@supabase/supabase-js';
-import type { NavItem, Role } from '~/types';
+import { routesNames } from '@typed-router';
+import type { Role } from '~/types';
 
 const props = defineProps({
   isDarkMode: {
@@ -15,29 +16,29 @@ const props = defineProps({
 
 const emit = defineEmits(['signOut', 'toggleDarkMode', 'showAccountSettings']);
 
-const isDarkMode = props.isDarkMode;
+const { isMedium } = useScreen();
 
-const navItems = computed<NavItem[]>(() => [
+const navItems = computed(() => [
   {
     label: 'Home',
-    name: 'Home',
+    name: routesNames.home,
     icon: 'ph:house',
     visible: true,
   },
   {
     label: 'Users',
-    name: 'Users',
+    name: routesNames.users,
     params: {
       role: 'employee',
       page: 1,
       perPage: 10,
-    } as PageParams,
+    } as { role: Role } & PageParams,
     icon: 'ph:users-three',
     visible: props.role === 'admin',
   },
   {
     label: 'Timecards',
-    name: 'Timecards',
+    name: routesNames.timecards,
     icon: 'ph:clock',
     visible: true,
   },
@@ -45,30 +46,50 @@ const navItems = computed<NavItem[]>(() => [
 </script>
 
 <template>
-  <NavigationMenu class="bg-secondary text-primary">
-    <NavigationMenuList class="w-screen md:w-full md:h-screen text-center">
-      <div class="w-full md:h-full flex flex-row md:flex-col justify-between items-center">
-        <div class="md:w-full">
-          <NuxtLink
+  <div class="w-screen bg-secondary text-primary md:w-full">
+    <NavigationMenu :orientation="isMedium ? 'vertical' : 'horizontal'">
+      <NavigationMenuList :class="`flex justify-between ${isMedium ? 'w-screen' : 'h-screen flex-col space-x-0'}`">
+        <div class="w-full">
+          <NavigationMenuItem v-if="isMedium">
+            <NavigationMenuTrigger class="bg-secondary text-lg">
+              <p>Menu</p>
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div class="h-full">
+                <div
+                  v-for="item in navItems"
+                  :key="item.label"
+                >
+                  <NuxtLink
+                    v-if="item.visible"
+                    class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
+                    :to="{ name: item.name }"
+                  >
+                    <Icon :name="item.icon ?? ''" />
+                    <p>{{ item.label }}</p>
+                  </NuxtLink>
+                </div>
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem
             v-for="item in navItems"
-            :key="item.label"
-            :to="{ name: item.name }"
+            v-else
+            class="w-full"
           >
-            <NavigationMenuItem
-              v-if="item.visible"
-              class="flex items-center gap-2 hover:cursor-pointer hover:bg-primary hover:text-secondary px-3 py-2"
+            <NuxtLink
+              class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
+              :to="{ name: item.name }"
             >
               <Icon :name="item.icon ?? ''" />
-              <NavigationMenuLink>
-                {{ item.label }}
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NuxtLink>
+              <p>{{ item.label }}</p>
+            </NuxtLink>
+          </NavigationMenuItem>
         </div>
-        <div class="w-full">
-          <div class="flex items-center">
-            <NavigationMenuItem
-              class="px-3 py-2 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
+        <div :class="isMedium ? 'flex' : 'w-full'">
+          <NavigationMenuItem>
+            <div
+              class="flex justify-center items-center gap-1 p-3 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
               @click="emit('toggleDarkMode')"
             >
               <Icon
@@ -79,25 +100,32 @@ const navItems = computed<NavItem[]>(() => [
                 v-else
                 name="ph:moon-fill"
               />
-            </NavigationMenuItem>
-            <NavigationMenuItem
-              class="px-3 py-2 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
+            </div>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <div
+              class="flex justify-around items-center gap-1 p-3 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
               @click="emit('showAccountSettings')"
             >
-              <Icon name="ph:gear" />
-            </NavigationMenuItem>
-          </div>
-          <NavigationMenuItem class="px-3 py-2 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary">
+              <p v-if="!isMedium">
+                Profile
+              </p>
+              <Icon name="ph:user" />
+            </div>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <NavigationMenuLink
-              class="flex justify-center items-center gap-2"
+              class="flex justify-around items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
               @click="emit('signOut')"
             >
-              <p>Sign Out</p>
+              <p v-if="!isMedium">
+                Sign Out
+              </p>
               <Icon name="ph:sign-out" />
             </NavigationMenuLink>
           </NavigationMenuItem>
         </div>
-      </div>
-    </NavigationMenuList>
-  </NavigationMenu>
+      </NavigationMenuList>
+    </NavigationMenu>
+  </div>
 </template>
