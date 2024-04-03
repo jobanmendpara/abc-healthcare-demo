@@ -1,8 +1,6 @@
-import type { RoutesNamesList } from '@typed-router';
-
 export interface NavItem {
   label: string;
-  name: RoutesNamesList;
+  name: string;
   params?: unknown;
   visible: boolean;
   icon?: string;
