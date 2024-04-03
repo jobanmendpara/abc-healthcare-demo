@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 interface Props extends /* @vue-ignore */ NavigationMenuContentProps {
   class?: string
 }
-interface Emits extends /* @vue-ignore */ NavigationMenuContentEmits { }
+interface Emits extends NavigationMenuContentEmits { }
 
 const props = defineProps<Props>()
 
