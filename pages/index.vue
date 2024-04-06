@@ -26,7 +26,7 @@ useHead({
       abc &#x2022; Healthcare
     </h1>
     <h2 class="text-2xl">
-      As simple as that
+      HR Portal
     </h2>
     <NuxtLink
       class="bg-primary hover:cursor-pointer text-secondary rounded-lg px-4 py-2"

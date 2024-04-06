@@ -103,6 +103,7 @@ export type Database = {
           id: string
           is_active: boolean
           started_at: string
+          verification_code: string | null
         }
         Insert: {
           assignment_id: string
@@ -111,6 +112,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           started_at?: string
+          verification_code?: string | null
         }
         Update: {
           assignment_id?: string
@@ -119,6 +121,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           started_at?: string
+          verification_code?: string | null
         }
         Relationships: [
           {
