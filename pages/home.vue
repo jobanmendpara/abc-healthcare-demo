@@ -5,6 +5,8 @@ import { queries } from '~/queries';
 const { $api, $toast, $user } = useNuxtApp();
 
 const queryClient = useQueryClient();
+const isPinVerificationModalOpen = ref(false);
+const timecardIdToVerify = ref('');
 
 const { data: user, status } = useQuery({
   ...queries.app.user($user.value!.id),
@@ -60,8 +62,10 @@ const clockInMutation = useMutation({
       latitude: coords.latitude,
       longitude: coords.longitude,
     }),
-  onSuccess: () => {
-    $toast.success('Clocked in successfully');
+  onSuccess: (data) => {
+    timecardIdToVerify.value = data.id;
+    $toast.success('Verification code sent to client');
+    isPinVerificationModalOpen.value = true;
   },
   onError: (error) => {
     $toast.error(error.message);
@@ -77,6 +81,23 @@ const clockOutMutation = useMutation({
   }),
   onSuccess: () => {
     $toast.success('Clocked out successfully');
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+  onSettled: () => {
+    queryClient.invalidateQueries(queries.timecards.active(user.value!.id));
+  },
+});
+
+const verifyClockInMutation = useMutation({
+  mutationFn: async (pin: string) => await $api.timecards.verifyClockIn.mutate({
+    timecardId: timecardIdToVerify.value,
+    verificationCode: pin,
+  }),
+  onSuccess: () => {
+    timecardIdToVerify.value = '';
+    $toast.success('Clocked in');
   },
   onError: (error) => {
     $toast.error(error.message);
@@ -109,24 +130,22 @@ definePageMeta({
         Hi, {{ user.first_name }}
       </h1>
     </div>
-    <div v-if="activeTimecards && activeTimecards.length < 1">
+    <div
+      v-if="activeTimecards && activeTimecards.length < 1 && clients && user && user.role === 'employee'"
+      class="space-y-3"
+    >
       <div
-        v-if="clients && user && user.role === 'employee'"
-        class="space-y-3"
+        v-for="assignment in user.assignments"
+        :key="assignment.id"
+        class="flex flex-row justify-between items-center border border-gray-500 p-4 text-lg"
       >
-        <div
-          v-for="assignment in user.assignments"
-          :key="assignment.id"
-          class="flex flex-row justify-between items-center border border-gray-500 p-4 text-lg"
-        >
-          <p>
-            {{ `${assignment.client.first_name} ${assignment.client.last_name}` }}
-          </p>
-          <ClockInModal
-            :user="clients.get(assignment.client.id)"
-            @submit="(coords: GeolocationCoordinates) => clockInMutation.mutate({ assignmentId: assignment.id, coords })"
-          />
-        </div>
+        <p>
+          {{ `${assignment.client.first_name} ${assignment.client.last_name}` }}
+        </p>
+        <ClockInModal
+          :user="clients.get(assignment.client.id)"
+          @submit="(coords: GeolocationCoordinates) => clockInMutation.mutate({ assignmentId: assignment.id, coords })"
+        />
       </div>
     </div>
     <Timecard
@@ -136,6 +155,10 @@ definePageMeta({
       :timecard="timecard"
       :name="getTimecardName(timecard.assignment?.id ?? '')"
       @clock-out="(id: string) => clockOutMutation.mutate(id)"
+    />
+    <PinVerificationModal
+      v-model:open="isPinVerificationModalOpen"
+      @submit="(val: string) => verifyClockInMutation.mutate(val)"
     />
   </div>
 </template>
