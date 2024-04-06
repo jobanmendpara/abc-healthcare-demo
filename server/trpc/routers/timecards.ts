@@ -11,11 +11,11 @@ export const timecardsRouter = createTRPCRouter({
       latitude: z.number(),
       longitude: z.number(),
     }))
-    .output(
-      z.void(),
-    )
+    .output(z.object({
+      id: z.string().uuid(),
+    }))
     .mutation(async ({
-      ctx: { db, requestor },
+      ctx: { db, requestor, twilio },
       input,
     }) => {
       if (requestor.role !== 'employee') {
@@ -59,15 +59,39 @@ export const timecardsRouter = createTRPCRouter({
         throw new Error('You are too far from the client');
       }
 
+      const { error: deleteUnverifiedTimecards } = await db.from('timecards')
+        .delete()
+        .eq('assignment_id', input.assignmentId)
+        .neq('verification_code', null);
+      if (deleteUnverifiedTimecards) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
+
+      const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+      const id = crypto.randomUUID();
       const { error: insertTimecardError } = await db.from('timecards').insert({
-        id: crypto.randomUUID(),
+        id,
         assignment_id: input.assignmentId,
         started_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
         created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        is_active: false,
+        verification_code: verificationCode,
       });
       if (insertTimecardError) {
         throw new Error('Error while creating timecard');
       }
+
+      await twilio.messages.create({
+        to: `+1${client.phone_number}`,
+        from: useRuntimeConfig().twilioPhone as string,
+        body: `
+              ${requestor.first_name} is clocking in. Please give them the following code: ${verificationCode}.
+              `,
+      });
+
+      return {
+        id,
+      };
     }),
   clockOut: authorizedProcedure
     .input(
@@ -273,5 +297,76 @@ export const timecardsRouter = createTRPCRouter({
       }
 
       return [];
+    }),
+  verifyClockIn: authorizedProcedure
+    .input(z.object({
+      timecardId: z.string().uuid(),
+      verificationCode: z.string().length(4),
+    }))
+    .mutation(async ({
+      ctx: { db },
+      input,
+    }) => {
+      const {
+        data: timecard,
+        error: selectTimecardError,
+      } = await db.from('timecards')
+        .select()
+        .eq('id', input.timecardId).single();
+
+      if (selectTimecardError) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: selectTimecardError.message,
+        });
+      }
+      if (!timecard) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Timecard not found',
+        });
+      }
+
+      if (timecard.is_active) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
+
+      if (timecard.verification_code === null) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Timecard has been verified already',
+        });
+      }
+
+      if (timecard.verification_code !== input.verificationCode) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Incorrect verification code',
+        });
+      }
+
+      const {
+        data: verifiedTimecard,
+        error: updateTimecardError,
+      } = await db.from('timecards').update({
+        ...timecard,
+        started_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        is_active: true,
+        verification_code: null,
+      }).eq('id', input.timecardId).select();
+      if (updateTimecardError) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: updateTimecardError.message,
+        });
+      }
+      if (!verifiedTimecard) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Timecard not found',
+        });
+      }
     }),
 });

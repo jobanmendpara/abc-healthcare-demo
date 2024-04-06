@@ -42,8 +42,12 @@ export default defineNuxtConfig({
       employeeEmail: process.env.EMPLOYEE_EMAIL,
       employeePassword: process.env.EMPLOYEE_PASSWORD,
     },
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+    twilioPhone: process.env.TWILIO_PHONE,
   },
   ssr: false,
+  // @ts-expect-error dayjs config
   dayjs: {
     locales: ['en'],
     plugins: ['duration', 'relativeTime', 'utc', 'timezone'],

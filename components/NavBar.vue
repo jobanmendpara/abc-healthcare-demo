@@ -71,19 +71,23 @@ const navItems = computed<NavItem[]>(() => [
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem
+          <div
             v-for="item in navItems"
             v-else
-            class="w-full"
+            :key="item.label"
           >
-            <NuxtLink
-              class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-              :to="{ name: item.name }"
+            <NavigationMenuItem
+              v-if="item.visible"
+              class="w-full"
             >
-              <Icon :name="item.icon ?? ''" />
-              <p>{{ item.label }}</p>
-            </NuxtLink>
-          </NavigationMenuItem>
+              <NuxtLink
+                class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
+                :to="{ name: item.name }"
+              >
+                <Icon :name="item.icon ?? ''" />
+              </NuxtLink>
+            </NavigationMenuItem>
+          </div>
         </div>
         <div :class="isMedium ? 'flex' : 'w-full'">
           <NavigationMenuItem>
@@ -106,9 +110,6 @@ const navItems = computed<NavItem[]>(() => [
               class="flex justify-around items-center gap-1 p-3 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
               @click="emit('showAccountSettings')"
             >
-              <p v-if="!isMedium">
-                Profile
-              </p>
               <Icon name="lucide:user" />
             </div>
           </NavigationMenuItem>
@@ -117,9 +118,6 @@ const navItems = computed<NavItem[]>(() => [
               class="flex justify-around items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
               @click="emit('signOut')"
             >
-              <p v-if="!isMedium">
-                Sign Out
-              </p>
               <Icon name="lucide:log-out" />
             </NavigationMenuLink>
           </NavigationMenuItem>
