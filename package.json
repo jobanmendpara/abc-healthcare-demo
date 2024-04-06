@@ -51,6 +51,7 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "trpc-nuxt": "^0.10.12",
+    "twilio": "^5.0.2",
     "v-calendar": "^3.1.2",
     "vee-validate": "^4.12.5",
     "vite-plugin-eslint": "^1.8.1",

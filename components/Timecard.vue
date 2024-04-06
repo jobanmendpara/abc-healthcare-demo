@@ -57,7 +57,7 @@ onBeforeUnmount(() => {
           >
             Clock Out
           </AlertDialogAction>
-          <AlertDialogCancel>
+          <AlertDialogCancel variant="outline">
             Cancel
           </AlertDialogCancel>
         </AlertDialogFooter>
