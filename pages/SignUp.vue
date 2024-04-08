@@ -132,6 +132,7 @@ onMounted(() => {
         </FormField>
       </div>
       <AddressAutocomplete
+        class="text-center"
         :value="form.values.geopoint ?? initSignUpFormData().geopoint"
         @select="(val: Geopoint) => form.setFieldValue('geopoint', val)"
       />
@@ -145,8 +146,8 @@ onMounted(() => {
           </FormLabel>
           <FormControl>
             <Input
-              disabled="true"
               id="email"
+              disabled="true"
               v-bind="componentField"
               type="email"
               placeholder="johndoe@email.com"

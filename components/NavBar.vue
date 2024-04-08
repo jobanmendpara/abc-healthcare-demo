@@ -105,13 +105,13 @@ const navItems = computed<NavItem[]>(() => [
               />
             </div>
           </NavigationMenuItem>
-          <NavigationMenuItem>
-            <div
-              class="flex justify-around items-center gap-1 p-3 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
-              @click="emit('showAccountSettings')"
+          <NavigationMenuItem class="w-full">
+            <NuxtLink
+              class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
+              :to="{ name: 'Account' }"
             >
               <Icon name="lucide:user" />
-            </div>
+            </NuxtLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuLink

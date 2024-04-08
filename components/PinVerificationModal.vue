@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useVModel, useDark } from '@vueuse/core';
+import { useDark, useVModel } from '@vueuse/core';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';

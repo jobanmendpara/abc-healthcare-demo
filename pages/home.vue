@@ -127,7 +127,7 @@ definePageMeta({
       class="text-center"
     >
       <h1 class="text-left text-2xl font-semibold">
-        Hi, {{ user.first_name }}
+        Home
       </h1>
     </div>
     <div
