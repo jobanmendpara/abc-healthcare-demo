@@ -6,9 +6,6 @@ const { $api, $toast, $user } = useNuxtApp();
 const { auth } = useSupabaseClient();
 const queryClient = useQueryClient();
 
-const { isOpen: isAccountSettingsOpen, show: showAccountSettings } = useDialog();
-const { isOpen: isPasswordChangeOpen, show: showPasswordChange } = useDialog();
-
 const { isDarkMode, toggleDarkMode } = useDarkMode();
 
 const { data: user, status } = useQuery({
@@ -49,36 +46,6 @@ const toggleThemeMutation = useMutation({
     toggleDarkMode(!isDarkMode.value);
   },
 });
-
-const updateUserMutation = useMutation({
-  mutationFn: async (user: Partial<User>) => await $api.users.updateSelf.mutate(user),
-  onSuccess: () => {
-    queryClient.invalidateQueries(queries.app.user($user.value!.id));
-    $toast.success('User updated successfully');
-    isAccountSettingsOpen.value = false;
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-});
-
-const updatePasswordMutation = useMutation({
-  mutationFn: async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }) =>
-    await $api.auth.updatePassword.mutate({ newPassword, oldPassword }),
-  onSuccess: () => {
-    $toast.success('Password updated successfully');
-    isPasswordChangeOpen.value = false;
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-});
-
-watchEffect(() => {
-  if (isPasswordChangeOpen.value) {
-    isAccountSettingsOpen.value = false;
-  }
-});
 </script>
 
 <template>
@@ -91,20 +58,9 @@ watchEffect(() => {
       :role="user.role"
       @sign-out="signOutMutation.mutate"
       @toggle-dark-mode="toggleThemeMutation.mutate"
-      @show-account-settings="showAccountSettings"
     />
     <main class="container pt-3 overflow-auto scrollbar-width-none">
       <slot />
-      <AccountSettings
-        v-model:open="isAccountSettingsOpen"
-        :user="user"
-        @submit="(user: Partial<User>) => updateUserMutation.mutate(user)"
-        @show-password-change="showPasswordChange"
-      />
-      <PasswordChange
-        v-model:open="isPasswordChangeOpen"
-        @submit="(val: ChangePasswordRequest) => updatePasswordMutation.mutate(val)"
-      />
     </main>
   </body>
 </template>
