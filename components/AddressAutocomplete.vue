@@ -7,6 +7,10 @@ const props = defineProps({
     type: Object as PropType<Partial<Geopoint>>,
     default: () => initGeopoint(),
   },
+  class: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits({
@@ -30,7 +34,7 @@ async function useAutocomplete() {
   const currentValue = ref<Partial<Geopoint>>(props.value);
   const searchTerm = ref('');
   const loader = new Loader({
-    apiKey: useRuntimeConfig().public.gmapsApiKey,
+    apiKey: useRuntimeConfig().public.gmapsApiKey as string,
     version: 'weekly',
     libraries: ['places'],
     region: 'US',
@@ -118,8 +122,8 @@ onMounted(() => {
 
 <template>
   <Popover v-model:open="isOpen">
-    <div class="w-full text-center">
-      <PopoverTrigger as-child>
+    <div :class="props.class">
+      <PopoverTrigger>
         <div class="space-x-2 mb-4">
           <Button
             :class="(currentValue ?? initGeopoint()).formatted_address ? '' : 'bg-red-500 hover:bg-red-700'"
