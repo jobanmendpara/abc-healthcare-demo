@@ -192,7 +192,10 @@ watchEffect(() => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction @click="$emit('deleteUser', user.id)">
+              <AlertDialogAction
+                variant="destructive"
+                @click="$emit('deleteUser', user.id)"
+              >
                 Delete User
               </AlertDialogAction>
               <AlertDialogCancel>
@@ -307,9 +310,7 @@ watchEffect(() => {
               >
                 Cancel
               </Button>
-              <Button
-                @click="onEditUserSubmit"
-              >
+              <Button @click="onEditUserSubmit">
                 Save
               </Button>
             </div>
