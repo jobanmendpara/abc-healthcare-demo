@@ -47,7 +47,6 @@ export default defineNuxtConfig({
     twilioPhone: process.env.TWILIO_PHONE,
   },
   ssr: false,
-  // @ts-expect-error dayjs config
   dayjs: {
     locales: ['en'],
     plugins: ['duration', 'relativeTime', 'utc', 'timezone'],

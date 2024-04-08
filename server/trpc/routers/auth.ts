@@ -175,7 +175,14 @@ export const authRouter = createTRPCRouter({
       if (getDuplicatePhoneResults.data.length > 0)
         throw new Error('User already exists.');
 
-      const signUpResponse = await db.auth.signUp({ email, phone, password });
+      const signUpResponse = await db.auth.signUp({
+        email,
+        phone,
+        password,
+        options: {
+          emailRedirectTo: `${useRuntimeConfig().public.baseUrl}/confirm?email=${input.email}`,
+        },
+      });
       if (signUpResponse.error)
         throw new Error(signUpResponse.error.message);
 
