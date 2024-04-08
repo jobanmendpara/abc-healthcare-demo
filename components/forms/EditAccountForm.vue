@@ -45,64 +45,27 @@ const { mutate, isPending } = useMutation({
     $toast.success('User updated successfully');
   },
   onError: (error) => {
-    form.resetForm();
     $toast.error(error.message);
   },
 });
 
-async function onSubmit() {
-  const formValidationResult = await form.validate();
-
-  if (!formValidationResult.valid) {
-    if (formValidationResult.errors.first_name) {
-      form.resetForm();
-      $toast.error(formValidationResult.errors.first_name);
-    }
-
-    if (formValidationResult.errors.middle_name) {
-      form.resetForm();
-      $toast.error(formValidationResult.errors.middle_name);
-    }
-
-    if (formValidationResult.errors.last_name) {
-      form.resetForm();
-      $toast.error(formValidationResult.errors.last_name);
-    }
-
-    if (formValidationResult.errors.email) {
-      form.resetForm();
-      $toast.error(formValidationResult.errors.email);
-    }
-
-    if (formValidationResult.errors.phone_number) {
-      form.resetForm();
-      $toast.error('Invalid phone number');
-    }
-    return;
-  }
-
-  if (!formValidationResult.values) {
-    form.resetForm();
-    $toast.error('Invalid form values');
-    return;
-  }
-
+const onSubmit = form.handleSubmit(async (values) => {
   const payload: Partial<User> = {
     id: props.user.id,
-    first_name: formValidationResult.values.first_name,
-    middle_name: formValidationResult.values.middle_name,
-    last_name: formValidationResult.values.last_name,
-    email: formValidationResult.values.email === props.user.email
+    first_name: values.first_name,
+    middle_name: values.middle_name,
+    last_name: values.last_name,
+    email: values.email === props.user.email
       ? undefined
-      : formValidationResult.values.email,
-    phone_number: formValidationResult.values.phone_number === props.user.phone_number
+      : values.email,
+    phone_number: values.phone_number === props.user.phone_number
       ? undefined
-      : formValidationResult.values.phone_number,
-    geopoint: formValidationResult.values.geopoint,
+      : values.phone_number,
+    geopoint: values.geopoint,
   };
 
   mutate(payload);
-}
+});
 </script>
 
 <template>
