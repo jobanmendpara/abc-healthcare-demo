@@ -32,7 +32,7 @@ const emailLoginMutation = useMutation({
 
     $toast.success('Logged in successfully');
     form.resetForm();
-    navigateTo({ name: 'Home' });
+    navigateTo({ name: 'home' });
   },
   onError: (error) => {
     $toast.error(error.message);

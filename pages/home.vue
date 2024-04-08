@@ -124,11 +124,14 @@ definePageMeta({
   <div class="space-y-10">
     <div
       v-if="status === 'success' && user"
-      class="text-center"
+      class="space-y-3"
     >
-      <h1 class="text-left text-2xl font-semibold">
+      <h1 class="text-2xl font-semibold">
         Home
       </h1>
+      <p>
+        Currently there are no announcements from your admins.
+      </p>
     </div>
     <div
       v-if="activeTimecards && activeTimecards.length < 1 && clients && user && user.role === 'employee'"
