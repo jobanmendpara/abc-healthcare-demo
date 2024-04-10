@@ -18,7 +18,7 @@ const { mutate } = useMutation({
   mutationFn: async (email: string) => await $api.auth.getMagicLink.mutate({ email }),
   onSuccess: () => {
     $toast.success('Magic login link sent');
-    navigateTo({ name: 'Login' });
+    navigateTo({ name: 'login' });
   },
   onError: (error) => {
     form.resetForm();
@@ -31,7 +31,7 @@ const onSubmit = form.handleSubmit(async (values) => {
 });
 
 definePageMeta({
-  name: 'PasswordlessLogin',
+  name: 'passwordlessLogin',
 });
 </script>
 

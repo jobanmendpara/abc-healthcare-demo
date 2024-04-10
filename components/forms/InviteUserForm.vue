@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { queries } from '~/queries';
+import queries from '~/queries';
 import { invitesTableSchema } from '~/types';
 
 const props = defineProps({

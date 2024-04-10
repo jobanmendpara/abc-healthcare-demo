@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  name: 'Confirm',
+  name: 'confirm',
 });
 
 const { $api, $toast } = useNuxtApp();
@@ -32,6 +32,10 @@ onMounted(() => {
   }
 
   mutate(email.toString());
+});
+
+definePageMeta({
+  name: 'confirm',
 });
 </script>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const { $user } = useNuxtApp();
 
@@ -21,7 +21,7 @@ const assignedClientIds = computed(() => {
 });
 
 const { data: clients } = useQuery({
-  ...queries.users.id(assignedClientIds),
+  ...queries.users.ids(assignedClientIds),
   placeholderData: keepPreviousData,
   staleTime: 0,
 });
@@ -62,7 +62,7 @@ function getTimecardName(assignmentId: string) {
 
 definePageMeta({
   layout: 'main',
-  name: 'Home',
+  name: 'home',
 });
 </script>
 
