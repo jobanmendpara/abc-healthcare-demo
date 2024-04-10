@@ -1,21 +1,47 @@
 <script setup lang="ts">
 import type { PageParams } from '@supabase/supabase-js';
+import { useDark } from '@vueuse/core';
 import type { NavItem, Role } from '~/types';
+import { queries } from '~/queries';
 
 const props = defineProps({
-  isDarkMode: {
-    type: Boolean,
-    default: false,
-  },
   role: {
     type: String as PropType<Role>,
     default: 'employee',
   },
 });
 
-const emit = defineEmits(['signOut', 'toggleDarkMode', 'showAccountSettings']);
+const emit = defineEmits(['signOut', 'toggleDarkMode']);
 
-const { isMedium } = useScreen();
+const queryClient = useQueryClient();
+const { $api, $toast, $user } = useNuxtApp();
+const { auth } = useSupabaseClient();
+const isDarkMode = useDark();
+
+const { mutate: signOut } = useMutation({
+  mutationFn: async () => await auth.signOut({ scope: 'local' }),
+  onSuccess: () => {
+    $toast.success('Signed out successfully');
+    navigateTo({ name: 'Login' });
+  },
+});
+
+const toggleThemeMutation = useMutation({
+  mutationFn: async () => await $api.userSettings.update.mutate({
+    userSettings: [{ id: $user.value!.id, is_dark_mode: !isDarkMode.value }],
+  }),
+  onSuccess: () => {
+    queryClient.invalidateQueries(queries.app.user($user.value!.id));
+  },
+  onError: (error) => {
+    $toast.error(error);
+  },
+  onSettled: () => {
+    emit('toggleDarkMode');
+  },
+});
+
+const viewport = useViewport();
 
 const navItems = computed<NavItem[]>(() => [
   {
@@ -45,11 +71,11 @@ const navItems = computed<NavItem[]>(() => [
 </script>
 
 <template>
-  <div class="w-screen bg-secondary text-primary md:w-full">
-    <NavigationMenu :orientation="isMedium ? 'vertical' : 'horizontal'">
-      <NavigationMenuList :class="`flex justify-between ${isMedium ? 'w-screen' : 'h-screen flex-col space-x-0'}`">
+  <div class="bg-secondary text-primary">
+    <NavigationMenu>
+      <NavigationMenuList class="flex justify-between w-screen md:w-auto md:h-screen md:flex-col md:space-x-0">
         <div class="w-full">
-          <NavigationMenuItem v-if="isMedium">
+          <NavigationMenuItem v-if="viewport.isLessThan('md')">
             <NavigationMenuTrigger class="bg-secondary text-lg">
               <p>Menu</p>
             </NavigationMenuTrigger>
@@ -89,11 +115,11 @@ const navItems = computed<NavItem[]>(() => [
             </NavigationMenuItem>
           </div>
         </div>
-        <div :class="isMedium ? 'flex' : 'w-full'">
+        <div class="flex md:flex-col">
           <NavigationMenuItem>
             <div
               class="flex justify-center items-center gap-1 p-3 hover:cursor-pointer w-full hover:bg-primary hover:text-secondary"
-              @click="emit('toggleDarkMode')"
+              @click="toggleThemeMutation.mutate"
             >
               <Icon
                 v-if="isDarkMode"
@@ -116,7 +142,7 @@ const navItems = computed<NavItem[]>(() => [
           <NavigationMenuItem>
             <NavigationMenuLink
               class="flex justify-around items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-              @click="emit('signOut')"
+              @click="signOut"
             >
               <Icon name="lucide:log-out" />
             </NavigationMenuLink>

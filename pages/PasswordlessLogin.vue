@@ -17,26 +17,18 @@ const form = useForm({
 const { mutate } = useMutation({
   mutationFn: async (email: string) => await $api.auth.getMagicLink.mutate({ email }),
   onSuccess: () => {
-    $toast.success('Password reset email sent');
+    $toast.success('Magic login link sent');
     navigateTo({ name: 'Login' });
   },
   onError: (error) => {
+    form.resetForm();
     $toast.error(error.message);
   },
 });
 
-async function onSubmit() {
-  const formValidationResults = await form.validate();
-
-  if (!formValidationResults.valid) {
-    $toast.error('Please enter a valid email');
-    return;
-  }
-  if (!form.values.email)
-    return;
-
-  mutate(form.values.email);
-}
+const onSubmit = form.handleSubmit(async (values) => {
+  mutate(values.email);
+});
 
 definePageMeta({
   name: 'PasswordlessLogin',

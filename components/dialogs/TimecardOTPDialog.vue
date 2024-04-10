@@ -3,20 +3,27 @@ import { useDark, useVModel } from '@vueuse/core';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
+import { queries } from '~/queries';
 
 const props = defineProps({
   open: {
     type: Boolean,
     default: false,
   },
+  timecardId: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['update:open', 'submit']);
 
-const { $toast } = useNuxtApp();
+const { $api, $toast, $user } = useNuxtApp();
+const queryClient = useQueryClient();
 
 const isDark = useDark();
 const isOpen = useVModel(props, 'open', emit);
+const localTimecardId = computed(() => props.timecardId);
 
 const formSchema = toTypedSchema(z.object({
   pin: z.array(z.coerce.string()).length(4, { message: 'Invalid input' }),
@@ -29,27 +36,39 @@ const form = useForm({
   },
 });
 
-async function onSubmit() {
-  const validationResults = await form.validate();
-
-  if (!validationResults.valid) {
-    $toast.error('Pin is invalid');
-    return;
-  }
-  if (!validationResults.values)
-    return;
-
-  const joinedPin = validationResults.values.pin.join('');
-
-  isOpen.value = false;
-  emit('submit', joinedPin);
-}
-
-watchEffect(() => {
-  if (isOpen.value) {
+const { mutate } = useMutation({
+  mutationFn: async (pin: string) => await $api.timecards.verifyClockIn.mutate({
+    timecardId: localTimecardId.value,
+    verificationCode: pin,
+  }),
+  onSuccess: () => {
+    $toast.success('Clocked in');
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+  onSettled: () => {
+    queryClient.invalidateQueries(queries.timecards.active($user.value!.id));
+    isOpen.value = false;
     form.resetForm();
-  }
+  },
 });
+
+async function onSubmit() {
+  const { valid, values } = await form.validate();
+
+  if (!valid) {
+    form.resetForm();
+    $toast.error('Invalid pin');
+    return;
+  }
+
+  const { pin } = values!;
+
+  const joinedPin = pin.join('');
+
+  mutate(joinedPin);
+};
 </script>
 
 <template>
@@ -64,7 +83,6 @@ watchEffect(() => {
       <div class="w-full flex justify-center items-center">
         <form
           class="space-y-4"
-          @submit.prevent="onSubmit()"
         >
           <FormField
             v-slot="{ componentField }"

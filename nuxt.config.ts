@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
     '@vueuse/nuxt',
+    'nuxt-viewport',
     'dayjs-nuxt',
     'shadcn-nuxt',
     'nuxt-icon',
@@ -47,31 +48,6 @@ export default defineNuxtConfig({
     twilioPhone: process.env.TWILIO_PHONE,
   },
   ssr: false,
-  dayjs: {
-    locales: ['en'],
-    plugins: ['duration', 'relativeTime', 'utc', 'timezone'],
-    defaultLocale: 'en',
-    defaultTimezone: 'America/New_York',
-  },
-  supabase: {
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_ANON_KEY,
-    serviceKey: process.env.SUPABASE_SERVICE_KEY,
-    redirect: true,
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
-      // TODO: Find a better way to pass these in to allow for easier refactor
-      exclude: [
-        '/',
-        '404',
-        '/MagicLink',
-        '/Login',
-        '/SignUp',
-        '/PasswordlessLogin'
-      ]
-    },
-  },
   components: {
     dirs: [
       {
@@ -91,6 +67,41 @@ export default defineNuxtConfig({
   devtools: {
     timeline: {
       enabled: true,
+    },
+  },
+  dayjs: {
+    locales: ['en'],
+    plugins: ['duration', 'relativeTime', 'utc', 'timezone'],
+    defaultLocale: 'en',
+    defaultTimezone: 'America/New_York',
+  },
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_ANON_KEY,
+    serviceKey: process.env.SUPABASE_SERVICE_KEY,
+    redirect: true,
+    redirectOptions: {
+      login: '/Login',
+      callback: '/Confirm',
+      // TODO: Find a better way to pass these in to allow for easier refactor
+      exclude: [
+        '/',
+        '404',
+        'Confirm',
+        '/MagicLink',
+        '/Login',
+        '/SignUp',
+        '/PasswordlessLogin'
+      ]
+    },
+  },
+  viewport: {
+    breakpoints: {
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      '2xl': 1536,
     },
   },
 });
