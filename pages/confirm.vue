@@ -1,30 +1,23 @@
 <script setup lang="ts">
-import type { AuthTokenResponse } from '@supabase/supabase-js';
-
 definePageMeta({
   name: 'Confirm',
 });
 
 const { $api, $toast } = useNuxtApp();
-const { auth } = useSupabaseClient();
 const route = useRoute();
 
 const { mutate } = useMutation({
-  mutationFn: async (email: string) => await $api.auth.confirmEmail.mutate({ email }) as AuthTokenResponse['data'],
-  onSuccess: async (data) => {
-    if (!data.session)
-      throw new Error('No session found in response');
-
-    await auth.setSession(data.session);
-
+  mutationFn: async (email: string) => await $api.auth.confirmEmail.mutate({ email }),
+  onSuccess: async () => {
     $toast.success('Logged in successfully');
-    navigateTo({ name: 'home' });
   },
   onError: (e) => {
+    $toast.error(e.message);
+  },
+  onSettled: () => {
     navigateTo({
       name: 'index',
     });
-    $toast.error(e.message);
   },
 });
 

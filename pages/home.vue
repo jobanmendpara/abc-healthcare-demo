@@ -2,9 +2,8 @@
 import { keepPreviousData } from '@tanstack/vue-query';
 import { queries } from '~/queries';
 
-const { $api, $toast, $user } = useNuxtApp();
+const { $user } = useNuxtApp();
 
-const queryClient = useQueryClient();
 const isPinVerificationModalOpen = ref(false);
 const timecardIdToVerify = ref('');
 
@@ -49,63 +48,10 @@ const { data: activeTimecards } = useQuery({
   enabled: user.value?.role === 'employee',
 });
 
-const clockInMutation = useMutation({
-  mutationFn: async ({
-    assignmentId,
-    coords,
-  }: {
-    assignmentId: string;
-    coords: Pick<GeolocationCoordinates, 'latitude' | 'longitude'>;
-  }) =>
-    await $api.timecards.clockIn.mutate({
-      assignmentId,
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-    }),
-  onSuccess: (data) => {
-    timecardIdToVerify.value = data.id;
-    $toast.success('Verification code sent to client');
-    isPinVerificationModalOpen.value = true;
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-  onSettled: () => {
-    queryClient.invalidateQueries(queries.timecards.active(user.value!.id));
-  },
-});
-
-const clockOutMutation = useMutation({
-  mutationFn: async (id: string) => await $api.timecards.clockOut.mutate({
-    timecardId: id,
-  }),
-  onSuccess: () => {
-    $toast.success('Clocked out successfully');
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-  onSettled: () => {
-    queryClient.invalidateQueries(queries.timecards.active(user.value!.id));
-  },
-});
-
-const verifyClockInMutation = useMutation({
-  mutationFn: async (pin: string) => await $api.timecards.verifyClockIn.mutate({
-    timecardId: timecardIdToVerify.value,
-    verificationCode: pin,
-  }),
-  onSuccess: () => {
-    timecardIdToVerify.value = '';
-    $toast.success('Clocked in');
-  },
-  onError: (error) => {
-    $toast.error(error.message);
-  },
-  onSettled: () => {
-    queryClient.invalidateQueries(queries.timecards.active(user.value!.id));
-  },
-});
+function toggleTimecardOTPDialog(timecardId: string) {
+  timecardIdToVerify.value = timecardId;
+  isPinVerificationModalOpen.value = true;
+}
 
 function getTimecardName(assignmentId: string) {
   const firstName = user.value?.assignments.find(assignment => assignment.id === assignmentId)?.client.first_name;
@@ -145,23 +91,23 @@ definePageMeta({
         <p>
           {{ `${assignment.client.first_name} ${assignment.client.last_name}` }}
         </p>
-        <ClockInModal
+        <ClockInDialog
           :user="clients.get(assignment.client.id)"
-          @submit="(coords: GeolocationCoordinates) => clockInMutation.mutate({ assignmentId: assignment.id, coords })"
+          :assignment-id="assignment.id"
+          @submit="(val: string) => toggleTimecardOTPDialog(val)"
         />
       </div>
     </div>
-    <Timecard
+    <TimecardDialog
       v-for="timecard in activeTimecards"
       v-else-if="activeTimecards && activeTimecards.length >= 1"
       :key="timecard.id"
       :timecard="timecard"
       :name="getTimecardName(timecard.assignment?.id ?? '')"
-      @clock-out="(id: string) => clockOutMutation.mutate(id)"
     />
-    <PinVerificationModal
+    <TimecardOTPDialog
       v-model:open="isPinVerificationModalOpen"
-      @submit="(val: string) => verifyClockInMutation.mutate(val)"
+      :timecard-id="timecardIdToVerify"
     />
   </div>
 </template>

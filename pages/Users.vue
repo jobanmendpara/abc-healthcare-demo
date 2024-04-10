@@ -15,7 +15,6 @@ const queryClient = useQueryClient();
 const usersTablePage = ref(1);
 const invitesTablePage = ref(1);
 const localUser = ref<Omit<User, 'settings'>>(await useQueryClient().fetchQuery(queries.app.user($user.value!.id)));
-const isInviteFormOpen = ref(false);
 const isClientUserFormOpen = ref(false);
 const localUserId = computed(() => localUser.value.id);
 
@@ -74,34 +73,6 @@ const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
   },
 });
 
-const createClientUserMutation = useMutation({
-  mutationFn: async (user: Partial<User>) => {
-    const newClient: User = {
-      id: crypto.randomUUID(),
-      first_name: user.first_name ?? '',
-      middle_name: user.middle_name ?? '',
-      last_name: user.last_name ?? '',
-      email: user.email ?? '',
-      geopoint: user.geopoint ?? initGeopoint(),
-      phone_number: user.phone_number ?? '',
-      role: 'client',
-      is_active: true,
-    };
-
-    await $api.users.create.mutate({ user: newClient });
-  },
-  onSuccess: () => {
-    isClientUserFormOpen.value = false;
-    queryClient.invalidateQueries({
-      ...queries.users.list(activeUsersListParams),
-    });
-    $toast.success('Client created');
-  },
-  onError: (error) => {
-    $toast.error(error);
-  },
-});
-
 const deleteInviteMutation = useMutation({
   mutationFn: async (id: string) => await $api.auth.deleteInvite.mutate({ ids: [id] }),
   onSuccess: () => {
@@ -128,20 +99,6 @@ const deleteUserMutation = useMutation({
   },
   onSettled: () => {
     isUserInfoOpen.value = false;
-  },
-});
-
-const inviteUserMutation = useMutation({
-  mutationFn: async (inviteFormData: Invite) => await $api.auth.invite.mutate(inviteFormData),
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: queries.invites.list._def,
-    });
-    isInviteFormOpen.value = false;
-    $toast.success('Invite sent');
-  },
-  onError: (error) => {
-    $toast.error(error);
   },
 });
 
@@ -195,18 +152,12 @@ watchEffect(() => {
     Users
   </h1>
   <div class="flex-basis-1/2 flex justify-end flex-grow px-5">
-    <ClientUserForm
+    <CreateClientDialog
       v-if="activeView === Views.CLIENTS"
-      v-model:open="isClientUserFormOpen"
-      :is-mutation-pending="createClientUserMutation.status.value === 'pending'"
-      @submit="(user: Partial<User>) => createClientUserMutation.mutate(user)"
     />
-    <InviteUserForm
+    <InviteUserDialog
       v-else
-      v-model:open="isInviteFormOpen"
-      :is-mutation-pending="inviteUserMutation.status.value === 'pending'"
       :role="activeRole"
-      @submit="(invite: Invite) => inviteUserMutation.mutate(invite)"
     />
   </div>
   <div class="space-y-1">
