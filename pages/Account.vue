@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 definePageMeta({
   layout: 'main',
-  name: 'Account',
+  name: 'account',
 });
 
 const { $user } = useNuxtApp();

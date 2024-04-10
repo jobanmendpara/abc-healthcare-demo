@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const emit = defineEmits(['submit']);
 

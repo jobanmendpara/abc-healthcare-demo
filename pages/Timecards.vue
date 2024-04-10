@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const filterDateRange = ref({
   start: dayjs().subtract(2, 'w').toDate(),
@@ -15,7 +15,7 @@ const activeTimecardsListParams = computed(() => ({
   },
 }));
 
-const { data: timecards, isFetching: isTimecardsFetching } = useQuery({
+const { data, isFetching: isTimecardsFetching } = useQuery({
   ...queries.timecards.list(activeTimecardsListParams),
   placeholderData: keepPreviousData,
   staleTime: 0,
@@ -36,7 +36,7 @@ function exportTimecards(timecards: TableTimecard[]) {
 
 definePageMeta({
   layout: 'main',
-  name: 'Timecards',
+  name: 'timecards',
 });
 </script>
 
@@ -50,7 +50,7 @@ definePageMeta({
     </div>
     <TimecardsDataTable
       :loading="isTimecardsFetching"
-      :data="timecards"
+      :data="data"
       @export="(val: TableTimecard[]) => exportTimecards(val)"
     />
   </div>

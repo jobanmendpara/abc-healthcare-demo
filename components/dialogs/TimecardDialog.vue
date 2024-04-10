@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const props = defineProps({
   timecard: {

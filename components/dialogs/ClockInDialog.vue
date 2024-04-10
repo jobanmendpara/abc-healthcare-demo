@@ -22,20 +22,23 @@ const isOpen = ref(false);
 const { mutate, isPending } = useMutation({
   mutationFn: async ({
     assignmentId,
-    coords,
+    latitude,
+    longitude,
   }: {
     assignmentId: string;
-    coords: Partial<GeolocationCoordinates>;
+    latitude: number;
+    longitude: number;
   }) =>
     await $api.timecards.clockIn.mutate({
       assignmentId,
-      latitude: coords.latitude ?? 0,
-      longitude: coords.longitude ?? 0,
+      latitude,
+      longitude,
     }),
   onSuccess: (data) => {
     $toast.success('Verification code sent to client');
     emit('submit', data.id);
     isOpen.value = false;
+    pause();
   },
   onError: (error) => {
     $toast.error(error.message);
@@ -45,21 +48,16 @@ const { mutate, isPending } = useMutation({
 async function onSubmit() {
   mutate({
     assignmentId: props.assignmentId,
-    coords: coords.value,
+    latitude: coords.value.latitude,
+    longitude: coords.value.longitude,
   });
 }
 
-watch(
-  () => isOpen.value,
-  (newVal) => {
-    if (newVal) {
-      resume();
-    }
-    else {
-      pause();
-    }
-  },
-);
+watchEffect(() => {
+  if (isOpen.value) {
+    resume();
+  }
+});
 </script>
 
 <template>

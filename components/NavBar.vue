@@ -2,7 +2,7 @@
 import type { PageParams } from '@supabase/supabase-js';
 import { useDark } from '@vueuse/core';
 import type { NavItem, Role } from '~/types';
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const props = defineProps({
   role: {
@@ -22,7 +22,7 @@ const { mutate: signOut } = useMutation({
   mutationFn: async () => await auth.signOut({ scope: 'local' }),
   onSuccess: () => {
     $toast.success('Signed out successfully');
-    navigateTo({ name: 'Login' });
+    navigateTo({ name: 'login' });
   },
 });
 
@@ -45,14 +45,14 @@ const viewport = useViewport();
 
 const navItems = computed<NavItem[]>(() => [
   {
-    label: 'Home',
-    name: 'Home',
+    label: 'home',
+    name: 'home',
     icon: 'lucide:home',
     visible: true,
   },
   {
     label: 'Users',
-    name: 'Users',
+    name: 'users',
     params: {
       role: 'employee',
       page: 1,
@@ -63,7 +63,7 @@ const navItems = computed<NavItem[]>(() => [
   },
   {
     label: 'Timecards',
-    name: 'Timecards',
+    name: 'timecards',
     icon: 'lucide:calendar-clock',
     visible: true,
   },
@@ -134,7 +134,7 @@ const navItems = computed<NavItem[]>(() => [
           <NavigationMenuItem class="w-full">
             <NuxtLink
               class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-              :to="{ name: 'Account' }"
+              :to="{ name: 'account' }"
             >
               <Icon name="lucide:user" />
             </NuxtLink>

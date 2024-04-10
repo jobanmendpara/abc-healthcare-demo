@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDark } from '@vueuse/core';
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const { $user } = useNuxtApp();
 

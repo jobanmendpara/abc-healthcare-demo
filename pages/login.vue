@@ -2,7 +2,7 @@
 definePageMeta({
   layout: 'default',
   middleware: ['verify-magic-link', 'verify-pre-auth'],
-  name: 'Login',
+  name: 'login',
 });
 </script>
 
@@ -12,7 +12,7 @@ definePageMeta({
     <div class="text-center">
       <NuxtLink
         class="hover:cursor-pointer px-4 py-2"
-        :to="{ name: 'PasswordlessLogin' }"
+        :to="{ name: 'passwordlessLogin' }"
       >
         Passwordless Login
       </NuxtLink>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
 import type { PageParams } from '@supabase/supabase-js';
-import { queries } from '~/queries';
+import queries from '~/queries';
 import { Views } from '~/types';
 import type { Assignment, AssignmentChanges, AssignmentUser } from '~/types';
 
@@ -15,7 +15,6 @@ const queryClient = useQueryClient();
 const usersTablePage = ref(1);
 const invitesTablePage = ref(1);
 const localUser = ref<Omit<User, 'settings'>>(await useQueryClient().fetchQuery(queries.app.user($user.value!.id)));
-const isClientUserFormOpen = ref(false);
 const localUserId = computed(() => localUser.value.id);
 
 const activeUsersListParams = computed<UsersListParams>(() => ({
@@ -41,9 +40,9 @@ const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
   staleTime: 1000 * 60 * 3,
 });
 
-// @ts-expect-error queryKeyFactory type error
+// @ts-expect-error string as key
 const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
-  ...queries.assignments.user(localUserId),
+  ...queries.assignments.user(localUserId.value),
   staleTime: 1000 * 60 * 3,
   placeholderData: {
     assignable: [],
@@ -135,7 +134,7 @@ function setUser(id: string) {
 
 definePageMeta({
   layout: 'main',
-  name: 'Users',
+  name: 'users',
   middleware: ['verify-admin'],
 });
 
@@ -152,9 +151,7 @@ watchEffect(() => {
     Users
   </h1>
   <div class="flex-basis-1/2 flex justify-end flex-grow px-5">
-    <CreateClientDialog
-      v-if="activeView === Views.CLIENTS"
-    />
+    <CreateClientDialog v-if="activeView === Views.CLIENTS" />
     <InviteUserDialog
       v-else
       :role="activeRole"
@@ -164,7 +161,7 @@ watchEffect(() => {
     <Tabs
       v-model="activeView"
       class="w-full"
-      @update:model-value="(newView) => setView(newView as Views)"
+      @update:model-value="(newView: string) => setView(newView as Views)"
     >
       <TabsList>
         <TabsTrigger
@@ -186,9 +183,9 @@ watchEffect(() => {
       @show-assignments="showAssignments()"
     />
     <InvitesDataTable
-      v-if="activeView === Views.INVITES"
+      v-if="activeView === Views.INVITES && invitesResponse"
       v-model:page="invitesTablePage"
-      :data="invitesResponse?.list"
+      :data="invitesResponse.list"
       :has-next-page="invitesResponse?.hasNextPage"
       :loading="isInvitesFetching"
       @delete-invite="(id: string) => deleteInviteMutation.mutate(id)"
@@ -200,10 +197,10 @@ watchEffect(() => {
       @update-user="(editedUser: Partial<User>) => updateUserMutation.mutate(editedUser)"
     />
     <AssignmentsPickList
-      v-if="assignmentsQueryStatus !== 'pending'"
+      v-if="assignmentsQueryStatus !== 'pending' && assignmentsData"
       v-model:open="isAssignmentsOpen"
-      :initial-assigned="assignmentsData!.assigned"
-      :initial-assignable="assignmentsData!.assignable"
+      :initial-assigned="assignmentsData.assigned"
+      :initial-assignable="assignmentsData.assignable"
       :user="localUser"
       @submit="(assignmentChanges: Omit<AssignmentChanges, 'id'>) => updateAssignmentsMutation.mutate({
         id: localUser.id,

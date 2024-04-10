@@ -30,7 +30,7 @@ useHead({
     </h2>
     <NuxtLink
       class="bg-primary hover:cursor-pointer text-secondary rounded-lg px-4 py-2"
-      :to="{ name: 'Login' }"
+      :to="{ name: 'login' }"
     >
       Sign In
     </NuxtLink>
