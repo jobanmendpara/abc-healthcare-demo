@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { authorizedProcedure } from '~/server/trpc/trpc';
