@@ -15,35 +15,13 @@ export const deleteUser = authorizedProcedure
     input,
   }) => {
     const { db, requestor } = ctx;
+    const { userIds } = input;
 
     if (requestor.role !== 'admin')
       throw new TRPCError({ code: 'PRECONDITION_FAILED' });
 
-    let assignmentsId: string[] = [];
-
-    const deleteUserSettingsQuery = await db.from('user_settings').delete().in('id', input.userIds).select();
-    if (deleteUserSettingsQuery.error)
-      throw new Error(deleteUserSettingsQuery.error.message);
-
-    const deleteUsersQuery = await db.from('users').delete().in('id', input.userIds).select();
-    if (deleteUsersQuery.error)
-      throw new Error(deleteUsersQuery.error.message);
-
-    input.userIds.forEach(async (userId) => {
-      const deleteAssignmentsQuery = await db.from('assignments').delete().eq('employee_id', userId).select();
-      if (deleteAssignmentsQuery.error)
-        throw new Error(deleteAssignmentsQuery.error.message);
-
-      assignmentsId = deleteAssignmentsQuery.data.map(({ id }) => id);
-
-      const deleteAuthQuery = await db.auth.admin.deleteUser(userId);
-      if (deleteAuthQuery.error)
-        throw new Error(deleteAuthQuery.error.message);
-    });
-
-    assignmentsId.forEach(async (assignmentId) => {
-      const deleteTimecardsQuery = await db.from('timecards').delete().eq('assignment_id', assignmentId).select();
-      if (deleteTimecardsQuery.error)
-        throw new Error(deleteTimecardsQuery.error.message);
-    });
+    const { error } = await db.from('users').delete().in('id', userIds);
+    if (error) {
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+    }
   });
