@@ -2,7 +2,7 @@
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
-import { queries } from '~/queries';
+import queries from '~/queries';
 
 const props = defineProps({
   user: {

@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
 
       toast.success('Logged in successfully');
 
-      navigateTo({ name: 'Home' });
+      navigateTo({ name: 'home' });
     },
     onError: (error) => {
       toast.error(error.message);

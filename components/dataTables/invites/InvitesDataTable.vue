@@ -89,7 +89,7 @@ function goToPreviousPage() {
           <TableCell>
             <InviteDataTableActions
               :id="(row.original as Invite).id"
-              @delete="(id: string) => emit('deleteInvite', id)"
+              @delete-invite="(id: string) => emit('deleteInvite', id)"
             />
           </TableCell>
         </TableRow>

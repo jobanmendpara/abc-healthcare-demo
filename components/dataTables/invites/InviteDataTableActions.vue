@@ -27,13 +27,17 @@ const actions = [
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem
+        <div
           v-for="action in actions"
-          class="bg-destructive hover:cursor-pointer"
-          @click="action.action"
+          :key="action.label"
         >
-          {{ action.label }}
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            class="bg-destructive text-destructive-foreground hover:cursor-pointer"
+            @click="action.action"
+          >
+            {{ action.label }}
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import queries from '~/queries';
+
 const props = defineProps({
   timecard: {
     type: Object as PropType<Timecard>,
@@ -10,7 +12,25 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['clockOut']);
+const { $api, $toast, $user } = useNuxtApp();
+const queryClient = useQueryClient();
+const isOpen = ref(false);
+
+const { mutate, isPending } = useMutation({
+  mutationFn: async (id: string) => await $api.timecards.clockOut.mutate({
+    timecardId: id,
+  }),
+  onSuccess: () => {
+    $toast.success('Clocked out successfully');
+    isOpen.value = false;
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+  onSettled: () => {
+    queryClient.invalidateQueries(queries.timecards.active($user.value!.id));
+  },
+});
 
 const localTimecard = computed(() => props.timecard);
 const elapsedTime = ref('00:00:00');
@@ -33,7 +53,7 @@ onBeforeUnmount(() => {
     <p class="text-xl font-bold text-red-400">
       {{ elapsedTime }}
     </p>
-    <AlertDialog>
+    <AlertDialog v-model:open="isOpen">
       <AlertDialogTrigger>
         <Button>
           Clock Out
@@ -51,9 +71,9 @@ onBeforeUnmount(() => {
         </p>
         <AlertDialogFooter>
           <AlertDialogAction
-            class="bg-destructive text-destructive-foreground
-              hover:bg-destructive-foreground hover:text-destructive hover:border-destructive-foreground"
-            @click="$emit('clockOut', timecard.id)"
+            variant="destructive"
+            :disabled="isPending"
+            @click="mutate(timecard.id)"
           >
             Clock Out
           </AlertDialogAction>

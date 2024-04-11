@@ -15,7 +15,7 @@ const form = useForm({
 });
 
 definePageMeta({
-  name: 'MagicLink',
+  name: 'magicLink',
 });
 </script>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
 import type { PageParams } from '@supabase/supabase-js';
-import { queries } from '~/queries';
+import queries from '~/queries';
 import { Views } from '~/types';
 import type { Assignment, AssignmentChanges, AssignmentUser } from '~/types';
 
@@ -15,8 +15,6 @@ const queryClient = useQueryClient();
 const usersTablePage = ref(1);
 const invitesTablePage = ref(1);
 const localUser = ref<Omit<User, 'settings'>>(await useQueryClient().fetchQuery(queries.app.user($user.value!.id)));
-const isInviteFormOpen = ref(false);
-const isClientUserFormOpen = ref(false);
 const localUserId = computed(() => localUser.value.id);
 
 const activeUsersListParams = computed<UsersListParams>(() => ({
@@ -42,9 +40,9 @@ const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
   staleTime: 1000 * 60 * 3,
 });
 
-// @ts-expect-error queryKeyFactory type error
+// @ts-expect-error string as key
 const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
-  ...queries.assignments.user(localUserId),
+  ...queries.assignments.user(localUserId.value),
   staleTime: 1000 * 60 * 3,
   placeholderData: {
     assignable: [],
@@ -74,34 +72,6 @@ const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
   },
 });
 
-const createClientUserMutation = useMutation({
-  mutationFn: async (user: Partial<User>) => {
-    const newClient: User = {
-      id: crypto.randomUUID(),
-      first_name: user.first_name ?? '',
-      middle_name: user.middle_name ?? '',
-      last_name: user.last_name ?? '',
-      email: user.email ?? '',
-      geopoint: user.geopoint ?? initGeopoint(),
-      phone_number: user.phone_number ?? '',
-      role: 'client',
-      is_active: true,
-    };
-
-    await $api.users.create.mutate({ user: newClient });
-  },
-  onSuccess: () => {
-    isClientUserFormOpen.value = false;
-    queryClient.invalidateQueries({
-      ...queries.users.list(activeUsersListParams),
-    });
-    $toast.success('Client created');
-  },
-  onError: (error) => {
-    $toast.error(error);
-  },
-});
-
 const deleteInviteMutation = useMutation({
   mutationFn: async (id: string) => await $api.auth.deleteInvite.mutate({ ids: [id] }),
   onSuccess: () => {
@@ -128,20 +98,6 @@ const deleteUserMutation = useMutation({
   },
   onSettled: () => {
     isUserInfoOpen.value = false;
-  },
-});
-
-const inviteUserMutation = useMutation({
-  mutationFn: async (inviteFormData: Invite) => await $api.auth.invite.mutate(inviteFormData),
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: queries.invites.list._def,
-    });
-    isInviteFormOpen.value = false;
-    $toast.success('Invite sent');
-  },
-  onError: (error) => {
-    $toast.error(error);
   },
 });
 
@@ -178,7 +134,7 @@ function setUser(id: string) {
 
 definePageMeta({
   layout: 'main',
-  name: 'Users',
+  name: 'users',
   middleware: ['verify-admin'],
 });
 
@@ -195,25 +151,17 @@ watchEffect(() => {
     Users
   </h1>
   <div class="flex-basis-1/2 flex justify-end flex-grow px-5">
-    <ClientUserForm
-      v-if="activeView === Views.CLIENTS"
-      v-model:open="isClientUserFormOpen"
-      :is-mutation-pending="createClientUserMutation.status.value === 'pending'"
-      @submit="(user: Partial<User>) => createClientUserMutation.mutate(user)"
-    />
-    <InviteUserForm
+    <CreateClientDialog v-if="activeView === Views.CLIENTS" />
+    <InviteUserDialog
       v-else
-      v-model:open="isInviteFormOpen"
-      :is-mutation-pending="inviteUserMutation.status.value === 'pending'"
       :role="activeRole"
-      @submit="(invite: Invite) => inviteUserMutation.mutate(invite)"
     />
   </div>
   <div class="space-y-1">
     <Tabs
       v-model="activeView"
       class="w-full"
-      @update:model-value="(newView) => setView(newView as Views)"
+      @update:model-value="(newView: string) => setView(newView as Views)"
     >
       <TabsList>
         <TabsTrigger
@@ -235,9 +183,9 @@ watchEffect(() => {
       @show-assignments="showAssignments()"
     />
     <InvitesDataTable
-      v-if="activeView === Views.INVITES"
+      v-if="activeView === Views.INVITES && invitesResponse"
       v-model:page="invitesTablePage"
-      :data="invitesResponse?.list"
+      :data="invitesResponse.list"
       :has-next-page="invitesResponse?.hasNextPage"
       :loading="isInvitesFetching"
       @delete-invite="(id: string) => deleteInviteMutation.mutate(id)"
@@ -249,10 +197,10 @@ watchEffect(() => {
       @update-user="(editedUser: Partial<User>) => updateUserMutation.mutate(editedUser)"
     />
     <AssignmentsPickList
-      v-if="assignmentsQueryStatus !== 'pending'"
+      v-if="assignmentsQueryStatus !== 'pending' && assignmentsData"
       v-model:open="isAssignmentsOpen"
-      :initial-assigned="assignmentsData!.assigned"
-      :initial-assignable="assignmentsData!.assignable"
+      :initial-assigned="assignmentsData.assigned"
+      :initial-assignable="assignmentsData.assignable"
       :user="localUser"
       @submit="(assignmentChanges: Omit<AssignmentChanges, 'id'>) => updateAssignmentsMutation.mutate({
         id: localUser.id,

@@ -54,7 +54,7 @@ watchEffect(() => {
 definePageMeta({
   layout: 'default',
   middleware: ['verify-invite'],
-  name: 'SignUp',
+  name: 'signUp',
 });
 
 onMounted(() => {

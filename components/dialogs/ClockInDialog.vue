@@ -6,33 +6,58 @@ const props = defineProps({
     type: Object as PropType<User>,
     default: () => initUser(),
   },
+  assignmentId: {
+    type: String,
+    default: '',
+  },
 });
 
-const emit = defineEmits(['update:open', 'submit']);
+const emit = defineEmits(['submit']);
+const { $api, $toast } = useNuxtApp();
 
 const { coords, resume, pause } = useGeolocation();
 const localUser = computed(() => props.user);
 const isOpen = ref(false);
 
+const { mutate, isPending } = useMutation({
+  mutationFn: async ({
+    assignmentId,
+    latitude,
+    longitude,
+  }: {
+    assignmentId: string;
+    latitude: number;
+    longitude: number;
+  }) =>
+    await $api.timecards.clockIn.mutate({
+      assignmentId,
+      latitude,
+      longitude,
+    }),
+  onSuccess: (data) => {
+    $toast.success('Verification code sent to client');
+    emit('submit', data.id);
+    isOpen.value = false;
+    pause();
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+});
+
 async function onSubmit() {
-  isOpen.value = false;
-  emit('submit', {
+  mutate({
+    assignmentId: props.assignmentId,
     latitude: coords.value.latitude,
     longitude: coords.value.longitude,
   });
 }
 
-watch(
-  () => isOpen.value,
-  (newVal) => {
-    if (newVal) {
-      resume();
-    }
-    else {
-      pause();
-    }
-  },
-);
+watchEffect(() => {
+  if (isOpen.value) {
+    resume();
+  }
+});
 </script>
 
 <template>
@@ -53,6 +78,7 @@ watch(
         <p>Address: <span>{{ localUser.geopoint.formatted_address }}</span></p>
         <Button
           class="w-full"
+          :disabled="isPending"
           @click="onSubmit"
         >
           Verify Location
