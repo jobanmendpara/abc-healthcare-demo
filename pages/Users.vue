@@ -42,7 +42,7 @@ const { data: invitesResponse, isFetching: isInvitesFetching } = useQuery({
 
 // @ts-expect-error string as key
 const { data: assignmentsData, status: assignmentsQueryStatus } = useQuery({
-  ...queries.assignments.user(localUserId.value),
+  ...queries.assignments.user(localUserId),
   staleTime: 1000 * 60 * 3,
   placeholderData: {
     assignable: [],
@@ -180,7 +180,7 @@ watchEffect(() => {
       :loading="isUsersFetching"
       @click-menu="(id: string) => setUser(id)"
       @show-info="showUserInfo(localUser)"
-      @show-assignments="showAssignments()"
+      @show-assignments="showAssignments"
     />
     <InvitesDataTable
       v-if="activeView === Views.INVITES && invitesResponse"

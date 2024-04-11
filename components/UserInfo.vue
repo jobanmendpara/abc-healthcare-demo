@@ -282,6 +282,7 @@ watchEffect(() => {
               </div>
               <AddressAutocomplete
                 :value="form.values.geopoint ?? initSignUpFormData().geopoint"
+                class="text-center"
                 @select="(val: Geopoint) => form.setFieldValue('geopoint', val)"
               />
               <FormField
