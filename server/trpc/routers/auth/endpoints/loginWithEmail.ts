@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { emailLoginSchema } from '~/types';
-import { authorizedProcedure } from '~/server/trpc/trpc';
+import { publicProcedure } from '~/server/trpc/trpc';
 
-export const loginWithEmail = authorizedProcedure
+export const loginWithEmail = publicProcedure
   .input(
     emailLoginSchema,
   )
