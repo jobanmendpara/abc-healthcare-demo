@@ -91,6 +91,9 @@ const deleteUserMutation = useMutation({
     queryClient.invalidateQueries({
       ...queries.users.list(activeUsersListParams),
     });
+    queryClient.invalidateQueries({
+      ...queries.assignments.user(localUserId),
+    });
     $toast.success('User deleted');
   },
   onError: (error) => {
