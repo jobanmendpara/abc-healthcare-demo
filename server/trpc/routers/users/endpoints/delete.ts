@@ -24,4 +24,13 @@ export const deleteUser = authorizedProcedure
     if (error) {
       throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
     }
+
+    const idsWithError: string[] = [];
+    userIds.forEach(async (id) => {
+      const { error } = await db.auth.admin.deleteUser(id);
+
+      if (error) {
+        idsWithError.push(id);
+      }
+    });
   });
