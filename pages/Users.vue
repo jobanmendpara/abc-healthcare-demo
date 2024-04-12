@@ -92,7 +92,7 @@ const deleteUserMutation = useMutation({
       ...queries.users.list(activeUsersListParams),
     });
     queryClient.invalidateQueries({
-      ...queries.assignments.user(localUserId),
+      queryKey: queries.assignments._def,
     });
     $toast.success('User deleted');
   },
@@ -108,7 +108,7 @@ const updateAssignmentsMutation = useMutation({
   mutationFn: async (assignmentChanges: AssignmentChanges) => await $api.assignments.update.mutate(assignmentChanges),
   onSuccess: () => {
     queryClient.invalidateQueries({
-      ...queries.assignments.user(localUserId),
+      queryKey: queries.assignments._def,
     });
     isAssignmentsOpen.value = false;
     $toast.success('Assignments updated');
