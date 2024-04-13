@@ -25,7 +25,7 @@ export function calculateTimeElapsed(dateString: string): string {
 
   const inputDate = dayjs(dateString).tz('America/New_York');
 
-  const now = dayjs();
+  const now = dayjs().tz('America/New_York');
   const diff = now.diff(inputDate, 'milliseconds');
 
   const millisecondsElapsed = dayjs.duration(diff);
