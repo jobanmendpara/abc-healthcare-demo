@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import { z } from 'zod';
-import dayjs from 'dayjs';
 import { TRPCError } from '@trpc/server';
 import { calculateEuclideanDistance } from '~/utils';
 import { authorizedProcedure } from '~/server/trpc/trpc';
@@ -72,13 +71,14 @@ export const clockIn = authorizedProcedure
     const { error: insertTimecardError } = await db.from('timecards').insert({
       id,
       assignment_id: input.assignmentId,
-      started_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       is_active: false,
       verification_code: verificationCode,
     });
     if (insertTimecardError) {
-      throw new Error('Error while creating timecard');
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error while creating timecard',
+      });
     }
 
     await twilio.messages.create({

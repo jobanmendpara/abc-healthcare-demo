@@ -7,7 +7,7 @@ export default createNuxtApiHandler({
   router: appRouter,
   createContext: createTRPCContext,
   onError:
-    useRuntimeConfig().public.nodeEnv === 'development'
+    useRuntimeConfig().public.nodeEnv === 'dev'
       ? ({ path, error }) => {
           console.error(
             `❌ tRPC failed on ${path ?? '<no-path>'}: ${error.message}`,

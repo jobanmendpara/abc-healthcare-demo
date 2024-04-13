@@ -5,7 +5,6 @@ export const timecardTableSchema = z.object({
   id: z.string(),
   started_at: z.string(),
   ended_at: z.string().nullable(),
-  created_at: z.string(),
   assignment_id: z.string(),
   is_active: z.boolean(),
 });
@@ -21,7 +20,6 @@ export interface TableTimecard {
   index: number;
   started_at: string;
   ended_at: string | null;
-  created_at: string;
   is_active: boolean;
   assignment: {
     id: string | undefined;

@@ -38,7 +38,6 @@ const localData = computed(() => {
     index: index + 1,
     started_at: dayjs(timecard.started_at).format('MM-DD-YY / hh:mm:ss A'),
     ended_at: dayjs(timecard.ended_at).format('MM-DD-YY / hh:mm:ss A'),
-    created_at: timecard.created_at,
     is_active: timecard.is_active,
     assignment: {
       id: timecard.assignment.id,
