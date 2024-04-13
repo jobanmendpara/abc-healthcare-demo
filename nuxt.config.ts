@@ -71,7 +71,7 @@ export default defineNuxtConfig({
   },
   dayjs: {
     locales: ['en'],
-    plugins: ['duration', 'relativeTime', 'utc', 'timezone'],
+    plugins: ['duration', 'isLeapYear', 'relativeTime', 'utc', 'timezone'],
     defaultLocale: 'en',
     defaultTimezone: 'America/New_York',
   },
