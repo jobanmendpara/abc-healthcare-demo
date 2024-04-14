@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { cn } from '~/lib/utils';
 
 // eslint-disable-next-line unused-imports/no-unused-imports
@@ -23,7 +22,7 @@ const emit = defineEmits(['update:dateRange']);
 const localDateRange = useVModel(props, 'dateRange', emit);
 const isOpen = ref(false);
 
-const day = dayjs;
+const dayjs = useDayjs();
 const mergeClasses = cn;
 
 function resetDateRange() {
@@ -53,8 +52,8 @@ function resetDateRange() {
             {{
               localDateRange.start
                 ? (localDateRange.end
-                  ? `${day(localDateRange.start).format('MMM D, YYYY')} - ${day(localDateRange.end).format('MMM D, YYYY')}`
-                  : day(localDateRange.start).format('MMM D, YYYY'))
+                  ? `${dayjs(localDateRange.start).format('MMM D, YYYY')} - ${dayjs(localDateRange.end).format('MMM D, YYYY')}`
+                  : dayjs(localDateRange.start).format('MMM D, YYYY'))
                 : 'Pick a date'
             }}
           </span>
