@@ -34,7 +34,10 @@ export const list = authorizedProcedure
             ended_at,
             is_active
       `;
-    const statement = db.from('timecards').select(query).gte('started_at', dateRange.start).lte('ended_at', dateRange.end);
+    const statement = db.from('timecards')
+      .select(query)
+      .gte('started_at', `${dateRange.start} 00:00:00`)
+      .lte('ended_at', `${dateRange.end} 23:59:59`);
 
     if (requestor.role === 'admin') {
       const { data: timecards, error: selectTimecardsError } = await statement

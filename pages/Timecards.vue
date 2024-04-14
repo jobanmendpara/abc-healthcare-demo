@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
-import dayjs from 'dayjs';
 import queries from '~/queries';
+
+const dayjs = useDayjs();
 
 const filterDateRange = ref({
   start: dayjs().subtract(2, 'w').toDate(),
