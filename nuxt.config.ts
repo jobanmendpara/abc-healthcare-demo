@@ -42,6 +42,7 @@ export default defineNuxtConfig({
       adminPassword: process.env.ADMIN_PASSWORD,
       employeeEmail: process.env.EMPLOYEE_EMAIL,
       employeePassword: process.env.EMPLOYEE_PASSWORD,
+      timeZone: process.env.TZ,
     },
     twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
@@ -73,7 +74,7 @@ export default defineNuxtConfig({
     locales: ['en'],
     plugins: ['duration', 'isLeapYear', 'relativeTime', 'utc', 'timezone'],
     defaultLocale: 'en',
-    defaultTimezone: 'America/New_York',
+    defaultTimezone: 'Etc/GMT',
   },
   supabase: {
     url: process.env.SUPABASE_URL,

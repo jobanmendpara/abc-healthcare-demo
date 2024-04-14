@@ -17,11 +17,12 @@ export function calculateEuclideanDistance(coord1: [number, number], coord2: [nu
 
 export function calculateTimeElapsed(dateString: string): string {
   const dayjs = useDayjs();
+  const timeZone = useRuntimeConfig().public.timeZone;
 
-  const inputDate = dayjs(dateString);
+  const startTime = dayjs(dateString).utc().tz(timeZone);
+  const now = dayjs().utc().tz(timeZone);
 
-  const now = dayjs().tz('America/New_York');
-  const diff = now.diff(inputDate, 'milliseconds');
+  const diff = now.diff(startTime, 'milliseconds');
 
   const millisecondsElapsed = dayjs.duration(diff);
 

@@ -45,7 +45,7 @@ const viewport = useViewport();
 
 const navItems = computed<NavItem[]>(() => [
   {
-    label: 'home',
+    label: 'Home',
     name: 'home',
     icon: 'lucide:home',
     visible: true,

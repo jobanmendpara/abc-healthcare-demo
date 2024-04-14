@@ -28,7 +28,6 @@ export const getActive = authorizedProcedure
             ),
             started_at,
             ended_at,
-            created_at,
             is_active
           `)
         .eq('is_active', true);
@@ -64,7 +63,6 @@ export const getActive = authorizedProcedure
             ),
             started_at,
             ended_at,
-            created_at,
             is_active
           `)
         .eq('is_active', true);

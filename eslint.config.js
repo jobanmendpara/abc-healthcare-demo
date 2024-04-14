@@ -65,7 +65,7 @@ export default antfu(
       ],
       'curly': 'off',
       'node/prefer-global/process': 'off',
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-console': process.env.NODE_ENV === 'prod' ? 'warn' : 'off',
       'style/member-delimiter-style': ['error', {
         multiline: {
           delimiter: 'semi',

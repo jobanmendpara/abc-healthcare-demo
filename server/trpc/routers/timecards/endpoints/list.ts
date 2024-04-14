@@ -32,7 +32,6 @@ export const list = authorizedProcedure
             ),
             started_at,
             ended_at,
-            created_at,
             is_active
       `;
     const statement = db.from('timecards').select(query).gte('started_at', dateRange.start).lte('ended_at', dateRange.end);
