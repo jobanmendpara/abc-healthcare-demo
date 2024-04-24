@@ -16,7 +16,7 @@ const { data: user, status } = useQuery({
 <template>
   <body
     v-if="status === 'success' && user"
-    :class="`${isDarkMode ? 'dark' : ''} h-screen overflow-hidden mx-auto grid grid-rows-[auto,1fr] grid-cols-1 md:grid-rows-1 md:grid-cols-[auto,1fr]`"
+    class="h-screen overflow-hidden mx-auto grid grid-rows-[auto,1fr] grid-cols-1 md:grid-rows-1 md:grid-cols-[auto,1fr]"
   >
     <NavBar
       :role="user.role"

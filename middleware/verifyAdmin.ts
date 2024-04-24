@@ -1,7 +1,7 @@
 import { api } from '~/plugins/server';
 import { useSupabaseUser } from '#imports';
 
-export default defineNuxtRouteMiddleware(async (_to, from) => {
+export default defineNuxtRouteMiddleware(async (_to, _from) => {
   const user = useSupabaseUser();
 
   if (!user.value)
@@ -10,5 +10,5 @@ export default defineNuxtRouteMiddleware(async (_to, from) => {
   const isUserAdmin = await api.auth.verifyAdmin.query();
 
   if (!isUserAdmin)
-    return navigateTo(from);
+    return navigateTo({ name: 'home' });
 });

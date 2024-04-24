@@ -1,9 +1,7 @@
 <script setup lang="ts">
+import type { SubmitAssignmentsEmit } from '~/types';
+
 const props = defineProps({
-  open: {
-    type: Boolean,
-    default: false,
-  },
   initialAssigned: {
     type: Array as PropType<AssignmentUser[]>,
     default: () => [],
@@ -16,11 +14,20 @@ const props = defineProps({
     type: Object as PropType<User>,
     default: () => initUser(),
   },
+  isFetching: {
+    type: Boolean,
+    default: true,
+  },
+  isMutating: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-const emit = defineEmits(['update:open', 'submit']);
-
-const isOpen = useVModel(props, 'open', emit);
+const emit = defineEmits<{
+  'update:open': [_newVal: boolean];
+  'submit': [_val: SubmitAssignmentsEmit];
+}>();
 
 const computedAssigned = computed(() => new Map<string, AssignmentUser>(props.initialAssigned.map(assignment => [assignment.id, assignment])));
 const computedAssignable = computed(() => new Map<string, AssignmentUser>(props.initialAssignable.map(assignment => [assignment.id, assignment])));
@@ -74,80 +81,84 @@ watch(
     reset();
   },
 );
-
-watchEffect(() => {
-  if (isOpen.value) {
-    reset();
-  }
-});
 </script>
 
 <template>
-  <Dialog
-    v-model:open="isOpen"
-    @update:open="reset"
-  >
-    <DialogContent>
-      <form
-        class="space-y-9"
-        @submit.prevent="onSubmit"
-      >
-        <DialogHeader>
-          <DialogTitle class="text-xl">
-            Assignments
-          </DialogTitle>
-          <DialogDescription class="text-lg">
-            Manage this user's assignments
-          </DialogDescription>
-        </DialogHeader>
-        <div class="flex w-full justify-evenly gap-1">
-          <div class="w-full">
-            <p class="text-lg">
-              Assignable
-            </p>
-            <div class="group overflow-y-auto h-full border border-secondary p-2">
-              <div
-                v-for="item in getSorted(Array.from(assignable.values()))"
-                :key="item.id"
-                class="even:bg-secondary p-1 flex w-full justify-between items-center"
-              >
-                <p>
-                  {{ `${item.first_name} ${item.last_name}` }}
-                </p>
-                <Button @click="addToAssigned(item)">
-                  Add
-                </Button>
-              </div>
-            </div>
+  <div class="space-y-3">
+    <div class="flex w-full justify-evenly gap-1">
+      <Card class="w-full p-3">
+        <p class="text-lg font-semibold">
+          Assignable
+        </p>
+        <div class="group overflow-y-auto h-full p-2">
+          <div
+            v-if="props.isFetching"
+            class="space-y-3"
+          >
+            <Skeleton
+              v-for="_ in 5"
+              class="w-auto h-[20px] rounded-full"
+            />
           </div>
-          <div class="w-full">
-            <p class="text-lg">
-              Assigned
+          <div
+            v-for="item in getSorted(Array.from(assignable.values()))"
+            v-else
+            :key="item.id"
+            class="even:bg-secondary p-1 flex w-full justify-between items-center"
+          >
+            <p>
+              {{ `${item.first_name} ${item.last_name}` }}
             </p>
-            <div class="group overflow-y-auto h-full border border-secondary p-2">
-              <div
-                v-for="item in getSorted(Array.from(assigned.values()))"
-                :key="item.id"
-                class="even:bg-secondary p-1 flex w-full justify-between items-center"
-              >
-                <p>
-                  {{ item.first_name }} {{ item.last_name }}
-                </p>
-                <Button @click="addToAssignable(item)">
-                  Remove
-                </Button>
-              </div>
-            </div>
+            <Button @click="addToAssigned(item)">
+              +
+            </Button>
           </div>
         </div>
-        <DialogFooter>
-          <Button type="submit">
-            Save
-          </Button>
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  </Dialog>
+      </Card>
+      <Card class="w-full p-3">
+        <p class="text-lg font-semibold">
+          Assigned
+        </p>
+        <div class="group overflow-y-auto h-full p-2">
+          <div
+            v-if="props.isFetching"
+            class="space-y-3"
+          >
+            <Skeleton
+              v-for="_ in 5"
+              class="w-auto h-[20px] rounded-full"
+            />
+          </div>
+          <div
+            v-for="item in getSorted(Array.from(assigned.values()))"
+            v-else
+            :key="item.id"
+            class="even:bg-secondary p-1 flex w-full justify-between items-center"
+          >
+            <p>
+              {{ item.first_name }} {{ item.last_name }}
+            </p>
+            <Button @click="addToAssignable(item)">
+              -
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+    <div class="flex-center gap-3">
+      <Button
+        :disabled="props.isMutating"
+        @click="onSubmit"
+      >
+        Save
+      </Button>
+      <Button
+        variant="outline"
+        :disabled="props.isMutating"
+        @click="reset"
+      >
+        Reset
+      </Button>
+    </div>
+  </div>
 </template>
-
-<style scoped></style>

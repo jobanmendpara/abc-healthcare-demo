@@ -3,6 +3,10 @@ import type { User } from '~/types';
 
 export const columns: ColumnDef<User>[] = [
   {
+    accessorKey: 'id',
+    header: 'ID',
+  },
+  {
     accessorKey: 'first_name',
     header: 'First Name',
   },

@@ -3,6 +3,8 @@ definePageMeta({
   layout: 'default',
 });
 
+const isDarkMode = useDark();
+
 useHead({
   title: 'abc Healthcare',
   meta: [
@@ -21,7 +23,10 @@ useHead({
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col items-center justify-center gap-16">
+  <div
+    class="flex min-h-screen flex-col items-center justify-center gap-16"
+    :class="isDarkMode ? 'dark' : ''"
+  >
     <h1 class="text-5xl text-center font-extrabold w-full">
       abc &#x2022; Healthcare
     </h1>

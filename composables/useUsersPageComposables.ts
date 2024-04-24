@@ -1,36 +1,7 @@
-import type { Role, User } from '~/types';
+import type { Role } from '~/types';
 import { Views } from '~/types';
 
-export function useAssignments() {
-  const isOpen = ref(false);
-
-  function showAssignments() {
-    isOpen.value = true;
-  }
-
-  return {
-    isOpen,
-    showAssignments,
-  };
-}
-
-export function useUserInfo() {
-  const user = ref<User | undefined>();
-  const isOpen = ref(false);
-
-  function showUserInfo(newUser: User) {
-    isOpen.value = true;
-    user.value = newUser;
-  }
-
-  return {
-    isOpen,
-    showUserInfo,
-    user,
-  };
-}
-
-export function useViewController() {
+export function useUsersPageController() {
   const defaultView = Views.EMPLOYEES;
   const activeView = ref<Views>(defaultView);
   const activeRole = computed<Role>(() => {

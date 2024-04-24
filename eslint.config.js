@@ -77,7 +77,7 @@ export default antfu(
         },
       }],
       'unused-imports/no-unused-vars': 'off',
-      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-imports': 'warn',
       'vue/multi-word-component-names': 'off',
       'vue/valid-v-for': 'off',
     },

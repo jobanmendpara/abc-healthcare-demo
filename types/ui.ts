@@ -1,9 +1,10 @@
 import type { RoutesNamesList } from '@typed-router';
+import type { LocationQueryRaw } from '#vue-router';
 
 export interface NavItem {
   label: string;
   name: RoutesNamesList;
-  params?: unknown;
+  query?: LocationQueryRaw;
   visible: boolean;
   icon?: string;
 }
