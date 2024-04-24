@@ -85,4 +85,8 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .flex-center {
+    @apply flex justify-center items-center
+  }
 }

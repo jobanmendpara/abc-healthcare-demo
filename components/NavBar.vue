@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { PageParams } from '@supabase/supabase-js';
 import { useDark } from '@vueuse/core';
+import { routesNames } from '@typed-router';
 import type { NavItem, Role } from '~/types';
 import queries from '~/queries';
 
@@ -46,24 +46,19 @@ const viewport = useViewport();
 const navItems = computed<NavItem[]>(() => [
   {
     label: 'Home',
-    name: 'home',
+    name: routesNames.home,
     icon: 'lucide:home',
     visible: true,
   },
   {
     label: 'Users',
-    name: 'users',
-    params: {
-      role: 'employee',
-      page: 1,
-      perPage: 10,
-    } as { role: Role } & PageParams,
+    name: routesNames.users,
     icon: 'lucide:users-round',
     visible: props.role === 'admin',
   },
   {
     label: 'Timecards',
-    name: 'timecards',
+    name: routesNames.timecards,
     icon: 'lucide:calendar-clock',
     visible: true,
   },
@@ -88,7 +83,7 @@ const navItems = computed<NavItem[]>(() => [
                   <NuxtLink
                     v-if="item.visible"
                     class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-                    :to="{ name: item.name }"
+                    :to="{ name: item.name, query: item.query }"
                   >
                     <Icon :name="item.icon ?? ''" />
                     <p>{{ item.label }}</p>
@@ -108,7 +103,7 @@ const navItems = computed<NavItem[]>(() => [
             >
               <NuxtLink
                 class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-                :to="{ name: item.name }"
+                :to="{ name: item.name, query: item.query }"
               >
                 <Icon :name="item.icon ?? ''" />
               </NuxtLink>

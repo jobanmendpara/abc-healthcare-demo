@@ -30,7 +30,7 @@ const actions = [
   <div class="space-x-1">
     <DropdownMenu @update:open="$emit('clickMenu', props.id)">
       <DropdownMenuTrigger>
-        <Button variant="outline">
+        <Button variant="link">
           &#x2022;
           &#x2022;
           &#x2022;

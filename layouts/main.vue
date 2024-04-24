@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useDark } from '@vueuse/core';
 import queries from '~/queries';
 
 const { $user } = useNuxtApp();
+
+const isDarkMode = useDark();
 
 const { data: user, status } = useQuery({
   ...queries.app.user($user.value!.id),
