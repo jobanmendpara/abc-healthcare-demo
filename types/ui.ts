@@ -5,6 +5,7 @@ export interface NavItem {
   label: string;
   name: RoutesNamesList;
   query?: LocationQueryRaw;
+  params?: unknown;
   visible: boolean;
   icon?: string;
 }

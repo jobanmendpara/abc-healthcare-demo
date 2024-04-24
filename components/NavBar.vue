@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useDark } from '@vueuse/core';
-import { routesNames } from '@typed-router';
 import type { NavItem, Role } from '~/types';
 import queries from '~/queries';
 
@@ -46,19 +45,20 @@ const viewport = useViewport();
 const navItems = computed<NavItem[]>(() => [
   {
     label: 'Home',
-    name: routesNames.home,
+    name: 'home',
     icon: 'lucide:home',
     visible: true,
   },
   {
     label: 'Users',
-    name: routesNames.users,
+    name: 'users',
     icon: 'lucide:users-round',
     visible: props.role === 'admin',
+    params: useRoute('users-id').params,
   },
   {
     label: 'Timecards',
-    name: routesNames.timecards,
+    name: 'timecards',
     icon: 'lucide:calendar-clock',
     visible: true,
   },
@@ -83,9 +83,9 @@ const navItems = computed<NavItem[]>(() => [
                   <NuxtLink
                     v-if="item.visible"
                     class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-                    :to="{ name: item.name, query: item.query }"
+                    :to="{ name: item.name, params: item.params as any }"
                   >
-                    <Icon :name="item.icon ?? ''" />
+                    <Icon :name="item.icon" />
                     <p>{{ item.label }}</p>
                   </NuxtLink>
                 </div>
@@ -103,9 +103,9 @@ const navItems = computed<NavItem[]>(() => [
             >
               <NuxtLink
                 class="flex items-center gap-1 p-3 hover:cursor-pointer hover:bg-primary hover:text-secondary"
-                :to="{ name: item.name, query: item.query }"
+                :to="{ name: item.name, params: item.params as any }"
               >
-                <Icon :name="item.icon ?? ''" />
+                <Icon :name="item.icon" />
               </NuxtLink>
             </NavigationMenuItem>
           </div>
