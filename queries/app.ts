@@ -12,7 +12,7 @@ export const queries = createQueryKeyStore({
       queryFn: async () => {
         const userResponse = await api.users.getById.query({ userIds: [toValue(userId)] });
         const userSettingsResponse = await api.userSettings.get.query();
-        const assignments = await api.assignments.getByUserId.query({ userId: toValue(userId) });
+        const assignments = await api.assignments.getAssigned.query({ userId: toValue(userId) });
 
         const user = userResponse.get(supabaseUser.value!.id);
         if (!user) {
@@ -27,7 +27,7 @@ export const queries = createQueryKeyStore({
 
         return {
           ...user,
-          assignments: assignments.assigned as Assignment[],
+          assignments,
           settings,
         };
       },

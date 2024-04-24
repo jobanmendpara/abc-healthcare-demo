@@ -1,8 +1,13 @@
 <script setup lang="ts" generic="TValue">
 import type { ColumnDef } from '@tanstack/vue-table';
 
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table';
+import {
+  // eslint-disable-next-line unused-imports/no-unused-imports
+  FlexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useVueTable,
+} from '@tanstack/vue-table';
 import { columns as defaultColumns } from '~/components/dataTables/users/usersDataTableColumns';
 import type { User } from '~/types';
 
@@ -33,16 +38,33 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['clickMenu', 'update:page', 'update:size', 'showInfo', 'showAssignments']);
+const emit = defineEmits([
+  'clickMenu',
+  'clickUser',
+  'update:page',
+  'update:size',
+  'showAssignments',
+]);
 
 const localPage = useVModel(props, 'page', emit);
 const localSize = useVModel(props, 'size', emit);
 
+const columnVisibility = ref<VisibilityState>({});
+
 const table = useVueTable({
-  get data() { return props.data; },
-  get columns() { return props.columns; },
+  get data() {
+    return props.data;
+  },
+  get columns() {
+    return props.columns;
+  },
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
+  initialState: {
+    columnVisibility: {
+      id: false,
+    },
+  },
 });
 
 function goToNextPage() {
@@ -85,26 +107,19 @@ function goToPreviousPage() {
       </template>
       <template v-else>
         <TableRow
-          v-for="row in table.getRowModel().rows "
+          v-for="row in table.getRowModel().rows"
           :key="row.id"
           :data-state="row.getIsSelected() ? 'selected' : undefined"
+          class="hover:cursor-pointer"
+          @click="emit('clickUser', row.getValue('id'))"
         >
           <TableCell
-            v-for="cell in row.getVisibleCells() "
+            v-for="cell in row.getVisibleCells()"
             :key="cell.id"
           >
             <FlexRender
               :render="cell.column.columnDef.cell"
               :props="cell.getContext()"
-            />
-          </TableCell>
-          <TableCell>
-            <UsersDataTableActions
-              :id="(row.original as User).id"
-              :role="(row.original as User).role"
-              @click-menu="(id: string) => emit('clickMenu', id)"
-              @click-info="(id: string) => emit('showInfo', id)"
-              @click-assignments="(id: string) => emit('showAssignments', id)"
             />
           </TableCell>
         </TableRow>

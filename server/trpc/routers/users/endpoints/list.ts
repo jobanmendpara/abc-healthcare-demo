@@ -13,7 +13,7 @@ export const list = authorizedProcedure
       perPage: z.number().int().positive().default(10),
     }),
   ).output(z.object({
-    list: z.array(userSchema),
+    list: z.array(userSchema.partial()),
     hasNextPage: z.boolean(),
   }))
   .query(async ({
@@ -29,7 +29,16 @@ export const list = authorizedProcedure
     const { start, end } = calculatePageRange(page, perPage);
 
     const { data: users, error: usersError } = await db.from('users')
-      .select()
+      .select(`
+        id,
+        first_name,
+        middle_name,
+        last_name,
+        role,
+        email,
+        phone_number,
+        geopoint:geopoints!geopoint_id(*)
+      `)
       .order('last_name', { ascending: true })
       .eq('role', role)
       .neq('id', requestor.id)

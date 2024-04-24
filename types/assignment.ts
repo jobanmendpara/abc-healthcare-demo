@@ -26,3 +26,8 @@ export const assignmentChangesSchema = z.object({
   removed: z.array(z.string().uuid()),
 });
 export interface AssignmentChanges extends z.infer<typeof assignmentChangesSchema> {}
+
+export interface SubmitAssignmentsEmit {
+  added: string[];
+  removed: string[];
+}

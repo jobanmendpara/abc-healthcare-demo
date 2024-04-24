@@ -4,7 +4,10 @@ import { api } from '~/plugins/server';
 
 export const queries = createQueryKeyStore({
   users: {
-    all: null,
+    all: () => ({
+      queryKey: ['max: 1000'] as const,
+      queryFn: async () => await api.users.getAll.query(),
+    }),
     list: (input: MaybeRef<UsersListParams>) => ({
       queryKey: [input] as const,
       queryFn: async () => await api.users.list.query(toValue(input)),
