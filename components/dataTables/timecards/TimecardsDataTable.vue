@@ -1,6 +1,5 @@
 <script setup lang="ts" generic="TValue">
 import type { ColumnDef } from '@tanstack/vue-table';
-import dayjs from 'dayjs';
 
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table';
@@ -30,14 +29,14 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['export', 'update:page', 'update:size']);
+const emit = defineEmits(['delete', 'export', 'update:page', 'update:size']);
 
 const localData = computed(() => {
   return props.data.map((timecard, index) => ({
     id: timecard.id,
     index: index + 1,
-    started_at: dayjs(timecard.started_at).format('MM-DD-YY / hh:mm:ss A'),
-    ended_at: dayjs(timecard.ended_at).format('MM-DD-YY / hh:mm:ss A'),
+    started_at: formatToAppDateTimePeriod(timecard.started_at),
+    ended_at: formatToAppDateTimePeriod(timecard.ended_at ?? ''),
     is_active: timecard.is_active,
     assignment: {
       id: timecard.assignment.id,
@@ -136,6 +135,10 @@ function goToPreviousPage() {
               :render="cell.column.columnDef.cell"
               :props="cell.getContext()"
             />
+          </TableCell>
+          <TableCell class="flex-center gap-2">
+            <EditTimecardDialog :timecard="row.original" />
+            <DeleteTimecardDialog @confirm="emit('delete', row.original.id)" />
           </TableCell>
         </TableRow>
       </template>

@@ -218,10 +218,6 @@ onMounted(async () => {
             />
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="timecards">
-          <AccordionTrigger>Timecards</AccordionTrigger>
-          <AccordionContent />
-        </AccordionItem>
       </accordion>
     </section>
   </div>

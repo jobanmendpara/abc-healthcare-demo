@@ -96,7 +96,10 @@ watchEffect(() => {
       :has-next-page="usersResponse?.hasNextPage"
       :loading="isUsersFetching"
       @click-user="(id: string) => navigateTo({
-        path: `/users/${id}`,
+        name: 'users-id',
+        params: {
+          id,
+        },
       })"
     />
     <InvitesDataTable
