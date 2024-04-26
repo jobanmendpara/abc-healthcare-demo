@@ -5,6 +5,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
+    size: 0,
   },
   {
     accessorKey: 'first_name',

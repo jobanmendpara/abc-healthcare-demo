@@ -2,6 +2,8 @@
 import { keepPreviousData } from '@tanstack/vue-query';
 import queries from '~/queries';
 
+const { $api, $toast } = useNuxtApp();
+const queryClient = useQueryClient();
 const dayjs = useDayjs();
 
 const filterDateRange = ref({
@@ -20,6 +22,17 @@ const { data, isFetching: isTimecardsFetching } = useQuery({
   ...queries.timecards.list(activeTimecardsListParams),
   placeholderData: keepPreviousData,
   staleTime: 0,
+});
+
+const { mutate: deleteTimecard } = useMutation({
+  mutationFn: async (id: string) => await $api.timecards.delete.mutate(id),
+  onSuccess: () => {
+    $toast.success('Timecard deleted');
+    queryClient.invalidateQueries(queries.timecards.list(activeTimecardsListParams));
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
 });
 
 function exportTimecards(timecards: TableTimecard[]) {
@@ -53,6 +66,7 @@ definePageMeta({
       :loading="isTimecardsFetching"
       :data="data"
       @export="(val: TableTimecard[]) => exportTimecards(val)"
+      @delete="(val: string) => deleteTimecard(val)"
     />
   </div>
 </template>

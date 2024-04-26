@@ -85,6 +85,21 @@ watch(
 
 <template>
   <div class="space-y-3">
+    <div class="flex-center justify-end gap-3">
+      <Button
+        variant="outline"
+        :disabled="props.isMutating"
+        @click="reset"
+      >
+        Reset
+      </Button>
+      <Button
+        :disabled="props.isMutating"
+        @click="onSubmit"
+      >
+        Save
+      </Button>
+    </div>
     <div class="flex w-full justify-evenly gap-1">
       <Card class="w-full p-3">
         <p class="text-lg font-semibold">
@@ -144,21 +159,6 @@ watch(
           </div>
         </div>
       </Card>
-    </div>
-    <div class="flex-center gap-3">
-      <Button
-        :disabled="props.isMutating"
-        @click="onSubmit"
-      >
-        Save
-      </Button>
-      <Button
-        variant="outline"
-        :disabled="props.isMutating"
-        @click="reset"
-      >
-        Reset
-      </Button>
     </div>
   </div>
 </template>
