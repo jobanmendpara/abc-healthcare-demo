@@ -24,11 +24,11 @@ export const columns: ColumnDef<TableTimecard>[] = [
   },
   {
     accessorKey: 'started_at',
-    header: 'Start Time',
+    header: 'Start Date Time',
   },
   {
     accessorKey: 'ended_at',
-    header: 'End Time',
+    header: 'End Date Time',
   },
   {
     accessorKey: 'assignment.employee.name',

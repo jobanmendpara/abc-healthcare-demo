@@ -19,8 +19,8 @@ export function calculateTimeElapsed(dateString: string): string {
   const dayjs = useDayjs();
   const timeZone = useRuntimeConfig().public.timeZone;
 
-  const startTime = dayjs(dateString).utc().tz(timeZone);
-  const now = dayjs().utc().tz(timeZone);
+  const startTime = dayjs(dateString).utc().tz(timeZone as string);
+  const now = dayjs().utc().tz(timeZone as string);
 
   const diff = now.diff(startTime, 'milliseconds');
 

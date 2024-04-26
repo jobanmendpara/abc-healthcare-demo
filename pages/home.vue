@@ -98,7 +98,7 @@ definePageMeta({
         />
       </div>
     </div>
-    <TimecardDialog
+    <ActiveTimecardDialog
       v-for="timecard in activeTimecards"
       v-else-if="activeTimecards && activeTimecards.length >= 1"
       :key="timecard.id"
