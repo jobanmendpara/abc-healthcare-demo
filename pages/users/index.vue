@@ -44,7 +44,7 @@ const deleteInviteMutation = useMutation({
     $toast.success('Invite deleted');
   },
   onError: (error) => {
-    $toast.error(error);
+    $toast.error(error.message);
   },
 });
 
