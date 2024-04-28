@@ -33,7 +33,7 @@ const toggleThemeMutation = useMutation({
     queryClient.invalidateQueries(queries.app.user($user.value!.id));
   },
   onError: (error) => {
-    $toast.error(error);
+    $toast.error(error.message);
   },
   onSettled: () => {
     emit('toggleDarkMode');

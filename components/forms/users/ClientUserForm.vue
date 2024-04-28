@@ -45,7 +45,7 @@ const { mutate, isPending } = useMutation({
     $toast.success('Client created');
   },
   onError: (error) => {
-    $toast.error(error);
+    $toast.error(error.message);
   },
 });
 

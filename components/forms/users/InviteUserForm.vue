@@ -35,7 +35,7 @@ const { mutate, isPending } = useMutation({
     $toast.success('Invite sent');
   },
   onError: (error) => {
-    $toast.error(error);
+    $toast.error(error.message);
   },
 });
 
