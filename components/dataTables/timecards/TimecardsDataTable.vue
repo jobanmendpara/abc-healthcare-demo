@@ -49,6 +49,7 @@ const localData = computed(() => {
         name: `${timecard.assignment.employee?.first_name} ${timecard.assignment.employee?.last_name}`,
       },
     },
+    edited_count: timecard.edited_count,
   }));
 });
 
