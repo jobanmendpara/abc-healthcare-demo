@@ -5,6 +5,7 @@ import type { ColumnDef } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getPaginationRowModel, useVueTable } from '@tanstack/vue-table';
 import { columns as defaultColumns } from './timecardsDataTableColumns';
 import type { TableTimecard, Timecard } from '~/types';
+import queries from '~/queries';
 
 const props = defineProps({
   data: {
@@ -30,6 +31,16 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['delete', 'export', 'update:page', 'update:size']);
+
+const { $user } = useNuxtApp();
+
+const { data: user } = useQuery({
+  ...queries.users.ids([$user.value!.id]),
+  select: (data) => {
+    return data.get($user.value!.id) ?? initUser();
+  },
+  initialData: new Map<string, User>(),
+});
 
 const localData = computed(() => {
   return props.data.map((timecard, index) => ({
@@ -138,7 +149,10 @@ function goToPreviousPage() {
             />
           </TableCell>
           <TableCell class="flex-center gap-2">
-            <EditTimecardDialog :timecard="row.original" />
+            <EditTimecardDialog
+              v-if="user.role === 'admin'"
+              :timecard="row.original"
+            />
             <DeleteTimecardDialog @confirm="emit('delete', row.original.id)" />
           </TableCell>
         </TableRow>
