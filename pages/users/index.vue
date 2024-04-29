@@ -2,7 +2,7 @@
 import { keepPreviousData } from '@tanstack/vue-query';
 import type { PageParams } from '@supabase/supabase-js';
 import queries from '~/queries';
-import { Views } from '~/types';
+import { UsersPageViews } from '~/types';
 
 const { $api, $toast } = useNuxtApp();
 const queryClient = useQueryClient();
@@ -55,7 +55,7 @@ definePageMeta({
 });
 
 watchEffect(() => {
-  if (activeView.value !== Views.INVITES)
+  if (activeView.value !== UsersPageViews.INVITES)
     usersTablePage.value = 1;
   else
     invitesTablePage.value = 1;
@@ -67,7 +67,7 @@ watchEffect(() => {
     Users
   </h1>
   <div class="flex-basis-1/2 flex justify-end flex-grow px-5">
-    <CreateClientDialog v-if="activeView === Views.CLIENTS" />
+    <CreateClientDialog v-if="activeView === UsersPageViews.CLIENTS" />
     <InviteUserDialog
       v-else
       :role="activeRole"
@@ -77,7 +77,7 @@ watchEffect(() => {
     <Tabs
       v-model="activeView"
       class="w-full"
-      @update:model-value="(newView: string) => setView(newView as Views)"
+      @update:model-value="(newView: string) => setView(newView as UsersPageViews)"
     >
       <TabsList>
         <TabsTrigger
@@ -90,7 +90,7 @@ watchEffect(() => {
       </TabsList>
     </Tabs>
     <UsersDataTable
-      v-if="activeView !== Views.INVITES"
+      v-if="activeView !== UsersPageViews.INVITES"
       v-model:page="usersTablePage"
       :data="usersResponse?.list"
       :has-next-page="usersResponse?.hasNextPage"
@@ -103,7 +103,7 @@ watchEffect(() => {
       })"
     />
     <InvitesDataTable
-      v-if="activeView === Views.INVITES && invitesResponse"
+      v-if="activeView === UsersPageViews.INVITES && invitesResponse"
       v-model:page="invitesTablePage"
       :data="invitesResponse.list"
       :has-next-page="invitesResponse?.hasNextPage"

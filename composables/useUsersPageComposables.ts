@@ -1,27 +1,27 @@
 import type { Role } from '~/types';
-import { Views } from '~/types';
+import { UsersPageViews } from '~/types';
 
 export function useUsersPageController() {
-  const defaultView = Views.EMPLOYEES;
-  const activeView = ref<Views>(defaultView);
+  const defaultView = UsersPageViews.EMPLOYEES;
+  const activeView = ref<UsersPageViews>(defaultView);
   const activeRole = computed<Role>(() => {
-    if (activeView.value === Views.EMPLOYEES)
+    if (activeView.value === UsersPageViews.EMPLOYEES)
       return 'employee';
-    else if (activeView.value === Views.ADMINS)
+    else if (activeView.value === UsersPageViews.ADMINS)
       return 'admin';
-    else if (activeView.value === Views.CLIENTS)
+    else if (activeView.value === UsersPageViews.CLIENTS)
       return 'client';
     else
       return 'employee';
   });
-  const tabs: Views[] = [
-    Views.EMPLOYEES,
-    Views.ADMINS,
-    Views.CLIENTS,
-    Views.INVITES,
+  const tabs: UsersPageViews[] = [
+    UsersPageViews.EMPLOYEES,
+    UsersPageViews.ADMINS,
+    UsersPageViews.CLIENTS,
+    UsersPageViews.INVITES,
   ];
 
-  function setView(view: Views) {
+  function setView(view: UsersPageViews) {
     activeView.value = view;
   }
 
