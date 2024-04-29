@@ -39,6 +39,7 @@ export const update = authorizedProcedure
         started_at: dayjs(input.newStartedValue).format(AppDateFormats.SERVER),
         ended_at: dayjs(input.newEndedValue).format(AppDateFormats.SERVER),
         edited_count: getCountData.edited_count + 1,
+        is_active: false,
       })
       .eq('id', input.id);
     if (error) {

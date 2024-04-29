@@ -34,7 +34,7 @@ const startedAtDate = computed({
 const startedPeriod = ref<'AM' | 'PM'>(dayjs(startedDateRef.value).get('h') < 12 ? 'AM' : 'PM');
 
 const endedAtDate = computed({
-  get: () => endedDateRef.value,
+  get: () => timecard.ended_at === null ? endedDateRef.value : dayjs().toDate(),
   set: val => endedDateRef.value = dayjs(val).toDate(),
 });
 const endedPeriod = ref<'AM' | 'PM'>(dayjs(endedDateRef.value).get('h') < 12 ? 'AM' : 'PM');
@@ -49,6 +49,9 @@ const { mutate: update } = useMutation({
     $toast.success('Updated');
     queryClient.invalidateQueries({
       queryKey: queries.timecards.list._def,
+    });
+    queryClient.invalidateQueries({
+      queryKey: queries.timecards.pending._def,
     });
   },
   onError: (error) => {

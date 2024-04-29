@@ -2,16 +2,23 @@
 import { z } from 'zod';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import queries from '~/queries';
+
+const { client, isPending } = defineProps({
+  isPending: {
+    type: Boolean,
+    default: false,
+  },
+  client: {
+    type: Object as PropType<Partial<User>>,
+    default: initUser(),
+  },
+});
 
 const emit = defineEmits(['submit']);
 
-const { $api, $toast } = useNuxtApp();
-const queryClient = useQueryClient();
-
 const formSchema = toTypedSchema(z.object({
   first_name: z.string().min(1).max(255),
-  middle_name: z.string().min(1).max(255).optional(),
+  middle_name: z.string().min(1).max(255).nullish(),
   last_name: z.string().min(1).max(255),
   email: z.string().email().optional(),
   phone_number: phoneSchema,
@@ -20,38 +27,13 @@ const formSchema = toTypedSchema(z.object({
 
 const form = useForm({
   validationSchema: formSchema,
-});
-
-const { mutate, isPending } = useMutation({
-  mutationFn: async (user: Partial<User>) => {
-    const newClient: User = {
-      id: crypto.randomUUID(),
-      first_name: user.first_name ?? '',
-      middle_name: user.middle_name ?? '',
-      last_name: user.last_name ?? '',
-      email: user.email ?? '',
-      geopoint: user.geopoint ?? initGeopoint(),
-      phone_number: user.phone_number ?? '',
-      role: 'client',
-      is_active: true,
-    };
-
-    await $api.users.create.mutate({ user: newClient });
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: queries.users.list._def,
-    });
-    $toast.success('Client created');
-  },
-  onError: (error) => {
-    $toast.error(error.message);
+  initialValues: {
+    ...client,
   },
 });
 
 const onSubmit = form.handleSubmit(async (values) => {
-  mutate(values);
-  emit('submit');
+  emit('submit', values);
   form.resetForm();
 });
 </script>
@@ -167,5 +149,3 @@ const onSubmit = form.handleSubmit(async (values) => {
     </Button>
   </form>
 </template>
-
-<style scoped></style>

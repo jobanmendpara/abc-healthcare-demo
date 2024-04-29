@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { keepPreviousData } from '@tanstack/vue-query';
+
+// eslint-disable-next-line unused-imports/no-unused-imports
+import { TimecardsPageViews } from '~/types';
 import queries from '~/queries';
 
 const { $api, $toast } = useNuxtApp();
 const queryClient = useQueryClient();
 const dayjs = useDayjs();
+
+const { activeView, setView, tabs } = useTimecardsPageController();
 
 const filterDateRange = ref({
   start: dayjs().subtract(2, 'w').toDate(),
@@ -18,10 +23,17 @@ const activeTimecardsListParams = computed(() => ({
   },
 }));
 
-const { data, isFetching: isTimecardsFetching } = useQuery({
+const { data: approvedTimecards, isFetching: isTimecardsFetching } = useQuery({
   ...queries.timecards.list(activeTimecardsListParams),
   placeholderData: keepPreviousData,
-  staleTime: 0,
+});
+
+const {
+  data: pendingTimecards,
+  isFetching: arePendingTimecardsFetching,
+} = useQuery({
+  ...queries.timecards.pending(),
+  placeholderData: keepPreviousData,
 });
 
 const { mutate: deleteTimecard } = useMutation({
@@ -48,6 +60,17 @@ function exportTimecards(timecards: TableTimecard[]) {
   useSheet().exportToSheet(data, 'timecards');
 }
 
+function getTableData() {
+  const data = activeView.value === TimecardsPageViews.APPROVED
+    ? approvedTimecards.value
+    : pendingTimecards.value;
+  if (!data) {
+    return [];
+  }
+
+  return data;
+}
+
 definePageMeta({
   layout: 'main',
   name: 'timecards',
@@ -58,13 +81,30 @@ definePageMeta({
   <h1 class="text-left text-2xl font-semibold">
     Timecards
   </h1>
+  <div class="space-y-1">
+    <Tabs
+      v-model="activeView"
+      class="w-full"
+      @update:model-value="(newView: TimecardsPageViews) => setView(newView)"
+    >
+      <TabsList>
+        <TabsTrigger
+          v-for="tab in tabs"
+          :key="tab"
+          :value="tab"
+        >
+          {{ tab }}
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+  </div>
   <div class="space-y-5">
     <div class="flex flex-row justify-between items-center w-full">
       <DateRangePicker v-model:dateRange="filterDateRange" />
     </div>
     <TimecardsDataTable
       :loading="isTimecardsFetching"
-      :data="data"
+      :data="getTableData()"
       @export="(val: TableTimecard[]) => exportTimecards(val)"
       @delete="(val: string) => deleteTimecard(val)"
     />
