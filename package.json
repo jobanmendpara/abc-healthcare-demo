@@ -6,7 +6,8 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --host",
-    "db:types": "bunx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > types/supabase.ts",
+    "db:prod:types": "bunx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > types/supabase.ts",
+    "db:local:types": "bunx supabase gen types typescript --local --schema public > types/supabase.ts",
     "db:reset": "bunx supabase db reset && bun run ./scripts/createDevAccounts.ts",
     "generate": "nuxt generate",
     "lint": "eslint .",

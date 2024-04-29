@@ -32,7 +32,8 @@ export const list = authorizedProcedure
             ),
             started_at,
             ended_at,
-            is_active
+            is_active,
+            edited_count
       `;
     const statement = db.from('timecards')
       .select(query)

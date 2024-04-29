@@ -7,6 +7,7 @@ export const timecardTableSchema = z.object({
   ended_at: z.string().nullable(),
   assignment_id: z.string(),
   is_active: z.boolean(),
+  edited_count: z.number().min(0).default(0),
 });
 
 export const timecardSchema = z.object({
@@ -32,4 +33,5 @@ export interface TableTimecard {
       name: string;
     };
   };
+  edited_count: number;
 }
