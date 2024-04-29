@@ -11,6 +11,8 @@ const { id } = useRoute('users-id').params;
 const { $api, $toast } = useNuxtApp();
 const queryClient = useQueryClient();
 
+const isEditUserFormOpen = ref(false);
+
 const { data: user, status: userQueryStatus } = useQuery({
   ...queries.users.ids([id]),
   select: (data) => {
@@ -26,6 +28,28 @@ const {
   data: availableAssignments,
   status: availableAssignmentsQueryStatus,
 } = useQuery(queries.assignments.available(id));
+
+const { mutate: updateUser, isPending } = useMutation({
+  mutationFn: async (updatedUser: Partial<User>) => {
+    updatedUser.phone_number = user.value?.phone_number === updatedUser.phone_number ? undefined : updatedUser.phone_number;
+    await $api.users.updateClient.mutate({
+      id,
+      ...updatedUser,
+    });
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      ...queries.users.ids([id]),
+    });
+    $toast.success('Client Updated');
+  },
+  onError: (error) => {
+    $toast.error(error.message);
+  },
+  onSettled: () => {
+    isEditUserFormOpen.value = false;
+  },
+});
 
 const {
   mutate: deleteUser,
@@ -50,7 +74,7 @@ const {
 });
 
 const {
-  mutate: updateUser,
+  mutate: flipUserStatus,
   isPending: isUpdateUserMutationPending,
 } = useMutation({
   mutationFn: async () => await $api.users.updateEmployee.mutate({
@@ -189,9 +213,32 @@ onMounted(async () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <Dialog v-model:open="isEditUserFormOpen">
+          <div class="w-full flex items-center">
+            <DialogTrigger>
+              <Button
+                v-if="user.role === 'client'"
+                variant="outline"
+              >
+                Edit
+              </Button>
+            </DialogTrigger>
+          </div>
+          <DialogContent>
+            <DialogTitle>Edit Client</DialogTitle>
+            <DialogDescription>
+              Update the client's information.
+            </DialogDescription>
+            <ClientUserForm
+              :is-pending="isPending"
+              :client="user"
+              @submit="(val: Partial<User>) => updateUser(val)"
+            />
+          </DialogContent>
+        </Dialog>
         <Button
           :disabled="isUpdateUserMutationPending"
-          @click="updateUser"
+          @click="flipUserStatus"
         >
           {{ user.is_active ? 'Deactivate' : 'Activate' }}
         </Button>
