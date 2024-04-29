@@ -19,6 +19,10 @@ export const queries = createQueryKeyStore({
         },
       }),
     }),
+    pending: () => ({
+      queryKey: ['all'] as const,
+      queryFn: async () => await api.timecards.pending.query(),
+    }),
   },
 });
 

@@ -10,7 +10,12 @@ export interface NavItem {
   icon?: string;
 }
 
-export enum Views {
+export enum TimecardsPageViews {
+  APPROVED = 'Approved',
+  PENDING = 'Pending',
+}
+
+export enum UsersPageViews {
   EMPLOYEES = 'Employees',
   ADMINS = 'Admins',
   CLIENTS = 'Clients',
