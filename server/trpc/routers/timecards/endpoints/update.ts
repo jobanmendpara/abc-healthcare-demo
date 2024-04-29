@@ -21,11 +21,24 @@ export const update = authorizedProcedure
       throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
 
+    const { data: getCountData, error: getCountError } = await db
+      .from('timecards')
+      .select('edited_count')
+      .eq('id', input.id)
+      .single();
+    if (getCountError) {
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+    }
+    if (!getCountData) {
+      throw new TRPCError({ code: 'NOT_FOUND' });
+    }
+
     const { error } = await db
       .from('timecards')
       .update({
         started_at: dayjs(input.newStartedValue).format(AppDateFormats.SERVER),
         ended_at: dayjs(input.newEndedValue).format(AppDateFormats.SERVER),
+        edited_count: getCountData.edited_count + 1,
       })
       .eq('id', input.id);
     if (error) {

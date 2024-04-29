@@ -38,4 +38,8 @@ export const columns: ColumnDef<TableTimecard>[] = [
     accessorKey: 'assignment.client.name',
     header: 'Client',
   },
+  {
+    accessorKey: 'edited_count',
+    header: '# of Edits',
+  },
 ];
