@@ -148,12 +148,16 @@ function goToPreviousPage() {
               :props="cell.getContext()"
             />
           </TableCell>
-          <TableCell class="flex-center gap-2">
+          <TableCell
+            v-if="user.role === 'admin'"
+            class="flex-center gap-2"
+          >
             <EditTimecardDialog
-              v-if="user.role === 'admin'"
               :timecard="row.original"
             />
-            <DeleteTimecardDialog @confirm="emit('delete', row.original.id)" />
+            <DeleteTimecardDialog
+              @confirm="emit('delete', row.original.id)"
+            />
           </TableCell>
         </TableRow>
       </template>
