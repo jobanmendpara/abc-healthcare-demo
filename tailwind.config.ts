@@ -6,10 +6,10 @@ module.exports = {
   safelist: ['dark'],
 
   content: [
-    './components/**/*.{vue,js,ts,jsx,tsx}',
-    './layouts/**/*.vue',
-    './pages/**/*.vue',
-    './plugins/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{vue,js,ts,jsx,tsx}',
+    './src/layouts/**/*.vue',
+    './src/pages/**/*.vue',
+    './src/plugins/**/*.{js,ts,jsx,tsx}',
     '.app.vue',
     '.nuxt.config.{js,ts}',
   ],

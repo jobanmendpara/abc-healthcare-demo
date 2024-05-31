@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   app: {
     head: {},
   },
+  srcDir: 'src/',
   css: ['~/assets/global.css'],
   typescript: {
     shim: false,
@@ -25,6 +26,7 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     'nuxt-icon',
     'nuxt-typed-router',
+    "@vite-pwa/nuxt"
   ],
   vite: {},
   postcss: {
@@ -60,7 +62,7 @@ export default defineNuxtConfig({
         pathPrefix: false,
       },
       {
-        path: '~/components/ui/',
+        path: '~/components/ui',
         pathPrefix: false,
       },
     ],
