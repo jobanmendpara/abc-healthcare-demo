@@ -1,9 +1,10 @@
 <script setup lang="ts">
+const { $pwa } = useNuxtApp();
+const isDarkMode = useDark();
+
 definePageMeta({
   layout: 'default',
 });
-
-const isDarkMode = useDark();
 
 useHead({
   title: 'abc Healthcare',

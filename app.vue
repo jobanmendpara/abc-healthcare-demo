@@ -2,6 +2,7 @@
 </script>>
 
 <template>
+  <NuxtPwaManifest />
   <Toaster />
   <NuxtLayout>
     <NuxtPage />

@@ -2,7 +2,7 @@
 import { keepPreviousData } from '@tanstack/vue-query';
 import queries from '~/queries';
 
-const { $user } = useNuxtApp();
+const { $user, $pwa } = useNuxtApp();
 
 const isPinVerificationModalOpen = ref(false);
 const timecardIdToVerify = ref('');

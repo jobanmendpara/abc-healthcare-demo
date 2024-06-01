@@ -1,7 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
-    head: {},
+    head: {
+      link: [
+      {
+          href: 'manifest.webmanifest',
+          rel: 'manifest',
+      }
+      ]
+    }
   },
   srcDir: 'src/',
   css: ['~/assets/global.css'],
@@ -20,13 +27,13 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
+    "@vite-pwa/nuxt",
     '@vueuse/nuxt',
     'nuxt-viewport',
     'dayjs-nuxt',
     'shadcn-nuxt',
     'nuxt-icon',
     'nuxt-typed-router',
-    "@vite-pwa/nuxt"
   ],
   vite: {},
   postcss: {
@@ -77,6 +84,69 @@ export default defineNuxtConfig({
     plugins: ['duration', 'isLeapYear', 'relativeTime', 'utc', 'timezone'],
     defaultLocale: 'en',
     defaultTimezone: 'Etc/GMT',
+  },
+  pwa: {
+    srcDir: 'service-worker',
+    filename: 'sw.ts',
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'ABC Healthcare',
+      short_name: 'ABC',
+      description: 'ABC Healthcare HRIS application',
+      display: 'standalone',
+      icons: [
+        {
+          src: 'favicon/favicon.png',
+          sizes: '1024x1024',
+          type: 'image/png',
+        },
+        {
+          src: 'favicon/favicon-144x144.ico',
+          sizes: '144x144',
+          type: 'icon',
+        },
+        {
+          src: 'favicon/favicon-48x48.ico',
+          sizes: '48x48',
+          type: 'icon',
+        },
+        {
+          src: 'favicon/favicon-32x32.ico',
+          sizes: '32x32',
+          type: 'icon',
+        },
+        {
+          src: 'favicon/favicon-16x16.ico',
+          sizes: '16x16',
+          type: 'icon',
+        }
+      ],
+      screenshots: [
+        {
+          src: 'screenshots/wide.png',
+          sizes: '1698x963',
+          type: 'image/png',
+          form_factor: 'wide',
+        },
+        {
+          src: 'screenshots/mobile.png',
+          sizes: '903x940',
+          type: 'image/png',
+        }
+      ],
+      theme_color: 'rgb(255 218 185)'
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      navigateFallback: '/',
+    },
+    client: {
+      installPrompt: true,
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module',
+    },
   },
   supabase: {
     url: process.env.SUPABASE_URL,
