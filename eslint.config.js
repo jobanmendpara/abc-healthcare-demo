@@ -13,9 +13,9 @@ export default antfu(
       'presets',
       'package.json',
       'nuxt.config.ts',
-      'components/ui/*',
       'README.md',
-      'supabase/*',
+      'src/components/ui/*',
+      'src/supabase/*',
     ],
     stylistic: {
       semi: true,

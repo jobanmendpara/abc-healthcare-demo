@@ -1,7 +1,7 @@
 {
   "name": "abc Healthcare",
   "type": "module",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "build": "nuxt build",
@@ -31,6 +31,7 @@
     "@trpc/client": "^10.9.0",
     "@trpc/server": "^10.9.0",
     "@types/google.maps": "^3.54.10",
+    "@vee-validate/nuxt": "^4.12.8",
     "@vee-validate/zod": "^4.12.5",
     "@vue/compiler-sfc": "^3.4.19",
     "@vue/runtime-dom": "^3.4.3",
@@ -67,6 +68,7 @@
     "@types/node": "^20.2.5",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.2.1",
+    "@vite-pwa/nuxt": "^0.8.0",
     "@vue/typescript-plugin": "^2.0.13",
     "autoprefixer": "^10.4.7",
     "eslint": "^8.56.0",
