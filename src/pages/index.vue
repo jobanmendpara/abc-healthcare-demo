@@ -1,7 +1,4 @@
 <script setup lang="ts">
-const { $pwa } = useNuxtApp();
-const isDarkMode = useDark();
-
 definePageMeta({
   layout: 'default',
 });
@@ -26,7 +23,6 @@ useHead({
 <template>
   <div
     class="flex min-h-screen flex-col items-center justify-center gap-16"
-    :class="isDarkMode ? 'dark' : ''"
   >
     <h1 class="text-5xl text-center font-extrabold w-full">
       abc &#x2022; Healthcare
