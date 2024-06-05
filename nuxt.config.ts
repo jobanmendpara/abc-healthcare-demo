@@ -3,10 +3,10 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-      {
+        {
           href: 'manifest.webmanifest',
           rel: 'manifest',
-      }
+        }
       ]
     }
   },
@@ -64,14 +64,6 @@ export default defineNuxtConfig({
         path: '~/components',
         pathPrefix: false,
       },
-      {
-        path: '~/components/forms',
-        pathPrefix: false,
-      },
-      {
-        path: '~/components/ui',
-        pathPrefix: false,
-      },
     ],
   },
   devtools: {
@@ -86,7 +78,8 @@ export default defineNuxtConfig({
     defaultTimezone: 'Etc/GMT',
   },
   pwa: {
-    srcDir: 'service-worker',
+    strategies: 'injectManifest',
+    srcDir: 'public',
     filename: 'sw.ts',
     registerType: 'autoUpdate',
     manifest: {
@@ -134,18 +127,22 @@ export default defineNuxtConfig({
           type: 'image/png',
         }
       ],
-      theme_color: 'rgb(255 218 185)'
-    },
-    workbox: {
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-      navigateFallback: '/',
+      theme_color: 'rgb(16 23 37)',
+      background_color: 'rgb(255 255 255)'
     },
     client: {
       installPrompt: true,
     },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
+    injectManifest: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
     devOptions: {
       enabled: true,
       type: 'module',
+      suppressWarnings: true,
     },
   },
   supabase: {
