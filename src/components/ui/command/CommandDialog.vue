@@ -2,7 +2,6 @@
 import { useEmitAsProps } from 'radix-vue'
 import type { DialogRootEmits, DialogRootProps } from 'radix-vue'
 import Command from './Command.vue'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface Props extends /* @vue-ignore */ DialogRootProps { }
 interface Emits extends DialogRootEmits { }

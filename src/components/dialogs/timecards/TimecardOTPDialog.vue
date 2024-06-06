@@ -3,6 +3,7 @@ import { useDark, useVModel } from '@vueuse/core';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod';
+import { FormField } from '~/components/ui/form';
 import queries from '~/queries';
 
 const props = defineProps({
