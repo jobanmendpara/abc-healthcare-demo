@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import type { Calendar } from 'v-calendar'
 import { DatePicker } from 'v-calendar'
 import { computed, nextTick, onMounted, ref, useSlots } from 'vue'
-import { isVCalendarSlot } from '.'
+import { isVCalendarSlot } from './isVCalenderSlot'
 import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '~/components/ui/button/buttonVariants';
 
 /* Extracted from v-calendar */
 type DatePickerModel = DatePickerDate | DatePickerRangeObject

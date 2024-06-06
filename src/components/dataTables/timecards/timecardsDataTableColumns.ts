@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/vue-table';
-import { Checkbox } from '~/components/ui/checkbox';
+import { Checkbox } from '~/components/ui/checkbox/component';
 import type { TableTimecard } from '~/types';
 
 export const columns: ColumnDef<TableTimecard>[] = [

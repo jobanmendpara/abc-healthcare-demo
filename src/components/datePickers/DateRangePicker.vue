@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { cn } from '~/lib/utils';
 
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { Calendar } from '~/components/ui/calendar';
-
 const props = defineProps({
   dateRange: {
     type: Object as PropType<{
