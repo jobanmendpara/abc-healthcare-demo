@@ -114,6 +114,10 @@ export default defineNuxtConfig({
           type: 'icon',
         }
       ],
+      // @ts-ignore
+      permissions: [
+        "geolocation",
+      ],
       screenshots: [
         {
           src: 'screenshots/wide.png',
