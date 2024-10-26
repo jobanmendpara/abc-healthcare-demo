@@ -87,7 +87,6 @@ const onSubmit = form.handleSubmit(async (values) => {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Roles</SelectLabel>
                 <SelectItem
                   v-for="role in ['employee', 'admin']"
                   :key="role"

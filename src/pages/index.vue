@@ -4,11 +4,11 @@ definePageMeta({
 });
 
 useHead({
-  title: 'abc Healthcare',
+  title: 'ABC Healthcare Demo',
   meta: [
     {
       name: 'description',
-      content: 'HR IS App',
+      content: 'ABC Healthcare Demo App',
     },
   ],
   link: [
@@ -17,6 +17,10 @@ useHead({
       href: 'favicon/favicon.ico',
     },
   ],
+});
+
+navigateTo({
+  name: 'login',
 });
 </script>
 
@@ -31,7 +35,7 @@ useHead({
       HR Portal
     </h2>
     <NuxtLink
-      class="bg-primary hover:cursor-pointer text-secondary rounded-lg px-4 py-2"
+      class="bg-primary hover:cursor-pointer text-primary-foreground rounded-lg px-4 py-2"
       :to="{ name: 'login' }"
     >
       Sign In

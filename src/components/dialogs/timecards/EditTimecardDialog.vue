@@ -8,22 +8,25 @@ const props = defineProps({
 </script>
 
 <template>
-  <Dialog>
-    <DialogTrigger>
+  <AlertDialog>
+    <AlertDialogTrigger>
       <Button variant="outline">
         Edit
       </Button>
-    </DialogTrigger>
-    <DialogContent>
-      <DialogTitle>
+    </AlertDialogTrigger>
+    <AlertDialogContent>
+      <AlertDialogTitle>
         Edit Timecard
-      </DialogTitle>
-      <DialogDescription>
+      </AlertDialogTitle>
+      <AlertDialogDescription>
         Update the current timecard details
-      </DialogDescription>
+      </AlertDialogDescription>
       <EditTimecardForm
         :timecard="props.timecard"
       />
-    </DialogContent>
-  </Dialog>
+    </AlertDialogContent>
+    <AlertDialogFooter>
+      <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
+    </AlertDialogFooter>
+  </AlertDialog>
 </template>

@@ -156,11 +156,11 @@ function onSubmit() {
         />
       </div>
     </div>
-    <Button
+    <AlertDialogAction
       class="w-full p-2"
       type="submit"
     >
       Update
-    </Button>
+    </AlertDialogAction>
   </form>
 </template>

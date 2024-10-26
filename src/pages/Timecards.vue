@@ -30,7 +30,6 @@ const { data: approvedTimecards, isFetching: isTimecardsFetching } = useQuery({
 
 const {
   data: pendingTimecards,
-  isFetching: arePendingTimecardsFetching,
 } = useQuery({
   ...queries.timecards.pending(),
   placeholderData: keepPreviousData,

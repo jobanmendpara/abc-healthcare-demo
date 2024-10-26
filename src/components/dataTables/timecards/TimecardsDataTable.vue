@@ -129,7 +129,7 @@ function goToPreviousPage() {
       <template v-if="loading">
         <TableRow v-for="_row in Array.from({ length: localSize })">
           <TableCell v-for="_cell in Array.from({ length: 4 })">
-            <Skeleton class="w-auto h-[20px] rounded-full" />
+            <Skeleton class="bg-gray-300 w-auto h-[20px] rounded-full" />
           </TableCell>
         </TableRow>
       </template>
@@ -173,7 +173,7 @@ function goToPreviousPage() {
       Previous
     </Button>
     <div>
-      <p class="bg-secondary text-primary rounded-md px-7 py-1 text-center">
+      <p class="bg-primary text-primary-foreground rounded-md px-7 py-1 text-center">
         {{ localPage }}
       </p>
     </div>

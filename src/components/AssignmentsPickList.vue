@@ -119,7 +119,7 @@ watch(
             v-for="item in getSorted(Array.from(assignable.values()))"
             v-else
             :key="item.id"
-            class="even:bg-secondary p-1 flex w-full justify-between items-center"
+            class="even:bg-gray-200 p-1 flex w-full justify-between items-center"
           >
             <p>
               {{ `${item.first_name} ${item.last_name}` }}

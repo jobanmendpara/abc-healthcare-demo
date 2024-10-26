@@ -61,29 +61,32 @@ watchEffect(() => {
 </script>
 
 <template>
-  <Dialog v-model:open="isOpen">
-    <DialogTrigger>
+  <AlertDialog v-model:open="isOpen">
+    <AlertDialogTrigger>
       <Button>
         Clock In
       </Button>
-    </DialogTrigger>
-    <DialogContent>
-      <DialogTitle>
-        {{ localUser.first_name }} {{ localUser.last_name }}
-      </DialogTitle>
-      <DialogDescription>
-        Please confirm your location.
-      </DialogDescription>
-      <div class="space-y-5">
-        <p>Address: <span>{{ localUser.geopoint.formatted_address }}</span></p>
-        <Button
+    </AlertDialogTrigger>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>
+          {{ localUser.first_name }} {{ localUser.last_name }}
+        </AlertDialogTitle>
+        <AlertDialogDescription>
+          Please confirm your location.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <p>Address: <span>{{ localUser.geopoint.formatted_address }}</span></p>
+      <AlertDialogFooter class="space-y-5">
+        <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
+        <AlertDialogAction
           class="w-full"
           :disabled="isPending"
           @click="onSubmit"
         >
           Verify Location
-        </Button>
-      </div>
-    </DialogContent>
-  </Dialog>
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>
